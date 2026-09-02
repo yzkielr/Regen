@@ -38,7 +38,7 @@ export function Hero() {
     >
       {/* ==================== 1. WATERMARK LOGO REGEN RESMI (ATAS TENGAH) ==================== */}
       {/* Menggunakan komponen <Logo /> langsung agar bentuk & font persis seperti di header kiri atas */}
-      <div className="pointer-events-none absolute top-12 left-1/2 -translate-x-1/2 z-0 opacity-100 select-none w-full flex justify-center overflow-hidden scale-[3] sm:scale-[4] lg:scale-[5]">
+      <div className="pointer-events-none absolute top-34 left-1/2 -translate-x-1/2 z-0 opacity-100 select-none w-full flex justify-center overflow-hidden scale-[3] sm:scale-[4] lg:scale-[5]">
         <Logo />
       </div>
 
@@ -102,20 +102,21 @@ export function Hero() {
             transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1], delay: 0.2 }}
           >
             <div className="relative flex items-center justify-center">
-              {/* Note: Div bayangan/glow oranye telah dihapus agar tampilan produk bersih */}
-
-              {/* Video/Foto Produk Pen */}
               <video
-                className="h-auto max-h-[380px] sm:max-h-[460px] lg:max-h-[520px] w-auto object-contain mix-blend-multiply drop-shadow-xl"
-                autoPlay
-                muted
-                loop
-                playsInline
-                poster="/hero-pen-poster.jpg"
-                aria-hidden="true"
-              >
-                <source src="/hero-pen.mp4" type="video/mp4" />
-              </video>
+              /* 
+                Gunakan `scale-[1.4]` atau `scale-[1.5]` untuk memaksa video mekar 40%-50% lebih besar 
+              */
+              className="h-auto max-h-[500px] sm:max-h-[600px] lg:max-h-[700px] w-auto object-contain drop-shadow-xl scale-[1.45] translate-y-16 origin-center transition-transform duration-300"
+              autoPlay
+              muted
+              loop
+              playsInline
+              poster="/hero-pen-poster.jpg"
+              aria-hidden="true"
+            >
+              <source src="/hero-pen.webm" type="video/webm" />
+              <source src="/hero-pen.mp4" type="video/mp4" />
+            </video>
             </div>
           </motion.div>
 
