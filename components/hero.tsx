@@ -1,6 +1,5 @@
 'use client'
 
-import dynamic from 'next/dynamic'
 import { motion, type Variants } from 'framer-motion'
 import { Button } from '@/components/ui/button'
 import { ConsultationButton } from '@/components/consultation-button'
@@ -8,15 +7,6 @@ import { useRegion } from '@/components/region-provider'
 import { TrustCarousel } from '@/components/trust-carousel'
 import { HOME_TAGLINE, homeCopy } from '@/lib/home-copy'
 import { Logo } from './logo'
-
-const PenModel = dynamic(() => import('@/components/pen-model'), {
-  ssr: false,
-  loading: () => (
-    <div className="absolute inset-0 z-0 flex items-center justify-center text-xs text-muted-foreground animate-pulse">
-      Memuat Model 3D...
-    </div>
-  ),
-})
 
 const container: Variants = {
   hidden: {},
@@ -49,11 +39,21 @@ export function Hero() {
         <Logo />
       </div>
 
-      {/* Canvas 3D berada di tengah penuh, di belakang konten */}
-      <PenModel />
+      {/* Element Video Pengganti Canvas 3D */}
+      <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden pointer-events-none">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="h-full w-full object-cover opacity-90"
+        >
+          {/* Pastikan file video ditaruh di folder public/ dengan nama hero-video.mp4 */}
+          <source src="/hero-video.mp4" type="video/mp4" />
+        </video>
+      </div>
 
-      {/* pointer-events-none membuat area tengah dapat diputar */}
-      <div className="pointer-events-none mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full relative flex-1 flex flex-col justify-between">
+      <div className="pointer-events-none mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full relative flex-1 flex flex-col justify-between z-10">
         <div className="relative z-30 grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto py-6 lg:py-10">
           <motion.div
             className="pointer-events-auto md:col-span-4 flex flex-col items-start gap-5 z-10"
