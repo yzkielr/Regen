@@ -45,7 +45,7 @@ export function Hero() {
         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8 items-center my-auto py-4 sm:py-6 lg:py-10">
           
           {/* 2. VIDEO CONTAINER: Order-1 (Mobile: Paling Atas), Order-2 (Desktop: Di Tengah Grid) */}
-          <div className="order-1 md:order-2 md:col-span-4 flex justify-center items-center w-full my-2 md:my-0">
+          <div className="order-1 md:order-2 md:col-span-4 flex justify-center items-center w-full my-2 md:my-0 translate-y-6 md:translate-y-8">
             <div className="w-full max-w-[260px] sm:max-w-xs md:max-w-none h-auto flex items-center justify-center">
               <video
                 autoPlay
