@@ -35,33 +35,31 @@ export function Hero() {
           'linear-gradient(to bottom, #f4f8f6 0%, #eef5f3 50%, #e2ede8 100%)',
       }}
     >
-      {/* Watermark Logo Background */}
+      {/* 1. Watermark Logo (Background Layer) */}
       <div className="pointer-events-none absolute top-24 sm:top-34 left-1/2 z-0 w-full -translate-x-1/2 select-none flex justify-center overflow-hidden scale-[2] sm:scale-[3.5] lg:scale-[5] opacity-20 sm:opacity-100">
         <Logo />
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full relative flex-1 flex flex-col justify-between z-10">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto py-4 sm:py-6 lg:py-10">
-          
-          {/* 1. VIDEO CONTAINER: Mobile di atas, Desktop di tengah dengan ukuran besar */}
-          <div className="order-1 md:order-2 md:col-span-4 flex items-center justify-center w-full my-2 md:my-0">
-            <div className="w-full max-w-sm md:max-w-none h-[320px] sm:h-[400px] md:h-[650px] rounded-2xl overflow-hidden shadow-md md:shadow-none bg-white/40 md:bg-transparent border border-white/60 md:border-none flex items-center justify-center">
-              <video
-                autoPlay
-                loop
-                muted
-                playsInline
-                className="w-full h-full object-cover md:object-contain md:scale-135 opacity-95 transition-transform"
-              >
-                <source src="/hero-video.mp4" type="video/mp4" />
-                <source src="/hero-video.webm" type="video/webm" />
-              </video>
-            </div>
-          </div>
+      {/* 2. Video Layer (Paling Belakang Tanpa Frame / Latar Belakang Putih) */}
+      <div className="pointer-events-none absolute inset-0 z-0 flex items-center justify-center overflow-hidden">
+        <video
+          autoPlay
+          loop
+          muted
+          playsInline
+          className="w-full h-full object-contain scale-110 md:scale-65 opacity-100 mix-blend-multiply"
+        >
+          <source src="/hero-video.webm" type="video/webm" />
+        </video>
+      </div>
 
-          {/* 2. KOLOM STATISTIK & KATALOG */}
+      {/* 3. Foreground Content (Layer Depan di Atas Video) */}
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full relative flex-1 flex flex-col justify-between z-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center my-auto py-6 lg:py-10">
+          
+          {/* Kolom Kiri: Statistik & Katalog */}
           <motion.div
-            className="order-2 md:order-1 md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left gap-4 sm:gap-5 z-10"
+            className="md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left gap-4 sm:gap-5"
             variants={container}
             initial="hidden"
             animate="show"
@@ -108,9 +106,12 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* 3. KOLOM DESKRIPSI & KONSULTASI */}
+          {/* Kolom Tengah Kosong di Desktop agar Video Terlihat di Belakang */}
+          <div aria-hidden="true" className="hidden md:block md:col-span-4" />
+
+          {/* Kolom Kanan: Deskripsi & Konsultasi */}
           <motion.div
-            className="order-3 md:order-3 md:col-span-4 flex flex-col items-center md:items-end text-center md:text-right gap-4 z-10"
+            className="md:col-span-4 flex flex-col items-center md:items-end text-center md:text-right gap-4"
             variants={container}
             initial="hidden"
             animate="show"
@@ -143,7 +144,7 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Card Headline Banner Bawah */}
+        {/* Card Banner Bawah */}
         <motion.div
           className="relative z-10 rounded-t-[2rem] sm:rounded-t-[2.5rem] bg-primary text-primary-foreground p-6 sm:p-12 shadow-2xl mt-4"
           initial={{ opacity: 0, y: 40 }}
