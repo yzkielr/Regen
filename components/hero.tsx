@@ -35,36 +35,38 @@ export function Hero() {
           'linear-gradient(to bottom, #f4f8f6 0%, #eef5f3 50%, #e2ede8 100%)',
       }}
     >
-      {/* Background Watermark Logo - disesuaikan ukurannya di HP */}
-      <div className="pointer-events-none absolute top-28 sm:top-34 left-1/2 z-0 w-full -translate-x-1/2 select-none flex justify-center overflow-hidden scale-[1.8] sm:scale-[3.5] lg:scale-[5] opacity-30 sm:opacity-100">
+      {/* Watermark Logo Background */}
+      <div className="pointer-events-none absolute top-24 sm:top-34 left-1/2 z-0 w-full -translate-x-1/2 select-none flex justify-center overflow-hidden scale-[2] sm:scale-[3.5] lg:scale-[5] opacity-20 sm:opacity-100">
         <Logo />
       </div>
 
-      {/* Video Pengganti Canvas 3D - Disesuaikan agar proporsional di HP */}
-      <div className="absolute inset-0 z-0 flex items-center justify-center overflow-hidden pointer-events-none">
-        <div className="w-full h-full max-w-5xl mx-auto flex items-center justify-center p-2 sm:p-4">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="w-full h-auto max-h-[45vh] sm:max-h-none sm:h-full object-contain sm:object-cover opacity-80 sm:opacity-90 rounded-2xl"
-          >
-            <source src="/hero-video.mp4" type="video/mp4" />
-          </video>
-        </div>
-      </div>
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full relative flex-1 flex flex-col justify-between z-10">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto py-4 sm:py-6 lg:py-10">
+          
+          {/* 1. VIDEO CONTAINER: Mobile di atas, Desktop di tengah dengan ukuran besar */}
+          <div className="order-1 md:order-2 md:col-span-4 flex items-center justify-center w-full my-2 md:my-0">
+            <div className="w-full max-w-sm md:max-w-none h-[320px] sm:h-[400px] md:h-[650px] rounded-2xl overflow-hidden shadow-md md:shadow-none bg-white/40 md:bg-transparent border border-white/60 md:border-none flex items-center justify-center">
+              <video
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="w-full h-full object-cover md:object-contain md:scale-135 opacity-95 transition-transform"
+              >
+                <source src="/hero-video.mp4" type="video/mp4" />
+                <source src="/hero-video.webm" type="video/webm" />
+              </video>
+            </div>
+          </div>
 
-      <div className="pointer-events-none mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 w-full relative flex-1 flex flex-col justify-between z-10">
-        <div className="relative z-30 grid grid-cols-1 md:grid-cols-12 gap-6 items-center my-auto py-4 sm:py-6 lg:py-10">
-          {/* Kolom Kiri */}
+          {/* 2. KOLOM STATISTIK & KATALOG */}
           <motion.div
-            className="pointer-events-auto md:col-span-4 flex flex-col items-center sm:items-start text-center sm:text-left gap-4 sm:gap-5 z-10 bg-white/40 sm:bg-transparent p-4 sm:p-0 rounded-2xl backdrop-blur-sm sm:backdrop-blur-none border border-white/40 sm:border-none shadow-sm sm:shadow-none"
+            className="order-2 md:order-1 md:col-span-4 flex flex-col items-center md:items-start text-center md:text-left gap-4 sm:gap-5 z-10"
             variants={container}
             initial="hidden"
             animate="show"
           >
-            <motion.div variants={item} className="flex flex-wrap items-center justify-center sm:justify-start gap-2">
+            <motion.div variants={item} className="flex flex-wrap items-center justify-center md:justify-start gap-2">
               <span className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
                 <span
                   aria-hidden="true"
@@ -79,22 +81,22 @@ export function Hero() {
             </motion.div>
 
             <motion.div variants={item} className="space-y-0.5">
-              <p className="text-2xl sm:text-3xl font-bold text-primary font-display">98%</p>
-              <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+              <p className="text-3xl font-bold text-primary font-display">98%</p>
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
                 Customer Satisfaction
               </p>
             </motion.div>
 
             <motion.div variants={item} className="space-y-0.5">
-              <p className="text-2xl sm:text-3xl font-bold text-primary font-display">
+              <p className="text-3xl font-bold text-primary font-display">
                 200+
               </p>
-              <p className="text-[11px] sm:text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+              <p className="text-xs text-muted-foreground uppercase tracking-wider font-semibold">
                 Peptide Research Library
               </p>
             </motion.div>
 
-            <motion.div variants={item} className="pt-1 sm:pt-2">
+            <motion.div variants={item} className="pt-2">
               <Button
                 render={<a href="#katalog" />}
                 size="lg"
@@ -106,33 +108,30 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Kolom Tengah (Kosong di Desktop untuk Ruang Video) */}
-          <div aria-hidden="true" className="hidden md:block md:col-span-4" />
-
-          {/* Kolom Kanan */}
+          {/* 3. KOLOM DESKRIPSI & KONSULTASI */}
           <motion.div
-            className="pointer-events-auto md:col-span-4 flex flex-col items-center md:items-end text-center md:text-right gap-3 sm:gap-4 z-10 bg-white/40 sm:bg-transparent p-4 sm:p-0 rounded-2xl backdrop-blur-sm sm:backdrop-blur-none border border-white/40 sm:border-none shadow-sm sm:shadow-none"
+            className="order-3 md:order-3 md:col-span-4 flex flex-col items-center md:items-end text-center md:text-right gap-4 z-10"
             variants={container}
             initial="hidden"
             animate="show"
           >
             <motion.div variants={item}>
-              <h2 className="text-xl sm:text-2xl font-bold text-primary font-display">
+              <h2 className="text-2xl font-bold text-primary font-display">
                 Regen Precision
               </h2>
-              <p className="text-xs sm:text-sm font-semibold text-accent mt-0.5">
+              <p className="text-sm font-semibold text-accent mt-0.5">
                 Your partner in peptide innovation.
               </p>
             </motion.div>
 
             <motion.p
               variants={item}
-              className="text-xs sm:text-sm text-muted-foreground leading-relaxed max-w-xs"
+              className="text-sm text-muted-foreground leading-relaxed max-w-xs"
             >
               {copy.hero.body}
             </motion.p>
 
-            <motion.div variants={item} className="pt-1 sm:pt-2">
+            <motion.div variants={item} className="pt-2">
               <ConsultationButton
                 size="default"
                 variant="outline"
@@ -144,9 +143,9 @@ export function Hero() {
           </motion.div>
         </div>
 
-        {/* Card Bawah */}
+        {/* Card Headline Banner Bawah */}
         <motion.div
-          className="pointer-events-auto relative z-10 rounded-t-[2rem] sm:rounded-t-[2.5rem] bg-primary text-primary-foreground p-6 sm:p-12 shadow-2xl mt-4"
+          className="relative z-10 rounded-t-[2rem] sm:rounded-t-[2.5rem] bg-primary text-primary-foreground p-6 sm:p-12 shadow-2xl mt-4"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.3 }}
