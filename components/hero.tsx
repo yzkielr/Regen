@@ -52,7 +52,7 @@ export function Hero() {
                 loop
                 muted
                 playsInline
-                className="w-full h-full object-contain scale-100 md:scale-280 opacity-100 mix-blend-multiply"
+                className="w-full h-full object-contain scale-140 md:scale-280 opacity-100 mix-blend-multiply"
               >
                 <source src="/hero-video.webm" type="video/webm" />
               </video>
