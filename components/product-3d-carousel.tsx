@@ -90,9 +90,9 @@ function OrbitProduct({
     const sway = Math.cos(phase) * FLOAT_TILT
     return `translate3d(${driftX}px, ${driftY}px, 0) rotate(${sway}deg)`
   })
-  const opacity = useTransform(depth, (d) => 0.26 + d * 0.74)
+  const opacity = 1
   const zIndex = useTransform(depth, (d) => Math.round(d * 100) + 1)
-  const captionOpacity = useTransform(depth, (d) => 0.25 + d * 0.75)
+  const captionOpacity = useTransform(depth, (d) => 0.85 + d * 1)
 
   return (
     <motion.button
