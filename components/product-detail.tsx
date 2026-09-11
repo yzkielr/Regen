@@ -64,11 +64,13 @@ export function ProductDetail({ product }: { product: Product }) {
     },
   ]
 
+  // Halaman detail dibuka dengan foto, harga, dan format Cartridge Set.
+  const defaultVariant = variants.find((v) => v.id === 'cartridge')?.id ?? variants[0].id
   const defaultSelection: ProductSelection = {
     regionId: region.id,
     productSlug: product.slug,
-    variant: variants[0].id,
-    activeImage: Math.max(0, gallery.findIndex((img) => img.variant === variants[0].id)),
+    variant: defaultVariant,
+    activeImage: Math.max(0, gallery.findIndex((img) => img.variant === defaultVariant)),
   }
   const [selection, setSelection] = useState<ProductSelection>(defaultSelection)
   // A client-side region or product change must not carry an unavailable
