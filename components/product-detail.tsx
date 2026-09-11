@@ -19,6 +19,10 @@ import { getRegionalPriceLabel } from '@/lib/region-pricing'
 
 const uspIcons = [FlaskConical, FileCheck2, Truck, Headset]
 
+// Simpan foto Paket Basic di public/products/basic-package.jpeg.
+// Foto paket ini dipakai bersama oleh semua halaman produk.
+const BASIC_PACKAGE_IMAGE = '/products/basic-package.png'
+
 type ProductSelection = {
   regionId: string
   productSlug: string
@@ -31,26 +35,8 @@ export function ProductDetail({ product }: { product: Product }) {
   const copy = catalogCopy[language]
   const localized = getProductCopy(product, language)
   const variants = getProductVariants(region.id)
-  const defaultSelection: ProductSelection = {
-    regionId: region.id,
-    productSlug: product.slug,
-    variant: variants[0].id,
-    activeImage: region.id === 'id' ? 2 : 0,
-  }
-  const [selection, setSelection] = useState<ProductSelection>(defaultSelection)
-  // A client-side region or product change must not carry an unavailable
-  // package or a different product's gallery selection into the new page.
-  const currentSelection = selection.regionId === region.id &&
-    selection.productSlug === product.slug &&
-    variants.some((v) => v.id === selection.variant)
-    ? selection
-    : defaultSelection
-  const { variant, activeImage } = currentSelection
-  const active = copy.variants[variant]
 
-  // Keep the supplied cartridge, pen and individual product photos. Basic
-  // uses the individual cartridge shot as an explicitly labelled illustration,
-  // not an invented image of Basic package contents.
+  // Urutan thumbnail: Cartridge Set, Pen Package, Paket Basic, foto produk.
   const gallery: {
     src: string
     alt: string
@@ -67,14 +53,36 @@ export function ProductDetail({ product }: { product: Product }) {
       variant: 'pen',
     },
     {
+      src: BASIC_PACKAGE_IMAGE,
+      alt: `Regen ${product.name} — ${copy.variants.basic.label}`,
+      variant: 'basic',
+    },
+    {
       src: product.image || '/placeholder.svg',
       alt: `Regen ${product.name} — ${copy.imageAlt}`,
       variant: null,
     },
   ]
 
+  const defaultSelection: ProductSelection = {
+    regionId: region.id,
+    productSlug: product.slug,
+    variant: variants[0].id,
+    activeImage: Math.max(0, gallery.findIndex((img) => img.variant === variants[0].id)),
+  }
+  const [selection, setSelection] = useState<ProductSelection>(defaultSelection)
+  // A client-side region or product change must not carry an unavailable
+  // package or a different product's gallery selection into the new page.
+  const currentSelection = selection.regionId === region.id &&
+    selection.productSlug === product.slug &&
+    variants.some((v) => v.id === selection.variant)
+    ? selection
+    : defaultSelection
+  const { variant, activeImage } = currentSelection
+  const active = copy.variants[variant]
+
   function selectVariant(id: VariantId) {
-    const idx = id === 'basic' ? 2 : gallery.findIndex((g) => g.variant === id)
+    const idx = gallery.findIndex((img) => img.variant === id)
     setSelection({
       ...currentSelection,
       variant: id,
@@ -83,10 +91,14 @@ export function ProductDetail({ product }: { product: Product }) {
   }
 
   function selectImage(idx: number) {
+    const imageVariant = gallery[idx].variant
+    // Semua foto dapat dilihat. Pilihan harga hanya mengikuti paket yang
+    // tersedia di region aktif; Paket Basic tetap khusus Indonesia.
+    const availableVariant = variants.find((v) => v.id === imageVariant)
     setSelection({
       ...currentSelection,
       activeImage: idx,
-      variant: gallery[idx].variant ?? variant,
+      variant: availableVariant?.id ?? variant,
     })
   }
 
@@ -115,7 +127,7 @@ export function ProductDetail({ product }: { product: Product }) {
                 priority
               />
             </div>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-4 gap-3">
               {gallery.map((img, idx) => {
                 const selected = idx === activeImage
                 return (
@@ -135,7 +147,7 @@ export function ProductDetail({ product }: { product: Product }) {
                       src={img.src}
                       alt=""
                       fill
-                      sizes="120px"
+                      sizes="(max-width: 640px) 25vw, 150px"
                       className="object-contain p-1"
                     />
                   </button>
@@ -143,7 +155,7 @@ export function ProductDetail({ product }: { product: Product }) {
               })}
             </div>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              {variant === 'basic' ? copy.basicPhotoNotice ?? copy.photoNotice : copy.photoNotice}
+              {copy.photoNotice}
             </p>
           </div>
 
