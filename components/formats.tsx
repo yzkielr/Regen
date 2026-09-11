@@ -17,7 +17,7 @@ export function Formats() {
   const { language, region } = useRegion()
   const copy = catalogCopy[language]
   const formats = getProductVariants(region.id)
-  const hasBasic = region.id === 'id'
+  const hasBasic = formats.some((format) => format.id === 'basic')
 
   return (
     <section id="format" className="bg-secondary py-16 md:py-24">

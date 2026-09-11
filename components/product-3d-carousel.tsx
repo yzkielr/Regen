@@ -40,16 +40,16 @@ interface StageMetrics {
 }
 
 // PENGATURAN: ubah angka di sini untuk menyesuaikan gerakan.
-const AUTO_PAUSE_MS = 5000 // Jeda 2,5 detik setelah foto berhenti di tengah.
+const AUTO_PAUSE_MS = 2500 // Jeda 2,5 detik setelah foto berhenti di tengah.
 const AUTO_TRANSITION_MS = 900 // Perpindahan halus selama 0,9 detik.
 const MAX_RADIUS = 350 // Jarak produk dari pusat orbit pada desktop.
 const PERSPECTIVE = 1400 // Proyeksi orbit dihitung tanpa memperbesar lapisan teks.
 const FLOAT_HEIGHT = 5 // Rentang atas-bawah kecil: 5px.
 const FLOAT_DRIFT = 3 // Rentang kanan-kiri kecil: 3px.
-const FLOAT_Y_DURATION = 5000 // Siklus atas-bawah yang santai: 16 detik.
-const FLOAT_X_DURATION = 5000 // Siklus kanan-kiri: 20 detik.
+const FLOAT_Y_DURATION = 16000 // Siklus atas-bawah yang santai: 16 detik.
+const FLOAT_X_DURATION = 20000 // Siklus kanan-kiri: 20 detik.
 const WHEEL_SENSITIVITY = 0.2
-const DRAG_SENSITIVITY = 0.2
+const DRAG_SENSITIVITY = 0.45
 // Jumlah dan urutan selalu mengikuti katalog; tidak ada daftar produk manual.
 const PRODUCT_COUNT = Math.max(products.length, 1)
 const STEP = 360 / PRODUCT_COUNT
@@ -205,7 +205,7 @@ function OrbitProduct({
 export function Product3DCarousel() {
   const { region, language, href } = useRegion()
   const copy = catalogCopy[language]
-  const catalogVariant = region.id === 'id' ? 'basic' : 'cartridge'
+  const catalogVariant = 'basic'
   const wheelProducts: WheelProduct[] = products.map((product) => {
     const localized = getProductCopy(product, language)
     return {
@@ -216,8 +216,7 @@ export function Product3DCarousel() {
       tagline: localized.tagline,
       price: getRegionalPriceLabel(region, product.slug, catalogVariant),
       variantLabel: copy.variants[catalogVariant].label.toLowerCase(),
-      showStartingPrice: region.id === 'id' &&
-        getRegionalPriceAmount(region.id, product.slug, catalogVariant) !== null,
+      showStartingPrice: getRegionalPriceAmount(region.id, product.slug, catalogVariant) !== null,
       href: href(`/product/${product.slug}`),
     }
   })
@@ -654,7 +653,7 @@ export function Product3DCarousel() {
             </p>
             <p className="mt-3 text-sm text-[#003F35]/70">
               {activeProduct.showStartingPrice && (
-                <span className="mb-1 block text-xs">mulai dari</span>
+                <span className="mb-1 block text-xs">{copy.startingPrice}</span>
               )}
               <span className="font-semibold text-[#003F35]">{activeProduct.price}</span>
               {' / '}{activeProduct.variantLabel}

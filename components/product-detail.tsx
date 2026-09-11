@@ -19,7 +19,7 @@ import { getRegionalPriceLabel } from '@/lib/region-pricing'
 
 const uspIcons = [FlaskConical, FileCheck2, Truck, Headset]
 
-// Simpan foto Paket Basic di public/products/basic-package.jpeg.
+// Simpan foto Basic Package di public/product/basic-package.png.
 // Foto paket ini dipakai bersama oleh semua halaman produk.
 const BASIC_PACKAGE_IMAGE = '/products/basic-package.png'
 
@@ -36,7 +36,7 @@ export function ProductDetail({ product }: { product: Product }) {
   const localized = getProductCopy(product, language)
   const variants = getProductVariants(region.id)
 
-  // Urutan thumbnail: Cartridge Set, Pen Package, Paket Basic, foto produk.
+  // Urutan thumbnail: Cartridge Package, Pen Package, Basic Package, foto produk.
   const gallery: {
     src: string
     alt: string
@@ -64,7 +64,7 @@ export function ProductDetail({ product }: { product: Product }) {
     },
   ]
 
-  // Halaman detail dibuka dengan foto, harga, dan format Cartridge Set.
+  // Halaman detail dibuka dengan foto, harga, dan format Cartridge Package.
   const defaultVariant = variants.find((v) => v.id === 'cartridge')?.id ?? variants[0].id
   const defaultSelection: ProductSelection = {
     regionId: region.id,
@@ -94,8 +94,7 @@ export function ProductDetail({ product }: { product: Product }) {
 
   function selectImage(idx: number) {
     const imageVariant = gallery[idx].variant
-    // Semua foto dapat dilihat. Pilihan harga hanya mengikuti paket yang
-    // tersedia di region aktif; Paket Basic tetap khusus Indonesia.
+    // Foto paket memilih format yang sama dan harga dalam mata uang region aktif.
     const availableVariant = variants.find((v) => v.id === imageVariant)
     setSelection({
       ...currentSelection,
@@ -192,7 +191,7 @@ export function ProductDetail({ product }: { product: Product }) {
               <legend className="text-sm font-medium text-foreground">
                 {copy.selectFormat}
               </legend>
-              <div className={`mt-3 grid gap-3 ${region.id === 'id' ? 'grid-cols-1 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3' : 'grid-cols-2'}`}>
+              <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3">
                 {variants.map((v) => {
                   const selected = v.id === variant
                   return (
@@ -228,7 +227,7 @@ export function ProductDetail({ product }: { product: Product }) {
 
             <ConsultationButton
               size="lg"
-              productName={region.id === 'id' ? `${product.name} — ${active.label}` : product.name}
+              productName={`${product.name} — ${active.label}`}
               className="mt-6 w-full gap-2 bg-accent text-accent-foreground hover:bg-accent/90"
             >
               <MessageCircle className="size-4" aria-hidden="true" />

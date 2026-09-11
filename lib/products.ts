@@ -12,16 +12,16 @@ export interface ProductVariant {
 }
 
 // Display copy is localized in product-copy.ts; market prices belong in
-// region-pricing.ts so an unapproved currency is never silently converted.
+// region-pricing.ts.
 export const VARIANTS: ProductVariant[] = [
   {
     id: 'basic',
-    label: 'Basic Set',
+    label: 'Basic Package',
     note: 'Basic package for laboratory research. Confirm package contents with our team.',
   },
   {
     id: 'cartridge',
-    label: 'Cartridge',
+    label: 'Cartridge Package',
     note: 'Refill cartridge for the Regen Pen device.',
   },
   {
@@ -31,8 +31,9 @@ export const VARIANTS: ProductVariant[] = [
   },
 ]
 
-export function getProductVariants(regionId: RegionId): ProductVariant[] {
-  return regionId === 'id' ? VARIANTS : VARIANTS.filter((variant) => variant.id !== 'basic')
+// The same three packages are offered in every region. Prices vary by region.
+export function getProductVariants(_regionId: RegionId): ProductVariant[] {
+  return VARIANTS
 }
 
 export interface Product {

@@ -104,6 +104,7 @@ type CatalogCopy = {
   intro: string
   talkToTeam: string
   viewProduct: string
+  startingPrice: string
   backToCatalog: string
   labelReference: string
   selectFormat: string
@@ -129,6 +130,7 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     intro: 'Talk to our team about your research and the catalog options for your selected region.',
     talkToTeam: 'Talk to Our Team',
     viewProduct: 'View Product',
+    startingPrice: 'from',
     backToCatalog: 'Back to catalog',
     labelReference: 'Cartridge label reference (not usage guidance)',
     selectFormat: 'Choose your format',
@@ -146,8 +148,8 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
       pen: { label: 'Pen Package', note: 'Pre-filled pen package for laboratory research.', alt: 'Pen Package packaging' },
     },
     imageAlt: 'research cartridge',
-    formatsHeading: 'One quality standard. Two research formats.',
-    formatsBody: 'Explore Cartridge Package and Pen Package. Our team can confirm format compatibility and availability for your research.',
+    formatsHeading: 'One quality standard. Three research formats.',
+    formatsBody: 'Explore Basic Package, Cartridge Package and Pen Package. Our team can confirm package details, format compatibility and availability for your research.',
     formats: {
       basic: { name: 'Basic Package', body: 'A Basic Package option for laboratory research. Ask our team to confirm package contents and product details.' },
       cartridge: { name: 'Cartridge Package', body: 'A refill cartridge for research setups using the compatible Regen Pen device. Ask our team to confirm compatibility and product details.' },
@@ -159,6 +161,7 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     intro: 'Beritahu kami tentang kajian anda. Kami boleh bantu anda semak pilihan produk untuk region anda.',
     talkToTeam: 'Tanya Kami',
     viewProduct: 'Lihat Produk',
+    startingPrice: 'bermula dari',
     backToCatalog: 'Kembali ke katalog',
     labelReference: 'Info pada label cartridge (bukan panduan penggunaan)',
     selectFormat: 'Pilih format anda',
@@ -176,8 +179,8 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
       pen: { label: 'Pen Package', note: 'Pen yang sudah diisi, untuk kajian makmal sahaja.', alt: 'gambar Pen Package' },
     },
     imageAlt: 'cartridge untuk kajian makmal',
-    formatsHeading: 'Kualiti yang sama. Dua format untuk kajian.',
-    formatsBody: 'Pilih antara Cartridge Package atau Pen Package. Kami boleh bantu semak kesesuaian peranti dan produk yang tersedia untuk kajian anda.',
+    formatsHeading: 'Kualiti yang sama. Tiga format untuk kajian.',
+    formatsBody: 'Pilih Basic Package, Cartridge Package atau Pen Package. Kami boleh bantu semak isi pakej, kesesuaian peranti dan produk yang tersedia untuk kajian anda.',
     formats: {
       basic: { name: 'Basic Package', body: 'Pilihan Basic Package untuk kajian makmal. Semak isi pakej dan detail produk dengan team kami.' },
       cartridge: { name: 'Cartridge Package', body: 'Cartridge refill untuk kajian makmal menggunakan Regen Pen yang serasi. Hubungi kami untuk semak kesesuaian peranti dan detail produk.' },
@@ -189,6 +192,7 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     intro: 'Ceritakan kebutuhan risetmu ke kami. Kami bantu kamu cek pilihan produk untuk region kamu.',
     talkToTeam: 'Tanya Tim Kami',
     viewProduct: 'Lihat Produk',
+    startingPrice: 'mulai dari',
     backToCatalog: 'Kembali ke katalog',
     labelReference: 'Info pada label cartridge (bukan petunjuk penggunaan)',
     selectFormat: 'Pilih format yang kamu butuhkan',

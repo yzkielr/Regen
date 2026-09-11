@@ -12,9 +12,8 @@ export function ProductCard({ product }: { product: Product }) {
   const { region, language, href } = useRegion()
   const copy = catalogCopy[language]
   const localized = getProductCopy(product, language)
-  const catalogVariant = region.id === 'id' ? 'basic' : 'cartridge'
-  const showStartingPrice = region.id === 'id' &&
-    getRegionalPriceAmount(region.id, product.slug, catalogVariant) !== null
+  const catalogVariant = 'basic'
+  const showStartingPrice = getRegionalPriceAmount(region.id, product.slug, catalogVariant) !== null
 
   return (
     <Link
@@ -42,7 +41,7 @@ export function ProductCard({ product }: { product: Product }) {
         </p>
         <div className="mt-auto flex flex-wrap items-baseline gap-x-1.5 gap-y-1 pt-3">
           <span className="font-display text-base font-bold text-primary sm:text-lg">
-            {showStartingPrice && <><span className="block text-xs font-medium text-muted-foreground">mulai dari</span>{' '}</>}
+            {showStartingPrice && <><span className="block text-xs font-medium text-muted-foreground">{copy.startingPrice}</span>{' '}</>}
             {getRegionalPriceLabel(region, product.slug, catalogVariant)}
           </span>
           <span className="text-xs text-muted-foreground">/ {copy.variants[catalogVariant].label.toLowerCase()}</span>
