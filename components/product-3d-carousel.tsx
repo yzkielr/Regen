@@ -29,15 +29,27 @@ interface WheelProduct {
   href: string
 }
 
+interface StageMetrics {
+  width: number
+  height: number
+  baseWidth: number
+  baseHeight: number
+  pixelRatio: number
+  pageLeft: number
+  pageTop: number
+}
+
 // PENGATURAN: ubah angka di sini untuk menyesuaikan gerakan.
-const AUTO_SPEED = 12 // Derajat/detik. Nilai lebih besar = lebih cepat.
+const AUTO_PAUSE_MS = 5000 // Jeda 2,5 detik setelah foto berhenti di tengah.
+const AUTO_TRANSITION_MS = 900 // Perpindahan halus selama 0,9 detik.
 const MAX_RADIUS = 350 // Jarak produk dari pusat orbit pada desktop.
-const FLOAT_HEIGHT = 6 // Naik/turun maksimal 6px dari posisi tengah.
-const FLOAT_DRIFT = 4 // Gerakan menyerong maksimal 4px ke samping.
-const FLOAT_TILT = 0.85 // Goyangan sangat kecil, dalam derajat.
-const FLOAT_DURATION = 9500 // Satu siklus perlahan selama 9,5 detik.
+const PERSPECTIVE = 1400 // Proyeksi orbit dihitung tanpa memperbesar lapisan teks.
+const FLOAT_HEIGHT = 5 // Rentang atas-bawah kecil: 5px.
+const FLOAT_DRIFT = 3 // Rentang kanan-kiri kecil: 3px.
+const FLOAT_Y_DURATION = 5000 // Siklus atas-bawah yang santai: 16 detik.
+const FLOAT_X_DURATION = 5000 // Siklus kanan-kiri: 20 detik.
 const WHEEL_SENSITIVITY = 0.2
-const DRAG_SENSITIVITY = 0.45
+const DRAG_SENSITIVITY = 0.2
 // Jumlah dan urutan selalu mengikuti katalog; tidak ada daftar produk manual.
 const PRODUCT_COUNT = Math.max(products.length, 1)
 const STEP = 360 / PRODUCT_COUNT
@@ -53,84 +65,140 @@ function OrbitProduct({
   index,
   rotation,
   radius,
+  metrics,
   clock,
+  floating,
   active,
-  onSelect,
 }: {
   product: WheelProduct
   index: number
   rotation: MotionValue<number>
   radius: MotionValue<number>
+  metrics: MotionValue<StageMetrics>
   clock: MotionValue<number>
+  floating: boolean
   active: boolean
-  onSelect: () => void
 }) {
   const angle = useTransform(rotation, (value) => (value + index * STEP) * DEG)
   const depth = useTransform(angle, (value) => (Math.cos(value) + 1) / 2)
+  // Rasio asli dipakai untuk menghitung kotak gambar, termasuk foto nonsquare.
+  const imageAspect = useMotionValue(1)
 
-  const transform = useTransform(() => {
+  const projection = useTransform(() => {
     const theta = angle.get()
     const d = depth.get()
     const r = radius.get()
-    const x = Math.sin(theta) * r
     const z = Math.cos(theta) * r
-    const y = (d - 1) * 66
-    // Kemiringan dibatasi agar label produk tetap menghadap ke pengunjung.
-    const tilt = -Math.sin(theta) * 34
-    const scale = 0.8 + d * 0.2
-
-    return `translate3d(calc(-50% + ${x}px), calc(-50% + ${y}px), ${z}px) rotateY(${tilt}deg) scale(${scale})`
+    const perspective = PERSPECTIVE / (PERSPECTIVE - z)
+    const m = metrics.get()
+    const snapPixel = (value: number) => Math.round(value * m.pixelRatio) / m.pixelRatio
+    const size = (0.8 + d * 0.2) * perspective
+    const width = snapPixel(m.baseWidth * size)
+    const frameHeight = snapPixel(m.baseHeight * size)
+    const aspect = imageAspect.get()
+    const photoWidth = snapPixel(Math.min(width, frameHeight * aspect))
+    const photoHeight = snapPixel(photoWidth / aspect)
+    const x = m.width / 2 + Math.sin(theta) * r * perspective - width / 2
+    const y = m.height / 2 + (d - 1) * 66 * perspective - (frameHeight + 80) / 2
+    return {
+      left: snapPixel(m.pageLeft + x) - m.pageLeft,
+      top: snapPixel(m.pageTop + y) - m.pageTop,
+      width,
+      frameHeight,
+      photoWidth,
+      photoHeight,
+      photoLeft: snapPixel((width - photoWidth) / 2),
+      photoTop: snapPixel((frameHeight - photoHeight) / 2),
+    }
   })
+  // Layout dan ukuran foto mengikuti piksel layar. Floating berada pada lapisan
+  // terpisah yang hanya bergeser; teks tidak ikut digeser atau diperbesar.
+  const left = useTransform(projection, (p) => p.left)
+  const top = useTransform(projection, (p) => p.top)
+  const width = useTransform(projection, (p) => p.width)
+  const frameHeight = useTransform(projection, (p) => p.frameHeight)
+  const photoWidth = useTransform(projection, (p) => p.photoWidth)
+  const photoHeight = useTransform(projection, (p) => p.photoHeight)
+  const photoLeft = useTransform(projection, (p) => p.photoLeft)
+  const photoTop = useTransform(projection, (p) => p.photoTop)
   const floatingTransform = useTransform(clock, (time) => {
-    // Tiap produk bergerak dengan jeda berbeda: naik menyerong, lalu kembali.
-    const phase = (time / FLOAT_DURATION) * Math.PI * 2 + index * 1.3
-    const wave = Math.sin(phase)
-    const driftX = wave * FLOAT_DRIFT
-    const driftY = -wave * FLOAT_HEIGHT
-    const sway = Math.cos(phase) * FLOAT_TILT
-    return `translate3d(${driftX}px, ${driftY}px, 0) rotate(${sway}deg)`
+    const phaseX = index * 0.73
+    const phaseY = index * 0.91
+    // Dua gelombang dengan periode berbeda membuat lintasan melengkung santai.
+    // Pengurangan fase awal menjaga posisi awal tetap sama, tanpa lompatan.
+    const x = (Math.sin(time / FLOAT_X_DURATION * Math.PI * 2 + phaseX) - Math.sin(phaseX)) * FLOAT_DRIFT / 2
+    const y = (Math.cos(time / FLOAT_Y_DURATION * Math.PI * 2 + phaseY) - Math.cos(phaseY)) * FLOAT_HEIGHT / 2
+    // Hanya translasi: tanpa rotasi, scale, filter, atau perubahan ukuran foto.
+    // Nilai kontinu menjaga gerakan lambat tidak melompat dari piksel ke piksel.
+    return `translate(${x}px, ${y}px)`
   })
-  const opacity = 1
   const zIndex = useTransform(depth, (d) => Math.round(d * 100) + 1)
-  const captionOpacity = useTransform(depth, (d) => 0.85 + d * 1)
+  // Label belakang disembunyikan sepenuhnya agar tidak bertumpuk dengan
+  // label depan. Semua delapan foto tetap memiliki tautan detail masing-masing.
+  const captionVisibility = useTransform(depth, (d) =>
+    d >= 0.82 ? 'var(--caption-visibility)' : 'hidden',
+  )
 
   return (
-    <motion.button
-      type="button"
-      onClick={onSelect}
-      aria-label={`Tampilkan ${product.name}`}
-      aria-pressed={active}
+    <motion.div
       data-product-id={product.id}
-      style={{ transform, opacity, zIndex, willChange: 'transform' }}
-      className="absolute left-1/2 top-1/2 w-[156px] select-none rounded-2xl border-0 bg-transparent p-0 text-center outline-none focus-visible:ring-2 focus-visible:ring-[#F26A21] focus-visible:ring-offset-4 sm:w-[210px] lg:w-[230px]"
+      data-active={active}
+      style={{ left, top, width, zIndex, transform: 'none', filter: 'none', opacity: 1 }}
+      className="absolute select-none rounded-2xl border-0 bg-transparent p-0 text-center"
     >
-      {/* PNG/WebP transparan akan membuat produk melayang tanpa kotak latar. */}
-      <motion.div
-        style={{ transform: floatingTransform, willChange: 'transform' }}
-        className="pointer-events-none relative h-[190px] w-full sm:h-[240px] lg:h-[260px]"
+      <Link
+        href={product.href}
+        aria-label={`Lihat harga dan detail ${product.name}`}
+        draggable={false}
+        onDragStart={(event) => event.preventDefault()}
+        className="block cursor-pointer rounded-2xl outline-none focus-visible:ring-2 focus-visible:ring-[#F26A21] focus-visible:ring-offset-4"
       >
-        <Image
-          src={product.image}
-          alt={product.name}
-          fill
-          draggable={false}
-          sizes="(max-width: 639px) 210px, (max-width: 1023px) 280px, 310px"
-          priority={index === 0}
-          className="object-contain drop-shadow-[0_18px_18px_rgba(0,63,53,0.16)]"
-        />
-      </motion.div>
-      <motion.div
-        style={{ opacity: captionOpacity }}
-        className={`pointer-events-none mt-4 px-1 ${active ? 'visible' : 'invisible sm:visible'}`}
-      >
-        <h3 className="min-h-[40px] text-sm font-semibold leading-5 text-[#003F35] sm:text-base">
-          {product.name}
-        </h3>
-        <p className="mt-1 text-xs font-medium text-[#003F35]/70 sm:text-sm">
-          {product.price}
-        </p>
-      </motion.div>
-    </motion.button>
+        {/* PNG/WebP transparan akan membuat produk melayang tanpa kotak latar. */}
+        <motion.div
+          style={{ height: frameHeight }}
+          className="pointer-events-none relative w-full"
+        >
+          <motion.div
+            style={{ left: photoLeft, top: photoTop, width: photoWidth, height: photoHeight }}
+            className="absolute"
+          >
+            <motion.div
+              style={{ transform: floatingTransform, willChange: floating ? 'transform' : 'auto' }}
+              className="absolute inset-0"
+            >
+              <Image
+                src={product.image}
+                alt={product.name}
+                fill
+                unoptimized
+                draggable={false}
+                sizes="(max-width: 639px) 210px, (max-width: 1023px) 280px, 310px"
+                priority={index === 0}
+                onLoad={(event) => {
+                  const image = event.currentTarget
+                  if (image.naturalWidth > 0 && image.naturalHeight > 0) {
+                    imageAspect.set(image.naturalWidth / image.naturalHeight)
+                  }
+                }}
+                style={{ transform: 'none', filter: 'none', opacity: 1, imageRendering: 'auto' }}
+                className="block"
+              />
+            </motion.div>
+          </motion.div>
+        </motion.div>
+        <motion.div
+          style={{ visibility: captionVisibility }}
+          className={`pointer-events-none mt-4 px-1 ${active ? '[--caption-visibility:visible]' : '[--caption-visibility:hidden] sm:[--caption-visibility:visible]'}`}
+        >
+          <h3 className="min-h-[40px] text-sm font-semibold leading-5 text-[#003F35] sm:text-base">
+            {product.name}
+          </h3>
+          <p className="mt-1 text-xs font-medium text-[#003F35] sm:text-sm">
+            {product.price}
+          </p>
+        </motion.div>
+      </Link>
+    </motion.div>
   )
 }
 
@@ -159,6 +227,10 @@ export function Product3DCarousel() {
   const hintId = useId()
   const rotation = useMotionValue(0)
   const radius = useMotionValue(130)
+  const metrics = useMotionValue<StageMetrics>({
+    width: 320, height: 410, baseWidth: 156, baseHeight: 190,
+    pixelRatio: 1, pageLeft: 0, pageTop: 0,
+  })
   const clock = useMotionValue(0)
   const [isHydrated, setIsHydrated] = useState(false)
   const prefersReducedMotion = useReducedMotion()
@@ -166,10 +238,13 @@ export function Product3DCarousel() {
   const reducedMotion = isHydrated && prefersReducedMotion
   const target = useRef(0)
   const activeRef = useRef(0)
-  const hovered = useRef(false)
-  const focused = useRef(false)
   const inView = useRef(false)
-  const resumeAt = useRef(0)
+  const idleElapsed = useRef(0)
+  const autoTransition = useRef<{
+    from: number
+    to: number
+    elapsed: number
+  } | null>(null)
   const wheelTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const suppressClick = useRef(false)
   const drag = useRef<{
@@ -184,7 +259,7 @@ export function Product3DCarousel() {
   const [dragging, setDragging] = useState(false)
 
   useEffect(() => {
-    // Transform Motion baru dirender sesudah React selesai melakukan hydration.
+    // Orbit interaktif baru dirender sesudah React selesai melakukan hydration.
     setIsHydrated(true)
   }, [])
 
@@ -193,9 +268,14 @@ export function Product3DCarousel() {
     wheelTimer.current = null
   }, [])
 
+  const resetIdle = useCallback(() => {
+    idleElapsed.current = 0
+  }, [])
+
   const moveTo = useCallback((angle: number) => {
+    autoTransition.current = null
     target.current = angle
-    resumeAt.current = performance.now() + 1600
+    idleElapsed.current = 0
     if (reducedMotion) rotation.set(angle)
   }, [reducedMotion, rotation])
 
@@ -239,10 +319,35 @@ export function Product3DCarousel() {
   useEffect(() => {
     const stage = stageRef.current
     if (!stage) return
-    const resize = () => radius.set(clamp(stage.clientWidth * 0.3, 90, MAX_RADIUS))
+    let resolutionQuery: MediaQueryList | null = null
+    const resize = () => {
+      const rect = stage.getBoundingClientRect()
+      const desktop = window.matchMedia('(min-width: 1024px)').matches
+      const tablet = window.matchMedia('(min-width: 640px)').matches
+      const pixelRatio = window.devicePixelRatio || 1
+      metrics.set({
+        width: stage.clientWidth,
+        height: stage.clientHeight,
+        baseWidth: desktop ? 230 : tablet ? 210 : 156,
+        baseHeight: desktop ? 260 : tablet ? 240 : 190,
+        pixelRatio,
+        pageLeft: rect.left + window.scrollX,
+        pageTop: rect.top + window.scrollY,
+      })
+      radius.set(clamp(stage.clientWidth * 0.3, 90, MAX_RADIUS))
+      // Browser zoom / pindah monitor dapat mengubah kerapatan piksel.
+      const query = `(resolution: ${pixelRatio}dppx)`
+      if (resolutionQuery?.media !== query) {
+        resolutionQuery?.removeEventListener('change', resize)
+        resolutionQuery = window.matchMedia(query)
+        resolutionQuery.addEventListener('change', resize)
+      }
+    }
     resize()
     const observer = new ResizeObserver(resize)
     observer.observe(stage)
+    observer.observe(document.documentElement)
+    window.addEventListener('resize', resize)
     const visibility = new IntersectionObserver(([entry]) => {
       inView.current = entry.isIntersecting
     }, { threshold: 0.1 })
@@ -250,8 +355,10 @@ export function Product3DCarousel() {
     return () => {
       observer.disconnect()
       visibility.disconnect()
+      window.removeEventListener('resize', resize)
+      resolutionQuery?.removeEventListener('change', resize)
     }
-  }, [radius])
+  }, [metrics, radius])
 
   useEffect(() => {
     const stage = stageRef.current
@@ -266,7 +373,10 @@ export function Product3DCarousel() {
       const unit = event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? stage.clientHeight : 1
       moveTo(target.current - clamp(raw * unit, -180, 180) * WHEEL_SENSITIVITY)
       clearWheelTimer()
-      wheelTimer.current = setTimeout(snap, 180)
+      wheelTimer.current = setTimeout(() => {
+        wheelTimer.current = null
+        snap()
+      }, 180)
     }
     // Listener native non-passive: hanya area orbit yang menangkap scroll.
     stage.addEventListener('wheel', handleWheel, { passive: false })
@@ -277,35 +387,81 @@ export function Product3DCarousel() {
   }, [clearWheelTimer, moveTo, snap])
 
   useAnimationFrame((_, delta) => {
-    if (!isHydrated || !inView.current || document.hidden) return
+    if (!isHydrated || !inView.current || document.hidden) {
+      idleElapsed.current = 0
+      return
+    }
     const dt = Math.min(delta, 50)
-    const canFloat = !paused && !reducedMotion && !drag.current
-    const canAutoRotate = canFloat && !hovered.current && !focused.current &&
-      performance.now() >= resumeAt.current
+    const current = rotation.get()
+    const transition = autoTransition.current
+    const canAnimate = !paused && !reducedMotion && !drag.current
+    const canAutoAdvance = canAnimate && wheelTimer.current === null && PRODUCT_COUNT > 1
+    const isSwitching = transition !== null || current !== target.current
 
-    // Hover menghentikan orbit, sementara produk tetap melayang perlahan.
-    if (canFloat) clock.set(clock.get() + dt)
-    if (canAutoRotate) {
-      target.current -= AUTO_SPEED * dt / 1000
+    // Saat switch, foto hanya mengikuti orbit. Bekukan waktu floating pada
+    // posisi terakhir, termasuk selama klik, scroll, drag, dan snap ke produk.
+    // Setelah sampai, lanjutkan fase yang sama tanpa kembali ke posisi awal.
+    if (canAnimate && !isSwitching && wheelTimer.current === null) {
+      clock.set(clock.get() + dt)
     }
 
-    const current = rotation.get()
-    const distance = target.current - current
-    const next = reducedMotion || Math.abs(distance) < 0.001
-      ? target.current
-      : current + distance * (1 - Math.exp(-dt / (drag.current ? 45 : 100)))
-    // MotionValue memperbarui transform tanpa render ulang React setiap frame.
+    let next = current
+    let arrived = false
+
+    if (transition) {
+      idleElapsed.current = 0
+      if (reducedMotion) {
+        next = transition.to
+        autoTransition.current = null
+        arrived = true
+      } else if (!paused && !drag.current) {
+        transition.elapsed = Math.min(transition.elapsed + dt, AUTO_TRANSITION_MS)
+        const progress = transition.elapsed / AUTO_TRANSITION_MS
+        // Kecepatan dan percepatan nol di kedua ujung: mulai dan berhenti lembut.
+        const eased = progress ** 3 * (progress * (progress * 6 - 15) + 10)
+        next = transition.from + (transition.to - transition.from) * eased
+        if (progress === 1) {
+          next = transition.to
+          autoTransition.current = null
+          arrived = true
+        }
+      }
+    } else {
+      const distance = target.current - current
+      next = reducedMotion || Math.abs(distance) < 0.001
+        ? target.current
+        : current + distance * (1 - Math.exp(-dt / (drag.current ? 45 : 100)))
+    }
+
+    // MotionValue memperbarui posisi tanpa render ulang React setiap frame.
     if (next !== current) rotation.set(next)
     const nextIndex = wrapIndex(Math.round(-next / STEP))
     if (nextIndex !== activeRef.current) {
       activeRef.current = nextIndex
       setActiveIndex(nextIndex)
     }
+
+    // Hitung 2,5 detik penuh setelah posisi benar-benar berhenti.
+    // Setiap interaksi baru mengulang hitungan, tanpa menghentikan transisi mendadak.
+    const settled = next === target.current
+    if (!canAutoAdvance || autoTransition.current || !settled || arrived) {
+      idleElapsed.current = 0
+    } else {
+      idleElapsed.current += dt
+      if (idleElapsed.current >= AUTO_PAUSE_MS) {
+        const destination = Math.round(next / STEP) * STEP - STEP
+        target.current = destination
+        autoTransition.current = { from: next, to: destination, elapsed: 0 }
+        idleElapsed.current = 0
+      }
+    }
   })
 
   const startDrag = (event: ReactPointerEvent<HTMLDivElement>) => {
     if (!event.isPrimary || event.button !== 0 || drag.current) return
     clearWheelTimer()
+    autoTransition.current = null
+    idleElapsed.current = 0
     suppressClick.current = false
     target.current = rotation.get()
     drag.current = {
@@ -340,7 +496,8 @@ export function Product3DCarousel() {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
-    if (state.moved) snap()
+    // Sentuhan singkat di tengah transisi juga mengembalikan foto ke pusat.
+    snap()
   }
 
   const activeProduct = wheelProducts[activeIndex] ?? wheelProducts[0]
@@ -352,14 +509,13 @@ export function Product3DCarousel() {
         role="region"
         aria-roledescription="carousel"
         aria-labelledby={titleId}
-        onMouseEnter={() => { hovered.current = true }}
-        onMouseLeave={() => { hovered.current = false }}
-        onFocusCapture={() => { focused.current = true }}
-        onBlurCapture={(event) => {
-          if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-            focused.current = false
-          }
-        }}
+        onPointerEnter={resetIdle}
+        onPointerLeave={resetIdle}
+        onPointerMove={resetIdle}
+        onPointerDown={resetIdle}
+        onFocusCapture={resetIdle}
+        onKeyDownCapture={resetIdle}
+        onWheelCapture={resetIdle}
         style={{
           width: 'var(--carousel-viewport-width, 100%)',
           marginLeft: 'var(--carousel-viewport-offset, 0px)',
@@ -381,11 +537,11 @@ export function Product3DCarousel() {
             Katalog Riset Peptide Premium
           </h2>
           <p id={hintId} className="mt-3 text-sm text-[#003F35]/60">
-            Scroll atau geser untuk memutar · Klik produk untuk memilih
+            Scroll atau geser untuk memutar · Klik foto untuk melihat harga dan detail
           </p>
         </div>
 
-        {/* Jangan menaruh overflow-hidden pada stage ini: kedalaman 3D perlu dipertahankan. */}
+        {/* Kedalaman diproyeksikan ke posisi dan ukuran; teks tidak ditransformasi 3D. */}
         <div
           ref={stageRef}
           role="group"
@@ -397,8 +553,8 @@ export function Product3DCarousel() {
           onPointerUp={endDrag}
           onPointerCancel={endDrag}
           onLostPointerCapture={(event) => {
-            // Sentuhan mula-mula ditangkap tombol produk, lalu dipindah ke stage.
-            // Abaikan lost capture dari tombol agar swipe tidak berhenti di tengah.
+            // Sentuhan mula-mula ditangkap tautan produk, lalu dipindah ke stage.
+            // Abaikan lost capture dari tautan agar swipe tidak berhenti di tengah.
             if (event.target === event.currentTarget) endDrag(event)
           }}
           onPointerLeave={(event) => {
@@ -418,8 +574,6 @@ export function Product3DCarousel() {
             }
           }}
           style={{
-            perspective: '1400px',
-            transformStyle: 'preserve-3d',
             touchAction: 'pan-y pinch-zoom',
             cursor: dragging ? 'grabbing' : 'grab',
           }}
@@ -436,9 +590,10 @@ export function Product3DCarousel() {
               index={index}
               rotation={rotation}
               radius={radius}
+              metrics={metrics}
               clock={clock}
+              floating={!paused && !reducedMotion && !dragging}
               active={activeIndex === index}
-              onSelect={() => selectProduct(index)}
             />
           )) : (
             // Tampilan statis yang identik di server dan render pertama browser.
@@ -449,15 +604,16 @@ export function Product3DCarousel() {
                   src={activeProduct.image}
                   alt={activeProduct.name}
                   fill
+                  unoptimized
                   priority
                   sizes="(max-width: 639px) 210px, (max-width: 1023px) 280px, 310px"
-                  className="object-contain drop-shadow-[0_18px_18px_rgba(0,63,53,0.16)]"
+                  className="object-contain"
                 />
               </div>
               <h3 className="mt-4 min-h-[40px] text-sm font-semibold leading-5 text-[#003F35] sm:text-base">
                 {activeProduct.name}
               </h3>
-              <p className="mt-1 text-xs font-medium text-[#003F35]/70 sm:text-sm">
+              <p className="mt-1 text-xs font-medium text-[#003F35] sm:text-sm">
                 {activeProduct.price}
               </p>
             </div>
@@ -515,7 +671,10 @@ export function Product3DCarousel() {
           {!reducedMotion && (
             <button
               type="button"
-              onClick={() => setPaused((value) => !value)}
+              onClick={() => {
+                resetIdle()
+                setPaused((value) => !value)
+              }}
               aria-pressed={paused}
               className="min-h-11 rounded px-3 text-xs font-medium text-[#003F35]/65 underline underline-offset-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F26A21]"
             >
