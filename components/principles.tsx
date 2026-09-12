@@ -10,7 +10,7 @@ export function Principles() {
   const copy = homeCopy[language]
 
   return (
-    <section className="bg-foreground py-16 text-background md:py-24">
+    <section className="bg-primary py-16 text-primary-foreground md:py-24">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <Reveal>
           <h2 className="heading-gradient-light max-w-2xl text-balance font-display text-3xl font-bold tracking-tight sm:text-4xl">
