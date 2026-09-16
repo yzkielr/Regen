@@ -187,7 +187,7 @@ export const products: Product[] = [
     slug: "hgh-191-aa-36iu",
     name: "HGH 191 AA 36IU",
     category: 'LABORATORY RESEARCH',
-    image: '/products/hgh-v.png',
+    image: '/products/HGH-v.png',
     tagline: "HGH 191 AA 36IU — explore package options and regional pricing.",
     description: "HGH 191 AA 36IU in the Regen research catalog. Select a package to view its price in your region. Contact our team to confirm product specifications, package contents and availability.",
     dosage: '',
