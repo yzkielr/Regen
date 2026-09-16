@@ -301,7 +301,7 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     strengthPhotoNotice: 'Foto ilustrasi. Label pada gambar bisa berbeda dari ukuran yang dipilih.',
     orderConsultation: 'Tanya Produk & Harga',
     viewImage: 'Lihat',
-    researchOnly: 'Khusus penggunaan riset laboratorium.',
+    researchOnly: 'Hanya untuk penggunaan dan aktivitas penelitian laboratorium.',
     priceNotice: 'Harga katalog yang tersedia ditampilkan dalam mata uang pilihanmu. Cek dulu dengan kami untuk harga akhir, produk yang bisa dipesan, pengiriman, dan pajak di region kamu.',
     photoNotice: 'Foto katalog hanya sebagai gambaran. Cek detail produk dan kemasan dengan kami sebelum memesan.',
     basicPhotoNotice: 'Foto Basic Package sebagai gambaran. Konfirmasi isi paket dan detail produk dengan tim kami.',
