@@ -10,12 +10,12 @@ import {
   useTransform,
 } from 'framer-motion'
 import type { MotionValue } from 'framer-motion'
-import Image from 'next/image'
+import { ProductImage as Image } from '@/components/product-image'
 import Link from 'next/link'
 import { products } from '@/lib/products'
 import { useRegion } from '@/components/region-provider'
 import { catalogCopy, getProductCopy } from '@/lib/product-copy'
-import { getRegionalPriceAmount, getRegionalPriceLabel } from '@/lib/region-pricing'
+import { getCatalogPriceVariant, getRegionalPriceAmount, getRegionalPriceLabel } from '@/lib/region-pricing'
 
 interface WheelProduct {
   id: string
@@ -134,7 +134,8 @@ function OrbitProduct({
   })
   const zIndex = useTransform(depth, (d) => Math.round(d * 100) + 1)
   // Label belakang disembunyikan sepenuhnya agar tidak bertumpuk dengan
-  // label depan. Semua delapan foto tetap memiliki tautan detail masing-masing.
+  // label depan. Untuk katalog besar, tampilkan hanya label produk aktif.
+  // Semua foto produk tetap memiliki tautan detail masing-masing.
   const captionVisibility = useTransform(depth, (d) =>
     d >= 0.82 ? 'var(--caption-visibility)' : 'hidden',
   )
@@ -188,7 +189,11 @@ function OrbitProduct({
         </motion.div>
         <motion.div
           style={{ visibility: captionVisibility }}
-          className={`pointer-events-none mt-4 px-1 ${active ? '[--caption-visibility:visible]' : '[--caption-visibility:hidden] sm:[--caption-visibility:visible]'}`}
+          className={`pointer-events-none mt-4 px-1 ${active
+            ? '[--caption-visibility:visible]'
+            : PRODUCT_COUNT > 8
+              ? '[--caption-visibility:hidden]'
+              : '[--caption-visibility:hidden] sm:[--caption-visibility:visible]'}`}
         >
           <h3 className="min-h-[40px] text-sm font-semibold leading-5 text-[#003F35] sm:text-base">
             {product.name}
@@ -205,9 +210,9 @@ function OrbitProduct({
 export function Product3DCarousel() {
   const { region, language, href } = useRegion()
   const copy = catalogCopy[language]
-  const catalogVariant = 'basic'
   const wheelProducts: WheelProduct[] = products.map((product) => {
     const localized = getProductCopy(product, language)
+    const catalogVariant = getCatalogPriceVariant(region.id, product.slug)
     return {
       id: product.slug,
       name: product.name,
@@ -619,7 +624,7 @@ export function Product3DCarousel() {
           )}
         </div>
 
-        <div className="relative z-10 mx-auto flex max-w-xl flex-col items-center gap-5 px-4 text-center">
+        <div className="relative z-10 mx-auto flex max-w-3xl flex-col items-center gap-5 px-4 text-center">
           <div className="flex max-w-full items-center gap-2 sm:gap-5">
             <button type="button" onClick={() => stepBy(-1)} aria-label="Produk sebelumnya" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#003F35]/15 bg-white text-xl text-[#003F35] transition-colors hover:bg-[#003F35] hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#F26A21] sm:h-11 sm:w-11">
               ←

@@ -1,18 +1,18 @@
 'use client'
 
-import Image from 'next/image'
+import { ProductImage as Image } from '@/components/product-image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import { useRegion } from '@/components/region-provider'
 import type { Product } from '@/lib/products'
 import { catalogCopy, getProductCopy } from '@/lib/product-copy'
-import { getRegionalPriceAmount, getRegionalPriceLabel } from '@/lib/region-pricing'
+import { getCatalogPriceVariant, getRegionalPriceAmount, getRegionalPriceLabel } from '@/lib/region-pricing'
 
 export function ProductCard({ product }: { product: Product }) {
   const { region, language, href } = useRegion()
   const copy = catalogCopy[language]
   const localized = getProductCopy(product, language)
-  const catalogVariant = 'basic'
+  const catalogVariant = getCatalogPriceVariant(region.id, product.slug)
   const showStartingPrice = getRegionalPriceAmount(region.id, product.slug, catalogVariant) !== null
 
   return (

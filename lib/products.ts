@@ -31,7 +31,8 @@ export const VARIANTS: ProductVariant[] = [
   },
 ]
 
-// The same three packages are offered in every region. Prices vary by region.
+// Shared package types across regions. Product-specific prices and availability
+// are resolved in region-pricing.ts.
 export function getProductVariants(_regionId: RegionId): ProductVariant[] {
   return VARIANTS
 }
@@ -48,6 +49,40 @@ export interface Product {
   /** Dosing reference printed on the pre-filled cartridge label. */
   dosage: string
 }
+
+export interface ProductStrength {
+  id: string
+  mg: number
+  name: string
+  /** Internal pricing key; the public product URL stays unchanged. */
+  priceKey: string
+  /** Optional photo for this exact strength. Otherwise use the catalog illustration. */
+  image?: string
+}
+
+const PRODUCT_STRENGTHS: Readonly<Record<string, readonly ProductStrength[]>> = {
+  tesamorelin: [
+    { id: '10mg', mg: 10, name: 'Tesamorelin 10mg', priceKey: 'tesamorelin' },
+    { id: '20mg', mg: 20, name: 'Tesamorelin 20mg', priceKey: 'tesamorelin-20mg' },
+  ],
+  'ghk-cu': [
+    { id: '50mg', mg: 50, name: 'GHK-Cu 50mg', priceKey: 'ghk-cu-50mg' },
+    { id: '100mg', mg: 100, name: 'GHK-Cu 100mg', priceKey: 'ghk-cu' },
+  ],
+  'nad-plus': [
+    { id: '500mg', mg: 500, name: 'NAD+ 500mg', priceKey: 'nad-plus' },
+    { id: '1000mg', mg: 1000, name: 'NAD+ 1000mg', priceKey: 'nad-plus-1000mg' },
+  ],
+}
+
+export function getProductStrengths(product: Product): readonly ProductStrength[] {
+  return Object.hasOwn(PRODUCT_STRENGTHS, product.slug) ? PRODUCT_STRENGTHS[product.slug] : []
+}
+
+export function getDefaultProductStrength(product: Product): ProductStrength | undefined {
+  return getProductStrengths(product).find((strength) => strength.priceKey === product.slug)
+}
+
 
 export const products: Product[] = [
   {
@@ -129,6 +164,78 @@ export const products: Product[] = [
     description:
       'GHK-Cu is a naturally occurring copper tripeptide studied for skin regeneration, collagen synthesis, and wound healing. Supplied at a high 100mg concentration for research use.',
     dosage: '200 clicks (40 clicks = 2 mg)',
+  },
+  {
+    slug: "semax",
+    name: "Semax 10mg",
+    category: 'LABORATORY RESEARCH',
+    image: '/products/Semax-v.png',
+    tagline: "Semax 10mg — explore package options and regional pricing.",
+    description: "Semax 10mg in the Regen research catalog. Select a package to view its price in your region. Contact our team to confirm product specifications, package contents and availability.",
+    dosage: '',
+  },
+  {
+    slug: "selank",
+    name: "Selank 10mg",
+    category: 'LABORATORY RESEARCH',
+    image: '/products/Selank-v.png',
+    tagline: "Selank 10mg — explore package options and regional pricing.",
+    description: "Selank 10mg in the Regen research catalog. Select a package to view its price in your region. Contact our team to confirm product specifications, package contents and availability.",
+    dosage: '',
+  },
+  {
+    slug: "hgh-191-aa-36iu",
+    name: "HGH 191 AA 36IU",
+    category: 'LABORATORY RESEARCH',
+    image: '/products/hgh-v.png',
+    tagline: "HGH 191 AA 36IU — explore package options and regional pricing.",
+    description: "HGH 191 AA 36IU in the Regen research catalog. Select a package to view its price in your region. Contact our team to confirm product specifications, package contents and availability.",
+    dosage: '',
+  },
+  {
+    slug: "glutathione",
+    name: "Glutathione 1500mg",
+    category: 'LABORATORY RESEARCH',
+    image: '/products/Glutathione-v.png',
+    tagline: "Glutathione 1500mg — explore package options and regional pricing.",
+    description: "Glutathione 1500mg in the Regen research catalog. Select a package to view its price in your region. Contact our team to confirm product specifications, package contents and availability.",
+    dosage: '',
+  },
+  {
+    slug: "tirzepatide",
+    name: "Tirzepatide 10mg",
+    category: 'LABORATORY RESEARCH',
+    image: '/products/Tirzepatide-v.png',
+    tagline: "Tirzepatide 10mg — explore package options and regional pricing.",
+    description: "Tirzepatide 10mg in the Regen research catalog. Select a package to view its price in your region. Contact our team to confirm product specifications, package contents and availability.",
+    dosage: '',
+  },
+  {
+    slug: "semaglutide",
+    name: "Semaglutide 5mg",
+    category: 'LABORATORY RESEARCH',
+    image: '/products/Semaglutide-v.png',
+    tagline: "Semaglutide 5mg — explore package options and regional pricing.",
+    description: "Semaglutide 5mg in the Regen research catalog. Select a package to view its price in your region. Contact our team to confirm product specifications, package contents and availability.",
+    dosage: '',
+  },
+  {
+    slug: "cagrilintide",
+    name: "Cagrilintide 5mg",
+    category: 'LABORATORY RESEARCH',
+    image: '/products/Cagrilintide-v.png',
+    tagline: "Cagrilintide 5mg — explore package options and regional pricing.",
+    description: "Cagrilintide 5mg in the Regen research catalog. Select a package to view its price in your region. Contact our team to confirm product specifications, package contents and availability.",
+    dosage: '',
+  },
+  {
+    slug: "5-amino-1mq",
+    name: "5-Amino-1MQ 5mg",
+    category: 'LABORATORY RESEARCH',
+    image: '/products/5-amino-v.png',
+    tagline: "5-Amino-1MQ 5mg — explore package options and regional pricing.",
+    description: "5-Amino-1MQ 5mg in the Regen research catalog. Select a package to view its price in your region. Contact our team to confirm product specifications, package contents and availability.",
+    dosage: '',
   },
 ]
 

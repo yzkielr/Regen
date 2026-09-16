@@ -1,10 +1,51 @@
 import type { Product, VariantId } from './products'
+import { getDefaultProductStrength, getProductStrengths } from './products'
 import type { Language } from './regions'
 
 type LocalizedProductCopy = Pick<Product, 'category' | 'tagline' | 'description'>
 
 const translations: Record<'ms' | 'id', Record<string, LocalizedProductCopy>> = {
   ms: {
+    "semax": {
+      category: "KAJIAN MAKMAL",
+      tagline: "Semax 10mg — lihat pilihan pakej dan harga di rantau anda.",
+      description: "Semax 10mg dalam katalog kajian Regen. Pilih pakej untuk melihat harga di rantau anda. Hubungi pasukan kami untuk mengesahkan spesifikasi produk, kandungan pakej dan ketersediaannya.",
+    },
+    "selank": {
+      category: "KAJIAN MAKMAL",
+      tagline: "Selank 10mg — lihat pilihan pakej dan harga di rantau anda.",
+      description: "Selank 10mg dalam katalog kajian Regen. Pilih pakej untuk melihat harga di rantau anda. Hubungi pasukan kami untuk mengesahkan spesifikasi produk, kandungan pakej dan ketersediaannya.",
+    },
+    "hgh-191-aa-36iu": {
+      category: "KAJIAN MAKMAL",
+      tagline: "HGH 191 AA 36IU — lihat pilihan pakej dan harga di rantau anda.",
+      description: "HGH 191 AA 36IU dalam katalog kajian Regen. Pilih pakej untuk melihat harga di rantau anda. Hubungi pasukan kami untuk mengesahkan spesifikasi produk, kandungan pakej dan ketersediaannya.",
+    },
+    "glutathione": {
+      category: "KAJIAN MAKMAL",
+      tagline: "Glutathione 1500mg — lihat pilihan pakej dan harga di rantau anda.",
+      description: "Glutathione 1500mg dalam katalog kajian Regen. Pilih pakej untuk melihat harga di rantau anda. Hubungi pasukan kami untuk mengesahkan spesifikasi produk, kandungan pakej dan ketersediaannya.",
+    },
+    "tirzepatide": {
+      category: "KAJIAN MAKMAL",
+      tagline: "Tirzepatide 10mg — lihat pilihan pakej dan harga di rantau anda.",
+      description: "Tirzepatide 10mg dalam katalog kajian Regen. Pilih pakej untuk melihat harga di rantau anda. Hubungi pasukan kami untuk mengesahkan spesifikasi produk, kandungan pakej dan ketersediaannya.",
+    },
+    "semaglutide": {
+      category: "KAJIAN MAKMAL",
+      tagline: "Semaglutide 5mg — lihat pilihan pakej dan harga di rantau anda.",
+      description: "Semaglutide 5mg dalam katalog kajian Regen. Pilih pakej untuk melihat harga di rantau anda. Hubungi pasukan kami untuk mengesahkan spesifikasi produk, kandungan pakej dan ketersediaannya.",
+    },
+    "cagrilintide": {
+      category: "KAJIAN MAKMAL",
+      tagline: "Cagrilintide 5mg — lihat pilihan pakej dan harga di rantau anda.",
+      description: "Cagrilintide 5mg dalam katalog kajian Regen. Pilih pakej untuk melihat harga di rantau anda. Hubungi pasukan kami untuk mengesahkan spesifikasi produk, kandungan pakej dan ketersediaannya.",
+    },
+    "5-amino-1mq": {
+      category: "KAJIAN MAKMAL",
+      tagline: "5-Amino-1MQ 5mg — lihat pilihan pakej dan harga di rantau anda.",
+      description: "5-Amino-1MQ 5mg dalam katalog kajian Regen. Pilih pakej untuk melihat harga di rantau anda. Hubungi pasukan kami untuk mengesahkan spesifikasi produk, kandungan pakej dan ketersediaannya.",
+    },
     retatrutide: {
       category: 'LEMAK & KOMPOSISI BADAN',
       tagline: 'Agonis tiga reseptor yang dikaji untuk komposisi badan.',
@@ -47,6 +88,46 @@ const translations: Record<'ms' | 'id', Record<string, LocalizedProductCopy>> = 
     },
   },
   id: {
+    "semax": {
+      category: "RISET LABORATORIUM",
+      tagline: "Semax 10mg — lihat pilihan paket dan harga di region Anda.",
+      description: "Semax 10mg dalam katalog riset Regen. Pilih paket untuk melihat harga di region Anda. Hubungi tim kami untuk memastikan spesifikasi produk, isi paket, dan ketersediaannya.",
+    },
+    "selank": {
+      category: "RISET LABORATORIUM",
+      tagline: "Selank 10mg — lihat pilihan paket dan harga di region Anda.",
+      description: "Selank 10mg dalam katalog riset Regen. Pilih paket untuk melihat harga di region Anda. Hubungi tim kami untuk memastikan spesifikasi produk, isi paket, dan ketersediaannya.",
+    },
+    "hgh-191-aa-36iu": {
+      category: "RISET LABORATORIUM",
+      tagline: "HGH 191 AA 36IU — lihat pilihan paket dan harga di region Anda.",
+      description: "HGH 191 AA 36IU dalam katalog riset Regen. Pilih paket untuk melihat harga di region Anda. Hubungi tim kami untuk memastikan spesifikasi produk, isi paket, dan ketersediaannya.",
+    },
+    "glutathione": {
+      category: "RISET LABORATORIUM",
+      tagline: "Glutathione 1500mg — lihat pilihan paket dan harga di region Anda.",
+      description: "Glutathione 1500mg dalam katalog riset Regen. Pilih paket untuk melihat harga di region Anda. Hubungi tim kami untuk memastikan spesifikasi produk, isi paket, dan ketersediaannya.",
+    },
+    "tirzepatide": {
+      category: "RISET LABORATORIUM",
+      tagline: "Tirzepatide 10mg — lihat pilihan paket dan harga di region Anda.",
+      description: "Tirzepatide 10mg dalam katalog riset Regen. Pilih paket untuk melihat harga di region Anda. Hubungi tim kami untuk memastikan spesifikasi produk, isi paket, dan ketersediaannya.",
+    },
+    "semaglutide": {
+      category: "RISET LABORATORIUM",
+      tagline: "Semaglutide 5mg — lihat pilihan paket dan harga di region Anda.",
+      description: "Semaglutide 5mg dalam katalog riset Regen. Pilih paket untuk melihat harga di region Anda. Hubungi tim kami untuk memastikan spesifikasi produk, isi paket, dan ketersediaannya.",
+    },
+    "cagrilintide": {
+      category: "RISET LABORATORIUM",
+      tagline: "Cagrilintide 5mg — lihat pilihan paket dan harga di region Anda.",
+      description: "Cagrilintide 5mg dalam katalog riset Regen. Pilih paket untuk melihat harga di region Anda. Hubungi tim kami untuk memastikan spesifikasi produk, isi paket, dan ketersediaannya.",
+    },
+    "5-amino-1mq": {
+      category: "RISET LABORATORIUM",
+      tagline: "5-Amino-1MQ 5mg — lihat pilihan paket dan harga di region Anda.",
+      description: "5-Amino-1MQ 5mg dalam katalog riset Regen. Pilih paket untuk melihat harga di region Anda. Hubungi tim kami untuk memastikan spesifikasi produk, isi paket, dan ketersediaannya.",
+    },
     retatrutide: {
       category: 'LEMAK & KOMPOSISI TUBUH',
       tagline: 'Agonis tiga reseptor yang diteliti untuk komposisi tubuh.',
@@ -90,12 +171,26 @@ const translations: Record<'ms' | 'id', Record<string, LocalizedProductCopy>> = 
   },
 }
 
-export function getProductCopy(product: Product, language: Language): Product {
-  if (language === 'en') return product
-  return {
+export function getProductCopy(product: Product, language: Language, strengthId?: string): Product {
+  const localized = language === 'en' ? product : {
     ...product,
     ...translations[language][product.slug],
     dosage: product.dosage.replaceAll('clicks', 'klik'),
+  }
+  const strength = getProductStrengths(product).find((item) => item.id === strengthId)
+  const defaultStrength = getDefaultProductStrength(product)
+  if (!strength || !defaultStrength) return localized
+
+  return {
+    ...localized,
+    name: strength.name,
+    image: strength.image ?? product.image,
+    description: localized.description.replace(
+      new RegExp(`\\b${defaultStrength.mg}\\s*mg\\b`, 'g'),
+      `${strength.mg}mg`,
+    ),
+    // A different strength must not inherit the original cartridge's click reference.
+    dosage: strength.id === defaultStrength.id ? localized.dosage : '',
   }
 }
 
@@ -108,6 +203,8 @@ type CatalogCopy = {
   backToCatalog: string
   labelReference: string
   selectFormat: string
+  selectStrength: string
+  strengthPhotoNotice: string
   orderConsultation: string
   viewImage: string
   researchOnly: string
@@ -134,9 +231,11 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     backToCatalog: 'Back to catalog',
     labelReference: 'Cartridge label reference (not usage guidance)',
     selectFormat: 'Choose your format',
+    selectStrength: 'Choose strength (mg)',
+    strengthPhotoNotice: 'Illustrative photo. The label shown may differ from the selected strength.',
     orderConsultation: 'Product & Pricing Inquiry',
     viewImage: 'View',
-    researchOnly: 'For lab research use and activity only.',
+    researchOnly: 'For laboratory research use and activity only .',
     priceNotice: 'Prices are shown in your selected currency where a catalog price is available. Ask our team to confirm final pricing, availability, shipping and any applicable taxes for your region.',
     photoNotice: 'Catalog images are illustrative. Confirm product and packaging details with our team.',
     recommendedHeading: 'More from the catalog.',
@@ -165,9 +264,11 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     backToCatalog: 'Kembali ke katalog',
     labelReference: 'Info pada label cartridge (bukan panduan penggunaan)',
     selectFormat: 'Pilih format anda',
+    selectStrength: 'Pilih kandungan (mg)',
+    strengthPhotoNotice: 'Gambar ilustrasi. Label pada gambar mungkin berbeza daripada kandungan yang dipilih.',
     orderConsultation: 'Tanya Produk & Harga',
     viewImage: 'Lihat',
-    researchOnly: 'Untuk kegunaan dan aktiviti penyelidikan makmal sahaja',
+    researchOnly: 'Untuk kegunaan dan aktiviti penyelidikan makmal sahaja.',
     priceNotice: 'Harga katalog yang tersedia dipaparkan dalam mata wang pilihan anda. Sebelum buat pesanan, semak harga akhir, produk yang tersedia, penghantaran dan cukai untuk region anda dengan kami.',
     photoNotice: 'Gambar katalog hanya sebagai rujukan. Semak detail produk dan packaging dengan kami sebelum membuat pesanan.',
     recommendedHeading: 'Lihat juga produk lain.',
@@ -196,9 +297,11 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     backToCatalog: 'Kembali ke katalog',
     labelReference: 'Info pada label cartridge (bukan petunjuk penggunaan)',
     selectFormat: 'Pilih format yang kamu butuhkan',
+    selectStrength: 'Pilih ukuran (mg)',
+    strengthPhotoNotice: 'Foto ilustrasi. Label pada gambar bisa berbeda dari ukuran yang dipilih.',
     orderConsultation: 'Tanya Produk & Harga',
     viewImage: 'Lihat',
-    researchOnly: 'Hanya untuk penggunaan dan aktivitas penelitian laboratorium.',
+    researchOnly: 'Khusus penggunaan riset laboratorium.',
     priceNotice: 'Harga katalog yang tersedia ditampilkan dalam mata uang pilihanmu. Cek dulu dengan kami untuk harga akhir, produk yang bisa dipesan, pengiriman, dan pajak di region kamu.',
     photoNotice: 'Foto katalog hanya sebagai gambaran. Cek detail produk dan kemasan dengan kami sebelum memesan.',
     basicPhotoNotice: 'Foto Basic Package sebagai gambaran. Konfirmasi isi paket dan detail produk dengan tim kami.',

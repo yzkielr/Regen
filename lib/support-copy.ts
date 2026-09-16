@@ -265,7 +265,7 @@ export const SUPPORT_COPY: Record<Language, SupportCopy> = {
       contact: 'Hubungi kami',
       regionShipping: 'Untuk region {region}, pasukan kami akan sahkan produk yang tersedia dan pilihan penghantarannya.',
       copyright: 'Hak cipta terpelihara.',
-      researchOnly: 'Untuk penyelidikan makmal sahaja.',
+      researchOnly: 'Untuk kegunaan dan aktiviti penyelidikan makmal sahaja',
     },
   },
   id: {
@@ -357,7 +357,7 @@ export const SUPPORT_COPY: Record<Language, SupportCopy> = {
       contact: 'Hubungi kami',
       regionShipping: 'Untuk region {region}, tim kami akan mengonfirmasi produk yang tersedia dan opsi pengirimannya.',
       copyright: 'Hak cipta dilindungi.',
-      researchOnly: 'Hanya untuk riset laboratorium.',
+      researchOnly: 'Hanya untuk penggunaan dan aktivitas penelitian laboratorium.',
     },
   },
 }
