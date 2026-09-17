@@ -95,7 +95,7 @@ export default async function PrivacyPolicyPage({ searchParams }: PageProps) {
   const copy = privacyCopy[region.language]
 
   return (
-    <article lang={region.language} className="min-h-screen bg-[#f4f8f5] pb-16 pt-28 text-[#003F35] sm:pt-32">
+    <article lang={region.language} className="min-h-screen bg-[#f4f8f5] pb-16 pt-6 text-[#003F35] sm:pt-10">
       <div className="mx-auto w-full max-w-6xl px-4 sm:px-6">
         <a href={regionPath(region.id)} className="inline-flex min-h-11 items-center gap-2 text-sm font-medium underline-offset-4 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-[#F26A21]">
           <span aria-hidden="true">←</span> {copy.back}
@@ -107,13 +107,6 @@ export default async function PrivacyPolicyPage({ searchParams }: PageProps) {
           <p className="mt-5 text-base leading-7 text-slate-700 sm:text-lg">{copy.intro}</p>
           <p className="mt-4 text-sm text-slate-600">{PRIVACY_IS_DRAFT ? copy.draftDateLabel : copy.updatedLabel}: {copy.date}</p>
         </header>
-
-        {PRIVACY_IS_DRAFT && (
-          <aside aria-label={copy.draftAria} className="mt-8 rounded-2xl border border-orange-200 bg-orange-50 p-5 text-sm leading-6 text-orange-950">
-            <p className="font-semibold">{copy.draftTitle}</p>
-            <p className="mt-1">{copy.draftBody}</p>
-          </aside>
-        )}
 
         <div className="mt-8 grid items-start gap-8 lg:grid-cols-[240px_minmax(0,1fr)]">
           <aside className="min-w-0 space-y-5 lg:sticky lg:top-28">

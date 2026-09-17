@@ -42,7 +42,7 @@ export const privacyCopy: Record<Language, PrivacyCopy> = {
     "updatedLabel": "Terakhir diperbarui",
     "date": "17 September 2026",
     "draftAria": "Status dokumen",
-    "draftTitle": "Draf untuk ditinjau sebelum dipublikasikan",
+    "draftTitle": "",
     "draftBody": "Identitas pengelola, penyedia layanan, penggunaan otomasi atau AI, pengaturan cookie, dan ketentuan penyimpanan perlu disesuaikan dengan praktik Regen yang sebenarnya.",
     "tocAria": "Daftar isi kebijakan privasi",
     "tocTitle": "Di halaman ini",
