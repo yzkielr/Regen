@@ -11,6 +11,11 @@ import { CONTACT_EMAIL, regionalSupportText, SUPPORT_COPY } from '@/lib/support-
 export function SiteFooter() {
   const { region, language, href } = useRegion()
   const copy = SUPPORT_COPY[language].footer
+  const privacyLabel = language === 'id'
+    ? 'Kebijakan Privasi'
+    : language === 'ms'
+      ? 'Dasar Privasi'
+      : 'Privacy Policy'
 
   return (
     <footer id="kontak" className="bg-primary text-primary-foreground">
@@ -119,11 +124,19 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-primary-foreground/15 py-6 text-xs text-primary-foreground/60 sm:flex-row sm:items-center sm:justify-between">
-          <p>
-            &copy; {new Date().getFullYear()} Regen. {copy.copyright}
-          </p>
-          <p className="max-w-lg text-pretty sm:text-right">
+        <div className="flex flex-col gap-4 border-t border-primary-foreground/15 py-6 text-xs text-primary-foreground/60 lg:flex-row lg:items-center lg:justify-between">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+            <p>
+              &copy; {new Date().getFullYear()} Regen. {copy.copyright}
+            </p>
+            <a
+              href={`/privacy-policy?region=${region.id}`}
+              className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-accent-foreground transition-colors hover:bg-accent/90 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-accent"
+            >
+              {privacyLabel}
+            </a>
+          </div>
+          <p className="max-w-lg text-pretty lg:text-right">
             {copy.researchOnly}
           </p>
         </div>
