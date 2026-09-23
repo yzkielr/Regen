@@ -126,10 +126,10 @@ const RETATRUTIDE_RESULTS: LabResult[] = [
 /** Shared fields for every code tied to the June 2026 Retatrutide batch. */
 const RETATRUTIDE_BATCH = {
   product: 'Regen Retatrutide 10mg',
-  batch: 'LRRT02',
+  batch: 'LREGENRT03',
   manufactured: '06 / 2026',
   expiry: '06 / 2028',
-  lab: 'Uzorak.com — Zagreb, Croatia (EU)',
+  lab: 'Janoshik and Uzorak',
   tested: '16 July 2026',
   results: RETATRUTIDE_RESULTS,
   documents: RETATRUTIDE_DOCUMENTS,
