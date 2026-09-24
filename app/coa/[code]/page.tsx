@@ -35,7 +35,7 @@ const product = {
   purity: '99.78%',
   measuredAmount: '11.18 mg',
   endotoxin: 'PASS',
-  batch: 'LREGENT03',
+  batch: 'LREGENRT03',
   manufactured: '06 / 2026',
   expiry: '06 / 2028',
   tested: '16 July 2026',
