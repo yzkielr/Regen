@@ -6,6 +6,8 @@ import type { MetadataRoute } from 'next'
  * out of search results along with the protected lab-document route.
  */
 export default function robots(): MetadataRoute.Robots {
+  // /coa pages and PDFs send noindex metadata/headers. Allow crawling so
+  // search engines can see that instruction; do not list them in a sitemap.
   return {
     rules: {
       userAgent: '*',

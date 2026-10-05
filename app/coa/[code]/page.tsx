@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import { Inter, Poppins } from 'next/font/google'
 import { notFound } from 'next/navigation'
 import { PdfPages } from './pdf-pages'
+import { CoaReportPage } from '@/components/coa-report-page'
+import { getCoaReport } from '@/lib/coa-reports'
 
 const inter = Inter({ subsets: ['latin'], display: 'swap', variable: '--coa-font-body' })
 const poppins = Poppins({
@@ -14,7 +16,7 @@ const poppins = Poppins({
 
 export const dynamic = 'force-dynamic'
 
-export const metadata: Metadata = {
+const legacyMetadata: Metadata = {
   title: 'Product Authenticity — Regen',
   description: 'Retatrutide batch documentation and laboratory reports.',
   robots: {
@@ -24,6 +26,20 @@ export const metadata: Metadata = {
     googleBot: { index: false, follow: false, noimageindex: true },
   },
   referrer: 'no-referrer',
+}
+
+export async function generateMetadata({ params }: { params: Promise<{ code: string }> }): Promise<Metadata> {
+  const report = getCoaReport((await params).code)
+  if (!report) return legacyMetadata
+  const title = `${report.name} — Certificate of Analysis | Regen`
+  const description = `COA and laboratory documentation for ${report.name}.`
+  return {
+    ...legacyMetadata,
+    title,
+    description,
+    alternates: { canonical: `/coa/${report.slug}` },
+    openGraph: { title, description, type: 'website', url: `/coa/${report.slug}` },
+  }
 }
 
 // The owner confirmed that Lorenic is the former brand of Regen.
@@ -133,6 +149,8 @@ function ReportImages({ code, start, end, label }: { code: string; start: number
 
 export default async function CoaPage({ params }: { params: Promise<{ code: string }> }) {
   const { code } = await params
+  const report = getCoaReport(code)
+  if (report) return <CoaReportPage report={report} />
   const expectedCode = process.env.REGEN_RETATRUTIDE_COA_CODE
 
   // Preserve the existing physical-product link and fail closed.

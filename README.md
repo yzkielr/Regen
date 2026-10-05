@@ -1,5 +1,54 @@
 # Regen Longevity Lab
 
+## Unlisted COA pages
+
+The 26 original PDFs supplied on 5 October 2026 are stored in
+`lab-documents/coa/` and grouped into 25 product pages by `lib/coa-reports.ts`.
+Retatrutide includes its summary and the separate five-page Janoshik report.
+Documents are served from `/coa/[code]/document/[document]` using a filename
+allowlist; production tracing includes these PDFs in the server route bundle.
+
+These URLs have no links from the storefront, menus, product cards or sitemap.
+Pages and PDFs send `X-Robots-Tag: noindex, nofollow, noarchive, noimageindex`;
+pages also include robots metadata. Crawling is allowed so search engines can
+read the noindex instruction. They are unlisted public links: anyone with a URL
+can open it, without a login. The existing coded COA and `/verify/reta10` routes
+retain their previous behavior.
+
+After deploying this project to `https://www.regenlongevitylab.com`, append:
+
+| Product | URL path |
+| --- | --- |
+| Tesamorelin | `/coa/tesamorelin` |
+| Semaglutide | `/coa/semaglutide` |
+| PT-141 | `/coa/pt-141` |
+| NAD+ | `/coa/nad-plus` |
+| Cagrilintide | `/coa/cagrilintide` |
+| 5-Amino-1MQ | `/coa/5-amino-1mq` |
+| Tirzepatide | `/coa/tirzepatide` |
+| GHK-Cu | `/coa/ghk-cu` |
+| SS-31 (Elamipretide) | `/coa/ss-31` |
+| KLOW80 | `/coa/klow80` |
+| BPC-157 | `/coa/bpc-157` |
+| Semax | `/coa/semax` |
+| Retatrutide | `/coa/retatrutide` |
+| TB-500 | `/coa/tb-500` |
+| HGH 191AA | `/coa/hgh-191aa` |
+| KPV | `/coa/kpv` |
+| DSIP | `/coa/dsip` |
+| Ipamorelin | `/coa/ipamorelin` |
+| CJC-1295 With DAC | `/coa/cjc-1295-with-dac` |
+| CJC-1295 Without DAC | `/coa/cjc-1295-without-dac` |
+| MT-2 | `/coa/mt-2` |
+| Selank | `/coa/selank` |
+| BPC-157 + TB-500 | `/coa/bpc-157-tb-500` |
+| AOD-9604 | `/coa/aod-9604` |
+| Epithalon | `/coa/epithalon` |
+
+Run `npm run test:coa` to check the registry and file coverage. To add or replace
+a report, update its registered filename and page count as well as the PDF.
+`scripts/prepare-coa-pdf.mjs` prepares the PDF.js assets after a PDF.js update.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [v0](https://v0.app).
 
 ## Regional websites

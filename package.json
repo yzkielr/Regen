@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "test:coa": "node --experimental-strip-types --test lib/coa-reports.test.mjs",
     "test:regions": "node --test lib/regions.test.mjs lib/region-pricing.test.mjs lib/product-pricing-ui.test.mjs lib/regional-routing.test.mjs lib/region-detection.test.mjs lib/region-entry.test.mjs lib/region-suggestion.test.mjs lib/regional-copy.test.mjs lib/trust-carousel.test.mjs",
     "lint": "eslint ."
   },
