@@ -37,6 +37,11 @@ export const metadata: Metadata = {
   description:
     'Regen develops and delivers advanced peptide therapies with uncompromising quality, traceability, and clinical precision.',
   generator: 'v0.app',
+  verification: {
+    other: {
+      'facebook-domain-verification': 'zeq22fpyjpvy6zb2tgpsvs10fzaddt',
+    },
+  },
   keywords: [
     'Regen',
     'peptide',
