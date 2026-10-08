@@ -1,9 +1,25 @@
 import type { Operations } from './operations';
-import type { ServiceJob } from './service-types';
+import type { ServiceJob, ServiceState } from './service-types';
 import { botMessageSendAllowed } from './service-types';
 import { REGEN_CS_PHONE } from './regen-phone';
 
 export const CS_PHONE_ID='1417834054746717';
+export type WhatsAppConnection = {
+ state:'checking'|'unavailable'|'unconfigured'|'attention'|'waiting'|'stale'|'active';
+ active:boolean;label:string;shortLabel:string;detail:string;lastAt:number;lastBackgroundAt:number;
+};
+// A connection is live only after a recent successful sync. AI pause and human
+// takeover affect replies, not the availability of the WhatsApp connection.
+export function whatsappConnectionStatus(configured:boolean|null|undefined,sync?:ServiceState['csSync'],now=Date.now()):WhatsAppConnection {
+ const base={active:false,lastAt:sync?.lastAt||0,lastBackgroundAt:sync?.lastBackgroundAt||0};
+ if(configured===undefined)return {...base,state:'checking',label:'Memeriksa koneksi WhatsApp',shortLabel:'Memeriksa',detail:'Membaca status koneksi dari server.'};
+ if(configured===null)return {...base,state:'unavailable',label:'Status WhatsApp belum tersedia',shortLabel:'Belum diketahui',detail:'Status koneksi belum dapat dibaca. Coba periksa ulang.'};
+ if(!configured)return {...base,state:'unconfigured',label:'WhatsApp belum dikonfigurasi',shortLabel:'Belum terhubung',detail:'Koneksi WhatsApp untuk ruang kerja ini belum dikonfigurasi.'};
+ if(sync?.error)return {...base,state:'attention',label:'WhatsApp perlu diperiksa',shortLabel:'Perlu diperiksa',detail:sync.error};
+ if(!base.lastAt)return {...base,state:'waiting',label:'WhatsApp menunggu sinkronisasi',shortLabel:'Menunggu sinkronisasi',detail:'Koneksi sudah dikonfigurasi; belum ada hasil sinkronisasi.'};
+ if(now-base.lastAt<0||now-base.lastAt>300000)return {...base,state:'stale',label:'WhatsApp perlu sinkronisasi',shortLabel:'Perlu sinkronisasi',detail:'Belum ada sinkronisasi berhasil dalam 5 menit terakhir. Periksa sinkronisasi di Pusat CS.'};
+ return {...base,active:true,state:'active',label:'WhatsApp live aktif',shortLabel:'Live aktif',detail:'Koneksi WhatsApp sudah dikonfigurasi dan sinkronisasi terakhir berhasil. Status terkirim atau tersampaikan dapat dilihat pada setiap pesan.'};
+}
 export type CsEvent={kind:'incoming'|'delivery';customerPhone:string;providerId:string;at:number;name?:string;text?:string;unsupported?:boolean;status?:string};
 export function parseCsEvent(raw:unknown,now=Date.now()):CsEvent {
  const v=raw as Record<string,unknown>;
