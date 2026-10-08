@@ -6,6 +6,7 @@ export type Entry = { id: string; createdAt: number; updatedAt: number; [key: st
 export const collections = ['contacts','knowledge','replies','guardrails','automations','agents','owners','campaigns','products','orders','appointments','shipments','rates','calls','channels','adEvents','integrations'] as const;
 export type Collection = typeof collections[number];
 export type Settings = { businessName: string; phone: string; email: string; address: string; timezone: string; serviceHours: string; botName: string; botPrompt: string; botEnabled: boolean; confidence: number; fallback: string; greeting: string; invoicePrefix: string; taxPercent: number; currency: string };
+export const MAX_BOT_PROMPT_LENGTH = 20000;
 export type Log = { id: string; at: number; area: string; message: string; level: 'info' | 'warning' | 'error' };
 export type Operations = { businessPhoneRevision?: number; records: Record<Collection, Entry[]>; settings: Settings; logs: Log[]; processed: string[]; service?:ServiceState; movements: { id: string; productId: string; quantity: number; reason: string; at: number }[] };
 export type OpsEnvelope = { state: Operations; version: number };
@@ -106,7 +107,7 @@ export function applyOps(original:Operations,a:OpsAction,now=Date.now(),context:
     for(const k of Object.keys(next) as (keyof Settings)[]) if(k in d) {
       if(k==='botEnabled') {if(typeof d[k]!=='boolean') throw new Error('Status bot tidak valid.');next.botEnabled=d[k];}
       else if(k==='confidence'||k==='taxPercent') next[k]=numeric(d[k],k,0,100);
-      else next[k]=text(d[k],k==='botPrompt'?8000:2000);
+      else next[k]=text(d[k],k==='botPrompt'?MAX_BOT_PROMPT_LENGTH:2000);
     }
     if(!next.businessName||!next.fallback||!next.invoicePrefix||!/^[A-Z0-9-]{1,12}$/.test(next.invoicePrefix)) throw new Error('Nama, jawaban eskalasi, dan awalan invoice harus valid.');
     if(next.timezone!=='Asia/Jakarta'||next.currency!=='IDR') throw new Error('Versi ini menggunakan WIB dan IDR.');
