@@ -1,5 +1,6 @@
 import type { Operations } from './operations';
 import type { ServiceJob } from './service-types';
+import { botMessageSendAllowed } from './service-types';
 import { REGEN_CS_PHONE } from './regen-phone';
 
 export const CS_PHONE_ID='1417834054746717';
@@ -24,6 +25,6 @@ export function csSendAllowed(s:Operations,j:ServiceJob,now=Date.now()){
  if(!c||c.test||c.transport!=='meta-cs'||j.test||j.transport!=='meta-cs'||j.kind!=='customer'||!m||!['bot','admin'].includes(m.role)||contact?.demoOnly===true||j.destination!==contact?.phone)return false;
  if(!/^\+[1-9]\d{6,14}$/.test(j.destination)||j.destination===REGEN_CS_PHONE||!['blocked','queued','sending'].includes(j.status)||m.status!=='queued')return false;
  if(!c.lastInboundAt||now-c.lastInboundAt>=86400000||c.lastInboundAt>now+300000)return false;
- if(m.role==='bot'&&(!s.settings.botEnabled||c.mode!=='bot'||c.messages.filter(m=>m.role==='customer').at(-1)?.id!==m.replyTo))return false;
+ if(m.role==='bot'&&!botMessageSendAllowed(c,m,s.settings.botEnabled))return false;
  return true;
 }

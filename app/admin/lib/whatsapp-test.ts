@@ -1,5 +1,6 @@
 import type { Operations } from './operations';
 import type { Conversation, ServiceJob } from './service-types';
+import { botMessageSendAllowed } from './service-types';
 
 export const META_TEST_PHONE = '+15551469188';
 export const META_TEST_PHONE_ID = '1310478815485552';
@@ -28,6 +29,6 @@ export function testSendAllowed(state:Operations,j:ServiceJob,now:number):boolea
   if(!c||!isWhatsAppTest(c)||j.transport!==META_TEST_TRANSPORT||j.kind!=='customer'||j.destination!==META_TEST_RECIPIENT||!m||!['admin','bot'].includes(m.role))return false;
   if(!['blocked','queued','sending'].includes(j.status)||!['queued'].includes(m.status))return false;
   if(!c.lastInboundAt||now-c.lastInboundAt>=24*60*60*1000||c.lastInboundAt>now+300000)return false;
-  if(m.role==='bot'&&(!state.settings.botEnabled||c.mode!=='bot'||c.messages.filter(x=>x.role==='customer').at(-1)?.id!==m.replyTo))return false;
+  if(m.role==='bot'&&!botMessageSendAllowed(c,m,state.settings.botEnabled))return false;
   return true;
 }

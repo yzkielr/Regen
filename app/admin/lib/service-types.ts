@@ -1,6 +1,6 @@
 export type ChatMode = 'bot' | 'off' | 'human';
 export type MessageStatus = 'received' | 'draft' | 'queued' | 'simulated' | 'sent' | 'delivered' | 'read' | 'failed' | 'cancelled' | 'unknown';
-export type ServiceMessage = { id:string; at:number; role:'customer'|'bot'|'admin'|'note'; text:string; status:MessageStatus; providerId?:string; source?:string; confidence?:number; corrects?:string; replyTo?:string };
+export type ServiceMessage = { id:string; at:number; role:'customer'|'bot'|'admin'|'note'; text:string; status:MessageStatus; providerId?:string; source?:string; confidence?:number; corrects?:string; replyTo?:string; purpose?:'handoff' };
 export type Conversation = { id:string; contactId:string; test:boolean; transport?:'meta-test'|'meta-cs'; lastInboundAt?:number; mode:ChatMode; epoch:number; assignee:string; needsAttention:boolean; reason:string; createdAt:number; updatedAt:number; messages:ServiceMessage[]; orderSuggestion?:{questionId:string;items:{productId:string;quantity:number}[]} };
 export type Payment = { id:string; provider:'flip'|'paper'|'manual'; transactionId:string; reference:string; amount:number; currency:string; customer:string; occurredAt:number; receivedAt:number; verified:boolean; test:boolean; status:'matched'|'review'|'rejected'; reason:string; orderId:string; evidence:string; reviewedBy?:string; reviewedAt?:number };
 export type ServiceJob = { id:string; kind:'customer'|'warehouse'|'flip_invoice'; orderId?:string; conversationId?:string; messageId?:string; destination:string; text:string; test:boolean; transport?:'meta-test'|'meta-cs'; status:'queued'|'blocked'|'sending'|'sent'|'failed'|'unknown'|'cancelled'|'simulated'; reason:string; createdAt:number; updatedAt:number; providerId?:string; attemptId?:string };
@@ -9,4 +9,9 @@ export type ServiceConfig = { warehousePhone:string; invoiceEmail:string; paymen
 export type ServiceState = { conversations:Conversation[]; payments:Payment[]; jobs:ServiceJob[]; ideas:ContentIdea[]; config:ServiceConfig; lastEventAt:number; lastAiAt:number; aiBusyUntil:number; csSync?:{lease:string;until:number;cursor:number;lastAt:number;error:string;lastBackgroundAt?:number}; testSync?:{lease:string;until:number;cursor:number;lastAt:number;error:string} };
 export type ServiceAction = { kind:string; [key:string]:unknown };
 export type ServiceContext = { trusted?:boolean; actor?:string; whatsappReady?:boolean; whatsappTestReady?:boolean; flipReady?:boolean };
+export function botMessageSendAllowed(c:Conversation,m:ServiceMessage,botEnabled:boolean):boolean {
+ if(!botEnabled||m.role!=='bot'||!m.replyTo)return false;
+ if(m.purpose==='handoff')return c.mode==='human'&&c.needsAttention&&c.messages.some(v=>v.role==='customer'&&v.id===m.replyTo);
+ return c.mode==='bot'&&c.messages.filter(v=>v.role==='customer').at(-1)?.id===m.replyTo;
+}
 export function createService():ServiceState {return {conversations:[],payments:[],jobs:[],ideas:[],lastEventAt:0,lastAiAt:0,aiBusyUntil:0,config:{warehousePhone:'',invoiceEmail:'',emailSender:'',paymentProvider:'paper',tone:'Ramah, jelas, ringkas. Gunakan bahasa pelanggan. Jangan mengarang fakta atau janji.',contentPrompt:'Buat konten edukasi dari pertanyaan pelanggan. Hindari data pribadi, klaim kesehatan yang tidak didukung, serta janji hasil.'}};}
