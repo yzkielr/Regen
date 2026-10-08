@@ -1,6 +1,7 @@
 import 'server-only';
 import { cookies } from 'next/headers';
 import { ADMIN_BACKEND, ADMIN_COOKIE, validAdminSession } from './admin-gateway-policy';
+import type { AdminRole } from '@/app/admin/lib/admin-roles';
 
 export function adminBackendOrigin() {
   const local=process.env.REGEN_ADMIN_BACKEND_URL;
@@ -24,6 +25,6 @@ export async function adminAuth(action: 'login'|'logout'|'session', token?: stri
 export async function currentAdmin() {
   const token = (await cookies()).get(ADMIN_COOKIE)?.value;
   if (!validAdminSession(token)) return null;
-  try { const response = await adminAuth('session',token); if (!response.ok) return null; const data = await response.json(); return typeof data.username === 'string' ? { username:data.username as string } : null; }
+  try { const response = await adminAuth('session',token); if (!response.ok) return null; const data = await response.json(); return typeof data.username === 'string' ? { username:data.username as string, displayName:typeof data.displayName==='string'?data.displayName:data.username, role:(data.role==='supervisor'?'supervisor':'admin') as AdminRole } : null; }
   catch { return null; }
 }

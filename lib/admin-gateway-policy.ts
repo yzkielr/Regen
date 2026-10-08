@@ -2,6 +2,7 @@ export const ADMIN_COOKIE = 'regen_admin_session';
 export const ADMIN_BACKEND = 'https://regen-inbox.hello-wearology.chatgpt.site';
 export const MAX_ADMIN_BODY = 4_000_000;
 const routes: Record<string, readonly string[]> = {
+  'admin-accounts': ['GET','POST'],
   operations: ['GET','POST'], workspace: ['GET','POST'], files: ['GET','POST','DELETE'], health: ['GET'], whatsapp: ['GET'],
   'knowledge/link': ['POST'], 'service/status': ['GET'], 'service/ai': ['POST'], 'service/flip': ['POST'],
   'service/whatsapp-test': ['POST'], 'service/whatsapp-cs': ['POST'], 'service/whatsapp-cs/setup': ['POST'],

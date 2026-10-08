@@ -5,5 +5,5 @@ export const dynamic = 'force-dynamic';
 export default async function AdminPage() {
   const user = await currentAdmin();
   if (!user) redirect('/admin/login');
-  return <OperationsConsole displayName={user.username}/>;
+  return <OperationsConsole displayName={user.displayName} role={user.role}/>;
 }
