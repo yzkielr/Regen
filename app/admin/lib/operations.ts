@@ -167,7 +167,7 @@ export const coaProducts=[['Tirzepatide','tirzepatide'],['Retatrutide','retatrut
 export function previewBot(s:Operations,question:string):{answer:string;source:string;handoff:boolean;score:number} {
   const q=question.toLowerCase().replace(/[^a-z0-9+]+/g,' ').trim();
   for(const r of s.records.guardrails.filter(r=>r.enabled)) if(String(r.keywords).split(',').some(k=>k.trim()&&q.includes(k.trim().toLowerCase()))) return {answer:String(r.response),source:`Guardrail: ${r.name}`,handoff:true,score:100};
-  if(/\b(admin|manusia|dosis|resep|efek samping)\b/.test(q))return {answer:s.settings.fallback,source:'Eskalasi admin',handoff:true,score:0};
+  if(/\b(admin|manusia|dosis|resep)\b/.test(q))return {answer:s.settings.fallback,source:'Eskalasi admin',handoff:true,score:0};
   if(/\b(coa|certificate|sertifikat)\b/.test(q)) {
     const matches=coaProducts.filter(([name])=>q.includes(name.toLowerCase().replace(/[^a-z0-9+]+/g,' ')));
     const combined=matches.find(([name])=>name.includes(' + '));const found=combined?[combined]:matches;

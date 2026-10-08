@@ -5,7 +5,7 @@ import path from 'node:path';
 import postcss from 'postcss';
 const root=process.cwd(), source=path.join(root,'sites/regen-inbox'), target=path.join(root,'app/admin');
 const ui=['admin-accounts-panel','operations-console','operations-panels','operations-components','service-console','knowledge-importer','whatsapp-test-sync','whatsapp-cs-panel','dashboard','admin-panels'];
-const libs=['admin-roles','admin-password-policy','operations','module-catalog','regen-phone','service','service-types','knowledge','whatsapp-test','whatsapp-cs','flip','document-extract','admin','types'];
+const libs=['admin-roles','admin-password-policy','operations','module-catalog','regen-phone','service','service-types','research-sources','knowledge','whatsapp-test','whatsapp-cs','flip','document-extract','admin','types'];
 fs.mkdirSync(path.join(target,'ui'),{recursive:true});fs.mkdirSync(path.join(target,'lib'),{recursive:true});fs.mkdirSync(path.join(root,'public/admin-assets'),{recursive:true});
 for(const name of libs){const data=fs.readFileSync(path.join(source,`lib/${name}.ts`),'utf8').replace(/(from\s+['"]\.\.?\/[^'"]+)\.ts(['"])/g,'$1$2').replaceAll("import('pdfjs-dist/","import('pdfjs-dist-admin/").replaceAll('/pdf.worker.min.mjs','/admin-assets/pdf.worker.min.mjs').replaceAll('/pdf-assets/','/admin-assets/pdf-assets/');fs.writeFileSync(path.join(target,`lib/${name}.ts`),data);}
 for(const name of ui){
