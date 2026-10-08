@@ -1,5 +1,35 @@
 # Regen Longevity Lab
 
+## Private Regen Admin
+
+`/admin` requires the owner-configured username and password. Its client is a
+scoped copy of the existing Regen Admin interface; all records and files remain
+in the same private Sites workspace. `/admin/login` is public; dashboard APIs
+validate the server-side session before accessing that workspace.
+
+Set `REGEN_ADMIN_BACKEND_ACCESS` as a **sensitive Production environment variable**
+in this Vercel project. Never use a `NEXT_PUBLIC_` prefix. It is the private Sites
+gateway credential; the server relay has a fixed destination and route allowlist.
+Deploy the backend authentication migration before deploying this frontend.
+
+The owner creates or resets the account at
+`https://regen-inbox.hello-wearology.chatgpt.site/admin-access` using existing
+ChatGPT owner sign-in. Passwords are salted scrypt hashes; random session tokens
+are stored as hashes. HttpOnly, SameSite=Strict session cookies are restricted
+to `/admin` and Secure in production. Sessions expire after 30 minutes without
+user interaction or eight hours maximum. Logout or password reset revokes them.
+Background polling does not refresh inactivity. Login attempts are rate limited.
+
+The new domain accepts request bodies up to 4 MB, including upload overhead;
+larger knowledge documents can still be parsed locally and saved as text.
+The original private Sites URL and its server-to-server n8n connection remain.
+
+Run `node --experimental-strip-types --test lib/admin-gateway-policy.test.mjs`,
+`npx tsc --noEmit --incremental false`, and `npm run build`. The separate Site
+checkout contains password tests and the additive database migration. After
+changing shared UI in that checkout, run `node scripts/sync-admin-ui.mjs` and
+commit the generated client files; server implementation and data are excluded.
+
 ## Unlisted COA pages
 
 The 26 original PDFs supplied on 5 October 2026 are stored in

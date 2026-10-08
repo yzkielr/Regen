@@ -4,6 +4,7 @@ import { REGION_COOKIE, REGION_HEADER, getRegionFromPath } from '@/lib/regions'
 export function proxy(request: NextRequest) {
   const region = getRegionFromPath(request.nextUrl.pathname)
   const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-regen-admin-route', request.nextUrl.pathname === '/admin' || request.nextUrl.pathname.startsWith('/admin/') ? '1' : '0')
   // Use the validated URL, never a caller-supplied header, for SSR language.
   requestHeaders.set(REGION_HEADER, region?.id ?? '')
   const response = NextResponse.next({ request: { headers: requestHeaders } })

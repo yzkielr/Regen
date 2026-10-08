@@ -71,19 +71,21 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const region = getRegion((await headers()).get(REGION_HEADER))
+  const requestHeaders = await headers()
+  const region = getRegion(requestHeaders.get(REGION_HEADER))
+  const admin = requestHeaders.get('x-regen-admin-route') === '1'
   return (
     <html
       lang={region?.locale ?? 'en'}
       className={`light bg-background ${ibmPlexSans.variable} ${archivo.variable}`}
     >
       <body className="font-sans antialiased">
-        <LoadingScreen />
-        <SmoothScroll />
-        <RegionProvider initialRegion={region?.id ?? DEFAULT_REGION}>
+        {!admin && <LoadingScreen />}
+        {!admin && <SmoothScroll />}
+        {admin ? children : <RegionProvider initialRegion={region?.id ?? DEFAULT_REGION}>
           <ConsultationProvider>{children}</ConsultationProvider>
-        </RegionProvider>
-        {process.env.NODE_ENV === 'production' && <Analytics />}
+        </RegionProvider>}
+        {!admin && process.env.NODE_ENV === 'production' && <Analytics />}
       </body>
     </html>
   )
