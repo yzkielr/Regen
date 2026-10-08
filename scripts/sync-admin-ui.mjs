@@ -25,7 +25,7 @@ for(const name of ui){
  if(imports.length)data=data.replace(/(['"]use client['"];?)/,`$1\nimport { ${imports.join(', ')} } from './admin-client';`);
  fs.writeFileSync(path.join(target,`ui/${name}.tsx`),data);
 }
-const styles=['globals','admin','comfortable','live','operations','service','knowledge'];
+const styles=['globals','admin','comfortable','live','operations','service','knowledge','responsive'];
 let css='/* Generated from the existing Regen Admin styles; scoped to /admin. */\n';
 for(const name of styles){const tree=postcss.parse(fs.readFileSync(path.join(source,`app/${name}.css`),'utf8'));tree.walkAtRules('import',r=>r.remove());tree.walkRules(rule=>{if(rule.parent?.type==='atrule'&&/keyframes$/.test(rule.parent.name))return;rule.selectors=rule.selectors.map(selector=>{if(selector.includes(':root'))return selector.replaceAll(':root','.regen-admin');if(/^(html|body)(?=[\s.:#\[]|$)/.test(selector))return selector.replace(/^(html|body)/,'.regen-admin');return `.regen-admin ${selector}`;});});css+=tree.toString()+'\n';}
 fs.writeFileSync(path.join(target,'admin-ui.css'),css.trimEnd()+'\n');
