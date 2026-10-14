@@ -1,3 +1,7 @@
+import type {PricingKnowledgeImport} from './pricing-knowledge';
+import { productTestReply } from './product-tests';
+import { matchCannedReply } from './canned-replies';
+export { coaProducts } from './product-tests';
 import { REGEN_CS_PHONE, REGEN_PHONE_REVISION } from './regen-phone';
 import { importKnowledge, changeKnowledgeSource } from './knowledge';
 import { applyService, createService } from './service';
@@ -7,9 +11,9 @@ export const collections = ['contacts','knowledge','replies','guardrails','autom
 export type Collection = typeof collections[number];
 export type Settings = { businessName: string; phone: string; email: string; address: string; timezone: string; serviceHours: string; botName: string; botPrompt: string; botEnabled: boolean; confidence: number; fallback: string; greeting: string; invoicePrefix: string; taxPercent: number; currency: string };
 export type Log = { id: string; at: number; area: string; message: string; level: 'info' | 'warning' | 'error' };
-export type Operations = { businessPhoneRevision?: number; records: Record<Collection, Entry[]>; settings: Settings; logs: Log[]; processed: string[]; service?:ServiceState; movements: { id: string; productId: string; quantity: number; reason: string; at: number }[] };
+export type Operations = { pricingKnowledgeImport?: PricingKnowledgeImport; cannedMinimumRevision?: number; businessPhoneRevision?: number; records: Record<Collection, Entry[]>; settings: Settings; logs: Log[]; processed: string[]; service?:ServiceState; movements: { id: string; productId: string; quantity: number; reason: string; at: number }[] };
 export type OpsEnvelope = { state: Operations; version: number };
-export type OpsAction = { type: 'save' | 'delete' | 'settings' | 'stock' | 'order_status' | 'automation' | 'seed' | 'restore' | 'test_event' | 'import_rows' | 'service' | 'knowledge_import' | 'knowledge_source'; requestId: string; collection?: Collection; id?: string; data?: Record<string, unknown>; quantity?: number; reason?: string; status?: string; backup?: unknown; rows?: Record<string,unknown>[] };
+export type OpsAction = { type: 'save' | 'delete' | 'settings' | 'stock' | 'order_status' | 'automation' | 'seed' | 'restore' | 'test_event' | 'import_rows' | 'service' | 'knowledge_import' | 'knowledge_source'; requestId: string; collection?: Collection; id?: string; data?: Record<string, unknown>; quantity?: number; expectedStock?: number; reason?: string; status?: string; backup?: unknown; rows?: Record<string,unknown>[] };
 const idPattern = /^[a-zA-Z0-9_-]{1,80}$/;
 const required: Record<Collection, string[]> = { contacts:['name'], knowledge:['title','content'], replies:['title','content'], guardrails:['name','keywords','response'], automations:['name','trigger','action'], agents:['name','email'], owners:['name','phone'], campaigns:['name','message'], products:['name','sku'], orders:['contactId','items'], appointments:['contactId','agent','start','end'], shipments:['orderId','courier','tracking'], rates:['destination','courier','service'], calls:['contactId','direction','outcome'], channels:['name','provider'], adEvents:['eventId','event','contactId'], integrations:['name','provider'] };
 export function createOperations(): Operations {
@@ -59,6 +63,7 @@ export function checkEntry(s: Operations, c: Collection, input: Record<string, u
     const lines: Line[]=raw.map(i=>{ const product=rowBy(s,'products',i.productId); if(used.has(product.id)) throw new Error('Gabungkan jumlah untuk produk yang sama.'); used.add(product.id); const quantity=numeric(i.quantity,'Jumlah',1,1000000); if(!Number.isInteger(quantity)) throw new Error('Jumlah harus bulat.'); return {productId:product.id,name:String(product.name),quantity,price:numeric(i.price,'Harga')}; });
     r.items=JSON.stringify(lines); r.shipping=numeric(r.shipping,'Ongkir'); r.taxPercent=numeric(r.taxPercent,'Pajak',0,100); r.discount=numeric(r.discount,'Diskon',0,lines.reduce((n,i)=>n+i.price*i.quantity,0)); r.status='draft';
     r.number=previous?.number??`${s.settings.invoicePrefix}-${new Date(now).toISOString().slice(0,10).replaceAll('-','')}-${id.slice(-6).toUpperCase()}`;
+    if(!previous){const base=String(r.number);let suffix=1;while(s.records.orders.some(order=>order.number===r.number))r.number=`${base}-${++suffix}`;}
   }
   if(c==='appointments') {
     rowBy(s,'contacts',r.contactId); rowBy(s,'agents',r.agent); const start=Date.parse(String(r.start)),end=Date.parse(String(r.end));
@@ -117,7 +122,7 @@ export function applyOps(original:Operations,a:OpsAction,now=Date.now(),context:
     }
     s.settings=next;log(s,a,now,'settings','Pengaturan disimpan.');
   } else if(a.type==='stock') {
-    const p=rowBy(s,'products',a.id); const q=numeric(a.quantity,'Perubahan stok',-1000000,1000000);if(!Number.isInteger(q)||!q) throw new Error('Perubahan stok harus bilangan bulat selain nol.');
+    const p=rowBy(s,'products',a.id); if(a.expectedStock!==undefined&&a.expectedStock!==Number(p.stock))throw new Error('Stok sudah berubah. Buka kembali Mutasi dan periksa stok terbaru.'); const q=numeric(a.quantity,'Perubahan stok',-1000000,1000000);if(!Number.isInteger(q)||!q) throw new Error('Perubahan stok harus bilangan bulat selain nol.');
     if(Number(p.stock)+q<0) throw new Error('Stok tidak mencukupi.'); const reason=text(a.reason??'',300);if(!reason) throw new Error('Isi alasan perubahan stok.');
     p.stock=Number(p.stock)+q;p.updatedAt=now;s.movements.unshift({id:a.requestId,productId:p.id,quantity:q,reason,at:now});log(s,a,now,'products',`${p.sku}: ${q>0?'+':''}${q} (${reason})`);
   } else if(a.type==='order_status') {
@@ -163,17 +168,12 @@ export function applyOps(original:Operations,a:OpsAction,now=Date.now(),context:
   if(JSON.stringify(s).length>3000000) throw new Error('Data ruang kerja melebihi batas. Ekspor dan kurangi data lama.');
   return s;
 }
-export const coaProducts=[['Tirzepatide','tirzepatide'],['Retatrutide','retatrutide'],['Semaglutide','semaglutide'],['Tesamorelin','tesamorelin'],['Cagrilintide','cagrilintide'],['BPC-157 + TB-500','bpc-157-tb-500'],['BPC-157','bpc-157'],['TB-500','tb-500'],['GHK-Cu','ghk-cu'],['KLOW80','klow80'],['NAD+','nad-plus'],['Ipamorelin','ipamorelin'],['CJC-1295 With DAC','cjc-1295-with-dac'],['CJC-1295 Without DAC','cjc-1295-without-dac'],['HGH 191AA','hgh-191aa'],['PT-141','pt-141'],['SS-31','ss-31'],['5-Amino-1MQ','5-amino-1mq'],['Semax','semax'],['Selank','selank'],['KPV','kpv'],['DSIP','dsip'],['MT-2','mt-2'],['AOD-9604','aod-9604'],['Epithalon','epithalon']];
 export function previewBot(s:Operations,question:string):{answer:string;source:string;handoff:boolean;score:number} {
   const q=question.toLowerCase().replace(/[^a-z0-9+]+/g,' ').trim();
   for(const r of s.records.guardrails.filter(r=>r.enabled)) if(String(r.keywords).split(',').some(k=>k.trim()&&q.includes(k.trim().toLowerCase()))) return {answer:String(r.response),source:`Guardrail: ${r.name}`,handoff:true,score:100};
-  if(/\b(admin|manusia|dosis|resep)\b/.test(q))return {answer:s.settings.fallback,source:'Eskalasi admin',handoff:true,score:0};
-  if(/\b(coa|certificate|sertifikat)\b/.test(q)) {
-    const matches=coaProducts.filter(([name])=>q.includes(name.toLowerCase().replace(/[^a-z0-9+]+/g,' ')));
-    const combined=matches.find(([name])=>name.includes(' + '));const found=combined?[combined]:matches;
-    if(found.length)return {answer:found.map(([name,slug])=>`COA ${name}: https://www.regenlongevitylab.com/coa/${slug}`).join('\n'),source:'Direktori COA Regen',handoff:false,score:100};
-    return {answer:'COA produk apa yang ingin Anda lihat? Sebutkan nama produknya.',source:'Klarifikasi COA',handoff:false,score:100};
-  }
+  if(/\b(admin|dosis|resep)\b/.test(q)||/\b(?:hubungkan|bicara|ngobrol|minta|ingin|mau)\b.{0,30}\bmanusia\b/.test(q))return {answer:s.settings.fallback,source:'Eskalasi admin',handoff:true,score:0};
+  const canned=matchCannedReply(s.records.replies,question);if(canned)return canned;
+  const tests=productTestReply([{role:'customer',text:question,status:'received'}]);if(tests)return tests;
   const words=q.split(' ').filter(w=>w.length>2);
   const ranked=s.records.knowledge.filter(k=>k.enabled).map(k=>{const hay=`${k.title} ${k.keywords} ${k.content}`.toLowerCase();return {k,score:words.length?Math.round(words.filter(w=>hay.includes(w)).length/words.length*100):0};}).sort((a,b)=>b.score-a.score);
   if(ranked[0]&&ranked[0].score>=s.settings.confidence)return {answer:String(ranked[0].k.content),source:String(ranked[0].k.title),handoff:false,score:ranked[0].score};

@@ -1,0 +1,4 @@
+sites/
+artifacts/
+tests/
+**/*.test.mjs

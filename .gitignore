@@ -12,3 +12,11 @@ next-env.d.ts
 *.tsbuildinfo
 .vercel
 .env*
+/.swc
+
+# Local private checkouts, diagnostics and disposable workspace output.
+# These are not part of the public storefront repository.
+/sites/
+/artifacts/
+/tmp/
+/Microsoft/

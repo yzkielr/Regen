@@ -12,4 +12,28 @@ export async function createFlipBill(bill:FlipBill,key:string,sandbox:boolean,se
  const r=await send(endpoint,{method:'POST',redirect:'error',signal:AbortSignal.timeout(20000),headers:{Authorization:`Basic ${btoa(key+':')}`,'Content-Type':'application/json',Accept:'application/json'},body:JSON.stringify({title:bill.title,type:'SINGLE',amount:bill.amount,reference_id:bill.reference,step:'checkout',is_address_required:false,is_phone_number_required:false})});
  if(!r.ok)throw new Error(`Flip mengembalikan HTTP ${r.status}. Periksa penyedia sebelum mencoba ulang.`);const d=parseFlipJson(await r.text());const id=String(d.link_id??'');if(!/^\d{1,25}$/.test(id)||d.reference_id!==bill.reference||Number(d.amount)!==bill.amount)throw new Error('Respons invoice Flip tidak cocok. Periksa penyedia.');return {billId:id,url:flipUrl(d.link_url)};
 }
-export function normalizeFlipCallback(data:Record<string,unknown>,test:boolean){const transactionId=String(data.id??''),reference=String(data.reference_id??'').trim().toUpperCase();if(!transactionId||transactionId.length>160)throw new Error('ID transaksi Flip kosong.');const amount=Number(data.amount);if(!Number.isSafeInteger(amount)||amount<=0||amount>1e12)throw new Error('Nominal Flip tidak valid.');if(!['SUCCESSFUL','CANCELLED','FAILED'].includes(String(data.status)))throw new Error('Status Flip tidak valid.');const raw=String(data.created_at??'');const occurredAt=Date.parse(/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(raw)?raw.replace(' ','T')+'+07:00':raw);if(!Number.isFinite(occurredAt))throw new Error('Waktu transaksi Flip tidak valid.');return {provider:'flip',transactionId,reference,amount,currency:'IDR',occurredAt,customer:String(data.sender_name??''),test,verified:true,paymentStatus:String(data.status),evidence:`Flip transaction ${transactionId}; bill ${String(data.bill_link_id??'')}`};}
+export function normalizeFlipCallback(data:Record<string,unknown>,test:boolean){
+ const exactId=(value:unknown)=>typeof value==='string'?value:typeof value==='number'&&Number.isSafeInteger(value)?String(value):'';
+ const transactionId=exactId(data.id),billId=exactId(data.bill_link_id),reference=String(data.reference_id??'').trim().toUpperCase();
+ if(!/^[A-Za-z0-9_-]{1,160}$/.test(transactionId)||!/^\d{1,25}$/.test(billId))throw new Error('ID transaksi / tagihan Flip tidak valid.');
+ if(reference&&!/^[A-Z0-9-]{1,100}$/.test(reference))throw new Error('Referensi Flip tidak valid.');
+ const amount=Number(data.amount);if(!Number.isSafeInteger(amount)||amount<=0||amount>1e12)throw new Error('Nominal Flip tidak valid.');
+ if(!['SUCCESSFUL','CANCELLED','FAILED'].includes(String(data.status)))throw new Error('Status Flip tidak valid.');
+ const raw=String(data.completed_at||data.created_at||'');
+ const occurredAt=Date.parse(/^\d{4}-\d\d-\d\d \d\d:\d\d:\d\d$/.test(raw)?raw.replace(' ','T')+'+07:00':raw);
+ if(!Number.isFinite(occurredAt))throw new Error('Waktu transaksi Flip tidak valid.');
+ return {provider:'flip',transactionId,billId,reference,amount,currency:'IDR',occurredAt,customer:String(data.sender_name??''),test,verified:true,paymentStatus:String(data.status),evidence:`Flip transaction ${transactionId}; bill ${billId}; status ${data.status}`};
+}
+
+// Authenticate the original form body before treating any payload field as payment evidence.
+export async function authenticatedFlipCallback(raw:string,keys:{live?:string;sandbox?:string}) {
+ if(raw.length>40000)throw new Error('Payload Flip terlalu besar.');
+ const form=new URLSearchParams(raw);
+ if(form.getAll('token').length!==1||form.getAll('data').length!==1)throw new Error('Format callback Flip tidak valid.');
+ const supplied=form.get('token')||'';
+ const digest=async(v:string)=>new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(v)));
+ const equal=async(expected?:string)=>{if(!supplied||!expected||supplied.length>1000)return false;const [a,b]=await Promise.all([digest(supplied),digest(expected)]);let diff=0;for(let i=0;i<a.length;i++)diff|=a[i]^b[i];return diff===0;};
+ const [live,sandbox]=await Promise.all([equal(keys.live),equal(keys.sandbox)]);
+ if(live===sandbox)throw new Error('Token callback Flip ditolak.');
+ return normalizeFlipCallback(parseFlipJson(form.get('data')!),sandbox);
+}

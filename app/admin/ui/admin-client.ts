@@ -1,10 +1,12 @@
 'use client';
 let lastActivity = Date.now();
 if(typeof window!=='undefined'){
- for(const event of ['pointerdown','keydown','scroll','touchstart'])window.addEventListener(event,()=>{lastActivity=Date.now();},{passive:true});
+ const active=()=>{lastActivity=Date.now();};
+ for(const event of ['pointerdown','keydown','scroll','touchstart','focus'])window.addEventListener(event,active,{passive:true,capture:true});
+ document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='visible')active();});
 }
 export async function adminFetch(input:RequestInfo|URL,init?:RequestInit){
- if(Date.now()-lastActivity>=30*60*1000){await logoutAdmin();throw Error('Sesi berakhir.');}
+ // The server owns expiration. A quiet or sleeping tab must not revoke a valid session.
  const headers=new Headers(init?.headers);
  if(Date.now()-lastActivity<60000)headers.set('x-regen-user-active','1');
  const response=await fetch(input,{...init,headers,cache:'no-store'});

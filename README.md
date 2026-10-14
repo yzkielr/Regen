@@ -1,5 +1,28 @@
 # Regen Longevity Lab
 
+## Workspace layout
+
+| Folder | Purpose |
+| --- | --- |
+| `app/`, `components/`, `lib/` | Storefront, admin frontend and application logic |
+| `public/` | Images, fonts and other assets used by the website |
+| `lab-documents/coa/` | Original COA PDFs served by the website; keep these files |
+| `scripts/`, `tests/`, `workflows/` | Maintenance scripts, regression checks and active background workflows |
+| `sites/regen-inbox/` | Private admin working source, including unpublished changes |
+| `sites/regen-refresh/` | Private admin source checkout used for Sites deployments |
+| `artifacts/` | Local diagnostic tools, deployment records, patches and business-document extracts |
+
+The private `sites/` checkouts and local `artifacts/` are excluded from this
+repository and the storefront deployment. Publish the private backend only
+through its own deployment workflow. Keep source checkouts with pending changes.
+Generated dependencies and caches (`node_modules/`, `.next/`, `.swc/`) stay at
+their framework-required paths and are excluded from Git.
+
+Workspace cleanup on 14 October 2026 removed retired Kommo artifacts, temporary
+browser profiles, obsolete deployment copies and one-off implementation scripts.
+Application source, credentials, original documents and pending work were kept.
+The local deletion inventory is `artifacts/workspace-cleanup-2026-10-14.json`.
+
 ## Private Regen Admin
 
 `/admin` requires the owner-configured username and password. Its client is a
@@ -29,6 +52,20 @@ Run `node --experimental-strip-types --test lib/admin-gateway-policy.test.mjs`,
 checkout contains password tests and the additive database migration. After
 changing shared UI in that checkout, run `node scripts/sync-admin-ui.mjs` and
 commit the generated client files; server implementation and data are excluded.
+
+## Flip invoice branch
+
+The public Flip Accept Payment callback is
+`https://www.regenlongevitylab.com/api/flip/webhook`. It preserves Flip's original
+form body, forwards it to the private Regen backend, and wakes the durable worker
+after the authenticated payment has been stored. The backend owns invoice IDs,
+payment reconciliation, bot drafts and warehouse delivery; see
+`sites/regen-inbox/FLIP.md` for setup and the WhatsApp delivery requirements.
+
+Configure `REGEN_FLIP_LIVE_KEY` and `REGEN_FLIP_LIVE_CALLBACK_TOKEN` as **Sites
+server secrets**, using the same Flip for Business account. No Flip secret is
+required in the public frontend. Until those secrets and the callback in Flip
+are configured, the new branch remains unavailable for live invoice creation.
 
 ## Unlisted COA pages
 
@@ -161,50 +198,54 @@ No reference-site image or recording is shipped with the website.
 
 ### Prices and catalog assets
 
-`lib/region-pricing.ts` is the single source for approved local prices. Indonesian
-prices are product-specific, matched to the exact catalog strength from the
-[`idr pricing` sheet](https://docs.google.com/spreadsheets/d/1kBjIQ498O3CDZ3d2GzyNS8zG6SJDJbM5A7kwonf6qQk/edit?gid=0#gid=0)
-on 2026-08-30. `INDONESIAN_PRODUCT_PRICES` uses column C (**Paket Basic**),
-column D (**Cartridge Set**) and column E (**complete Pen package**), including
-the evaluated numeric results of the sheet formulas. This is a checked-in price
-snapshot, not a live Sheets sync.
+`lib/region-pricing.ts` contains the normal website prices from the supplied
+`regen pricing web.xlsx`, tab **idr pricing v2**, checked on 10 October 2026.
+The 19 rows (6–24) cover 16 catalog products and the additional selectable
+Tesamorelin 20mg, GHK-Cu 50mg and NAD+ 1000mg strengths.
 
-| Existing product | Source row | Paket Basic (IDR) | Cartridge Set (IDR) | Complete Pen package (IDR) |
-| --- | --- | ---: | ---: | ---: |
-| Retatrutide 10mg | 4 | 999,000 | 1,199,000 | 1,799,000 |
-| Tesamorelin 10mg | 5 | 1,372,000 | 1,572,000 | 2,172,000 |
-| GHK-Cu 100mg | 8 | 1,078,000 | 1,278,000 | 1,878,000 |
-| NAD+ 500mg | 9 | 1,162,000 | 1,362,000 | 1,962,000 |
-| KLOW80 (KLOW 80mg in the sheet) | 11 | 1,800,000 | 2,000,000 | 2,600,000 |
-| CJC-1295 (No DAC) 5mg + Ipamorelin 5mg | 12 | 1,098,000 | 1,298,000 | 1,898,000 |
-| MOTS-C 10mg | 13 | 1,176,000 | 1,376,000 | 1,976,000 |
-| BPC-157 10mg | 19 | 1,162,000 | 1,362,000 | 1,962,000 |
+| Currency / region | Basic normal price | Cartridge normal price | Pen normal price |
+| --- | --- | --- | --- |
+| EUR / EU | C | L | U |
+| GBP / UK | D | M | V |
+| AUD / AU | E | N | W |
+| SGD / SG | F | O | X |
+| USD / US | G | P | Y |
+| MYR / MY | H | Q | Z |
+| IDR / ID | J | S | AB |
 
-Indonesian catalog and recommended cards show the Basic starting price, e.g.
-**mulai dari IDR 999,000 / paket basic**, while retaining each product's existing
-cartridge photo. IDR prices use comma grouping to match this display style.
-Indonesian detail pages start with Basic selected and offer all three packages;
-the chosen package name also follows through to the product inquiry. Basic uses
-the individual cartridge photo with an explicit illustration notice, not a
-claimed photo of Basic contents. Its selection does not show the cartridge's
-click-label reference. The formats overview has a labelled Basic photo placeholder
-until actual package photography is supplied; package contents are not inferred.
+Only normal prices are published. After-voucher/discount columns I, R and AA
+and voucher-amount columns K, T and AC are not website prices and are not
+included in the runtime price data. There is no currency conversion or
+voucher calculation in the website.
 
-Additional strengths, products not already in the catalog, and the separate
-coming-soon sheet are not listed by this pricing update. An unmapped Indonesian
-product or format shows a pricing inquiry without a starting-price claim, never
-the old flat IDR 2,500,000 / 3,500,000 fallback. The catalog, detail page, format
-options and recommended product cards use the same product-aware price helpers.
+The independent source snapshot in `lib/fixtures/pricing-v2.json` records the
+workbook SHA-256, row labels, strength, normal-price columns and all 399 slots.
+The 350 numeric amounts are positive whole values. The remaining 49 slots
+stay unpriced (blank, out of stock or unavailable). Normal-price formula
+results were checked against their precedents and cached workbook values.
 
-Other regions are unchanged: EUR prices remain 143 / 200 for cartridge / pen;
-AUD, USD, GBP, SGD and MYR show a localized pricing inquiry, not a guessed
-conversion. Basic is offered only in Indonesia via `getProductVariants`; the
-other six regions retain their two formats. Replace a market's `null` values
-only with approved local amounts.
+GHK-Cu 50mg Basic has a source formula error at J9 because I9 says
+`out of stock`; the IDR website keeps it sold out with no numeric price.
+Semaglutide and Cagrilintide Basic are also sold out in IDR. Their foreign
+Basic prices are blank and remain inquiries. Semax and Selank have only
+priced Basic packages; Cartridge and Pen are unavailable in every region.
 
-Changing region does not assert local product approval or guaranteed shipping.
-The team confirms availability, shipping and final pricing. The existing catalog
-photos remain temporary assets until Regen product photography is supplied.
+Catalog cards, recommendations and the carousel use the first priced package.
+Product details show the chosen strength and package price. For example,
+Retatrutide IDR normal prices are 2,099,000 / 2,799,000 / 3,799,000 for
+Basic / Cartridge / Pen. Formatting uses comma grouping for IDR.
+The existing catalog, package images, strength selectors and consultation
+flows are preserved.
+
+Run the pricing checks with Node.js 22.6+:
+```bash
+node --experimental-strip-types --test lib/region-pricing.test.mjs lib/product-pricing-ui.test.mjs
+```
+They compare every source slot, independently check the screenshot's IDR
+amounts, and exercise real product components for catalog prices, package
+selection, strength changes, region switches, photo selection and unavailable
+formats. Update this source snapshot and its checks when approved prices change.
+
 
 ### Verification
 

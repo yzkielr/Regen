@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { adminAuth } from '@/lib/admin-gateway';
 import { ADMIN_COOKIE, boundedAdminBody, sameOrigin, validAdminSession } from '@/lib/admin-gateway-policy';
+import { SESSION_LIFETIME } from '@/app/admin/lib/admin-session-policy';
 export const runtime='nodejs';export const dynamic='force-dynamic';
 const json=(error:string,status:number)=>NextResponse.json({error},{status,headers:{'Cache-Control':'no-store'}});
 export async function POST(request:Request){
@@ -9,8 +10,11 @@ export async function POST(request:Request){
   const ip=request.headers.get('x-vercel-forwarded-for')||request.headers.get('x-real-ip')||'unknown';
   const r=await adminAuth('login',null,{username:body.username,password:body.password},ip);if(r.status>=300&&r.status<400)return json('Koneksi admin belum dikonfigurasi.',503);const d=await r.json();
   if(!r.ok||!validAdminSession(d.token))return json([401,429,503].includes(r.status)?String(d.error||'Belum dapat masuk.'):'Layanan login belum tersedia.',[401,429,503].includes(r.status)?r.status:503);
+  const now=Date.now();
+  if(!Number.isSafeInteger(d.expiresAt)||d.expiresAt<=now+1000)return json('Layanan login belum tersedia.',503);
+  const maxAge=Math.min(SESSION_LIFETIME/1000,Math.floor((d.expiresAt-now)/1000));
   const response=NextResponse.json({ok:true},{headers:{'Cache-Control':'no-store'}});
-  response.cookies.set(ADMIN_COOKIE,d.token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'strict',path:'/admin'});
+  response.cookies.set(ADMIN_COOKIE,d.token,{httpOnly:true,secure:process.env.NODE_ENV==='production',sameSite:'strict',path:'/admin',maxAge,expires:new Date(now+maxAge*1000)});
   return response;
  }catch(e){return json(e instanceof Error&&e.message==='too_large'?'Permintaan terlalu besar.':'Login belum tersedia. Hubungi pemilik untuk memeriksa koneksi hosting.',e instanceof Error&&e.message==='too_large'?413:503);}
 }

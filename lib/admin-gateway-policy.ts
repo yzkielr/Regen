@@ -6,6 +6,7 @@ const routes: Record<string, readonly string[]> = {
   operations: ['GET','POST'], workspace: ['GET','POST'], files: ['GET','POST','DELETE'], health: ['GET'], whatsapp: ['GET'],
   'knowledge/link': ['POST'], 'service/status': ['GET'], 'service/ai': ['POST'], 'service/flip': ['POST'],
   'service/whatsapp-test': ['POST'], 'service/whatsapp-cs': ['POST'], 'service/whatsapp-cs/setup': ['POST'],
+  'service/payment-test': ['POST'], 'service/payment-evidence': ['GET'], 'service/mail-sync': ['POST'],
 };
 export function allowedAdminRoute(path: string[], method: string) {
   return path.every(part => /^[a-z-]+$/.test(part)) && !!routes[path.join('/')]?.includes(method);

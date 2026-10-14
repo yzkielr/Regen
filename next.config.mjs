@@ -1,8 +1,12 @@
+import { withWorkflow } from 'workflow/next';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Include registered PDF files in production/serverless route bundles.
   outputFileTracingIncludes: {
     '/coa/*/document/*': ['./lab-documents/coa/**/*.pdf'],
+    // sharp 0.35 loads libvips through dlopen; pnpm's native libraries need
+    // explicit tracing for the email evidence renderer on Linux hosting.
+    '/**': ['./node_modules/.pnpm/@img+sharp-libvips-*/node_modules/@img/**/*.so*','./public/admin-assets/pdf-assets/standard_fonts/LiberationSans-Regular.ttf','./public/admin-assets/pdf-assets/standard_fonts/LiberationSans-Bold.ttf'],
   },
   async headers() {
     return [{
@@ -30,4 +34,4 @@ const nextConfig = {
   },
 }
 
-export default nextConfig
+export default withWorkflow(nextConfig)
