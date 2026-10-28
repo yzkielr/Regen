@@ -3,13 +3,15 @@ import type { Region, RegionId } from './regions'
 
 type ProductPriceTable = Readonly<Record<string, Readonly<Record<VariantId, number | null>>>>
 
-/** Normal prices from "regen pricing web.xlsx", tab "idr pricing v2" (10 October 2026).
+/** Website prices from "regen pricing web", tab "idr pricing v2" (19 October 2026).
  * Rows 6-24 cover 16 catalog products and 3 additional selectable strengths.
- * IDR uses J / S / AB, never the after-voucher or voucher-amount columns.
+ * IDR uses final after-voucher/discount values from I / R / AA directly.
+ * Do not subtract voucher amounts again or publish normal-price J / S / AB.
  * Other currencies use their normal-price columns directly, without conversion.
  * Blank prices stay null; sold-out and unavailable formats retain their statuses.
- * J9 is #VALUE! because I9 says "out of stock": GHK-Cu 50mg Basic stays unpriced.
- * The source snapshot and cell references are in fixtures/pricing-v2.json.
+ * I9 says "out of stock": GHK-Cu 50mg Basic stays unpriced.
+ * Source values and cell references: fixtures/pricing-v2-after-discount.json.
+ * Owner override, 26 October 2026: Retatrutide 10mg Cartridge IDR 1,099,000.
  */
 export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTable>> = {
   // AUD normal prices: Basic E, Cartridge N, Pen W.
@@ -144,27 +146,27 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'cagrilintide': { basic: null, cartridge: 530, pen: 750 }, // Row 23.
     '5-amino-1mq': { basic: 320, cartridge: 480, pen: 710 }, // Row 24.
   },
-  // IDR normal prices: Basic J, Cartridge S, Pen AB.
+  // IDR after-discount prices: Basic I, Cartridge R, Pen AA.
   id: {
-    'retatrutide': { basic: 2_099_000, cartridge: 2_799_000, pen: 3_799_000 }, // Row 6.
-    'cjc-1295-ipamorelin': { basic: 1_598_000, cartridge: 2_298_000, pen: 3_298_000 }, // Row 14.
-    'klow80': { basic: 2_300_000, cartridge: 3_000_000, pen: 4_000_000 }, // Row 13.
-    'mots-c': { basic: 1_676_000, cartridge: 2_376_000, pen: 3_376_000 }, // Row 15.
-    'nad-plus': { basic: 1_662_000, cartridge: 2_362_000, pen: 3_362_000 }, // Row 11.
-    'tesamorelin': { basic: 1_872_000, cartridge: 2_572_000, pen: 3_572_000 }, // Row 7.
-    'bpc-157': { basic: 1_662_000, cartridge: 2_362_000, pen: 3_362_000 }, // Row 18.
-    'ghk-cu': { basic: 1_578_000, cartridge: 2_278_000, pen: 3_278_000 }, // Row 10.
-    'tesamorelin-20mg': { basic: 1_992_800, cartridge: 2_692_800, pen: 3_692_800 }, // Row 8.
-    'ghk-cu-50mg': { basic: null, cartridge: 2_051_000, pen: 3_051_000 }, // Row 9.
-    'nad-plus-1000mg': { basic: 1_830_000, cartridge: 2_530_000, pen: 3_530_000 }, // Row 12.
-    'semax': { basic: 1_662_000, cartridge: null, pen: null }, // Row 16.
-    'selank': { basic: 1_662_000, cartridge: null, pen: null }, // Row 17.
-    'hgh-191-aa-36iu': { basic: 2_090_000, cartridge: 2_790_000, pen: 3_790_000 }, // Row 19.
-    'glutathione': { basic: 900_000, cartridge: 1_600_000, pen: 2_600_000 }, // Row 20.
-    'tirzepatide': { basic: 1_662_000, cartridge: 2_362_000, pen: 3_362_000 }, // Row 21.
-    'semaglutide': { basic: null, cartridge: 2_230_400, pen: 3_230_400 }, // Row 22.
-    'cagrilintide': { basic: null, cartridge: 2_299_000, pen: 3_299_000 }, // Row 23.
-    '5-amino-1mq': { basic: 1_389_000, cartridge: 2_099_000, pen: 3_099_000 }, // Row 24.
+    'retatrutide': { basic: 1_599_000, cartridge: 1_099_000, pen: 2_799_000 }, // Row 6; Cartridge overridden by owner 26 Oct 2026.
+    'cjc-1295-ipamorelin': { basic: 1_098_000, cartridge: 1_298_000, pen: 2_298_000 }, // Row 14.
+    'klow80': { basic: 1_800_000, cartridge: 2_000_000, pen: 3_000_000 }, // Row 13.
+    'mots-c': { basic: 1_176_000, cartridge: 1_376_000, pen: 2_376_000 }, // Row 15.
+    'nad-plus': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 11.
+    'tesamorelin': { basic: 1_372_000, cartridge: 1_572_000, pen: 2_572_000 }, // Row 7.
+    'bpc-157': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 18.
+    'ghk-cu': { basic: 1_078_000, cartridge: 1_278_000, pen: 2_278_000 }, // Row 10.
+    'tesamorelin-20mg': { basic: 1_492_800, cartridge: 1_692_800, pen: 2_692_800 }, // Row 8.
+    'ghk-cu-50mg': { basic: null, cartridge: 1_051_000, pen: 2_051_000 }, // Row 9.
+    'nad-plus-1000mg': { basic: 1_330_000, cartridge: 1_530_000, pen: 2_530_000 }, // Row 12.
+    'semax': { basic: 1_162_000, cartridge: null, pen: null }, // Row 16.
+    'selank': { basic: 1_162_000, cartridge: null, pen: null }, // Row 17.
+    'hgh-191-aa-36iu': { basic: 1_590_000, cartridge: 1_790_000, pen: 2_790_000 }, // Row 19.
+    'glutathione': { basic: 400_000, cartridge: 600_000, pen: 1_600_000 }, // Row 20.
+    'tirzepatide': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 21.
+    'semaglutide': { basic: null, cartridge: 1_230_400, pen: 2_230_400 }, // Row 22.
+    'cagrilintide': { basic: null, cartridge: 1_299_000, pen: 2_299_000 }, // Row 23.
+    '5-amino-1mq': { basic: 889_000, cartridge: 1_099_000, pen: 2_099_000 }, // Row 24.
   },
 }
 
@@ -197,7 +199,7 @@ export function getRegionalPriceAmount(regionId: RegionId, productSlug: string, 
 
 export type RegionalPriceStatus = 'available' | 'out-of-stock' | 'unavailable' | 'inquiry'
 
-/** I9, J22 and J23 say "out of stock". Their foreign Basic cells are blank. */
+/** I9, I22 and I23 say "out of stock". Their foreign Basic cells are blank. */
 const OUT_OF_STOCK: Partial<Record<RegionId, Readonly<Record<string, readonly VariantId[]>>>> = {
   id: { 'ghk-cu-50mg': ['basic'], semaglutide: ['basic'], cagrilintide: ['basic'] },
 }
@@ -224,10 +226,11 @@ export function isRegionalVariantSelectable(regionId: RegionId, productSlug: str
   return status === 'available' || status === 'inquiry'
 }
 
-/** Catalog and wheel use the first package with an actual published price. */
+/** Catalog and wheel show the lowest available package price. */
 export function getCatalogPriceVariant(regionId: RegionId, productSlug: string): VariantId {
   const variants: VariantId[] = ['basic', 'cartridge', 'pen']
-  return variants.find((variant) => getRegionalPriceStatus(regionId, productSlug, variant) === 'available')
+  return variants.filter((variant) => getRegionalPriceStatus(regionId, productSlug, variant) === 'available')
+    .sort((a,b) => getRegionalPriceAmount(regionId,productSlug,a)! - getRegionalPriceAmount(regionId,productSlug,b)!)[0]
     ?? variants.find((variant) => isRegionalVariantSelectable(regionId, productSlug, variant))
     ?? 'basic'
 }
@@ -236,7 +239,7 @@ export function formatRegionPrice(region: Region, productSlug: string, variant: 
   const amount = getRegionalPriceAmount(region.id, productSlug, variant)
   if (amount === null) return null
 
-  // Keep comma grouping for IDR (for example, IDR 2,099,000).
+  // Keep comma grouping for IDR (for example, IDR 1,599,000).
   // Other currencies retain their regional formatting.
   return new Intl.NumberFormat(region.currency === 'IDR' ? 'en-US' : region.locale, {
     style: 'currency',
