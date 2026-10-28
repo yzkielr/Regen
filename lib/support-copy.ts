@@ -91,9 +91,9 @@ export const SUPPORT_COPY: Record<Language, SupportCopy> = {
       description: 'Tell us about your research needs. Our team can help you explore the catalog and confirm product information, regional pricing, and availability. No cost, no obligation to buy.',
       points: ['Product and format information', 'Regional pricing and shipping enquiries', 'Support before and after your order'],
       cardTitle: 'Contact the Regen team',
-      cardDescription: 'Prepare an email for our team with your selected region and currency. You can review the message before sending it from Gmail or your email app.',
-      start: 'Start free consultation',
-      privacy: 'Nothing is sent until you choose to send the email.',
+      cardDescription: 'Chat with our team on WhatsApp. Your selected region and currency are included in the draft, which you can review before sending.',
+      start: 'Free Consultation via WA',
+      privacy: 'The message is only sent when you send it in WhatsApp.',
     },
     modal: {
       close: 'Close consultation',
@@ -183,9 +183,9 @@ export const SUPPORT_COPY: Record<Language, SupportCopy> = {
       description: 'Kongsikan apa yang anda perlukan untuk kajian. Kami boleh bantu semak pilihan dalam katalog, info produk, harga dan produk yang tersedia untuk region anda. Konsultasi ini percuma, tanpa perlu membeli.',
       points: ['Info produk dan pilihan format', 'Harga dan pilihan penghantaran untuk region anda', 'Customer support sebelum dan selepas order'],
       cardTitle: 'Hubungi pasukan Regen',
-      cardDescription: 'Kami sediakan draf email dengan region dan mata wang yang anda pilih. Anda boleh semak dan hantar melalui Gmail atau aplikasi email anda.',
-      start: 'Mulakan konsultasi percuma',
-      privacy: 'Tiada apa-apa dihantar sehingga anda sendiri menghantar email.',
+      cardDescription: 'Hubungi pasukan kami melalui WhatsApp. Region dan mata wang pilihan anda disertakan dalam draf mesej yang boleh disemak sebelum dihantar.',
+      start: 'Konsultasi Percuma via WA',
+      privacy: 'Mesej hanya dihantar apabila anda menghantarnya sendiri di WhatsApp.',
     },
     modal: {
       close: 'Tutup konsultasi',
@@ -275,9 +275,9 @@ export const SUPPORT_COPY: Record<Language, SupportCopy> = {
       description: 'Ceritakan kebutuhan riset kamu. Kami bisa bantu cek pilihan di katalog, info produk, harga, dan produk yang tersedia untuk region kamu. Konsultasinya gratis, tanpa harus membeli.',
       points: ['Info produk dan pilihan format', 'Harga dan opsi pengiriman untuk region kamu', 'Customer support sebelum dan setelah order'],
       cardTitle: 'Hubungi tim Regen',
-      cardDescription: 'Kami siapkan draf email dengan region dan mata uang pilihan kamu. Cek dulu isinya, lalu kirim lewat Gmail atau aplikasi email kamu.',
-      start: 'Mulai konsultasi gratis',
-      privacy: 'Tidak ada yang dikirim sampai kamu sendiri mengirim email.',
+      cardDescription: 'Hubungi tim kami melalui WhatsApp. Region dan mata uang pilihan kamu disertakan dalam draf pesan yang bisa kamu cek sebelum dikirim.',
+      start: 'Konsultasi Gratis via WA',
+      privacy: 'Pesan hanya dikirim saat kamu mengirimkannya sendiri di WhatsApp.',
     },
     modal: {
       close: 'Tutup konsultasi',
@@ -360,6 +360,31 @@ export const SUPPORT_COPY: Record<Language, SupportCopy> = {
       researchOnly: 'Hanya untuk penggunaan dan aktivitas penelitian laboratorium.',
     },
   },
+}
+
+export const CONSULTATION_WHATSAPP_NUMBER = '6285287834725'
+
+export function buildConsultationWhatsAppUrl({
+  language,
+  region,
+  productName,
+}: {
+  language: Language
+  region: Region
+  productName?: string
+}) {
+  const greetings = {
+    id: 'Halo REGEN, saya ingin konsultasi mengenai katalog produk peptida riset, standar kualitas, dan prosedur pemesanan resmi.',
+    ms: 'Halo Regen, saya ingin mendapatkan konsultasi mengenai katalog produk peptida penyelidikan, standard kualiti dan cara membuat pesanan rasmi.',
+    en: 'Hello Regen, I would like a consultation about your research peptide catalog, quality standards, and official ordering process.',
+  }
+  const message = [
+    greetings[language],
+    ...(productName ? [`${language === 'en' ? 'Product' : 'Produk'}: ${productName}`] : []),
+    `Region: ${region.name} · ${region.currency}`,
+  ].join('\n\n')
+
+  return `https://api.whatsapp.com/send?phone=${CONSULTATION_WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`
 }
 
 export function regionalSupportText(text: string, region: Region): string {

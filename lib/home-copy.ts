@@ -426,8 +426,8 @@ const REGIONAL_REVIEWS: Record<Exclude<RegionId, 'id'>, HomeCopy['reviews']> = {
 export const homeCopy: Record<Language, HomeCopy> = {
   en: {
     viewCatalog: 'View Catalog',
-    freeConsultation: 'Free Consultation',
-    startConsultation: 'Start Free Consultation',
+    freeConsultation: 'Free Consultation via WA',
+    startConsultation: 'Start Free Consultation via WA',
     hero: {
       trusted: 'Trusted and used by influencers, physicians, and wellness practitioners.',
       body: 'European research-grade peptides for fat loss, muscle gain, regeneration & lifespan, recovery, and cognitive focus — all on one platform.',
@@ -474,8 +474,8 @@ export const homeCopy: Record<Language, HomeCopy> = {
   },
   ms: {
     viewCatalog: 'Lihat Katalog',
-    freeConsultation: 'Konsultasi Percuma',
-    startConsultation: 'Mulakan Konsultasi Percuma',
+    freeConsultation: 'Konsultasi Percuma via WA',
+    startConsultation: 'Mulakan Konsultasi Percuma via WA',
     hero: {
       trusted: 'Dipercayai dan digunakan oleh influencer, doktor dan profesional wellness.',
       body: 'Research-grade peptides dari Eropah untuk fat loss, pembinaan otot, regenerasi dan longevity, recovery serta fokus kognitif — semuanya dalam satu platform.',
@@ -522,8 +522,8 @@ export const homeCopy: Record<Language, HomeCopy> = {
   },
   id: {
     viewCatalog: 'Lihat Katalog',
-    freeConsultation: 'Konsultasi Gratis',
-    startConsultation: 'Mulai Konsultasi Gratis',
+    freeConsultation: 'Konsultasi Gratis via WA',
+    startConsultation: 'Mulai Konsultasi Gratis via WA',
     hero: {
       trusted: 'Dipercaya dan digunakan oleh influencer, dokter, dan praktisi wellness.',
       body: 'Research-grade peptides dari Eropa untuk fat loss, pembentukan otot, regenerasi dan longevity, recovery, serta fokus kognitif — semuanya di satu platform.',
