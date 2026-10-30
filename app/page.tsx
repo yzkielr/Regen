@@ -2,16 +2,23 @@ import type { Metadata } from 'next'
 import { cookies, headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { RegionLanding } from '@/components/region-landing'
-import { REGION_COOKIE, getRegion, regionPath } from '@/lib/regions'
+import { REGIONS, REGION_COOKIE, getRegion, regionPath } from '@/lib/regions'
 import { COUNTRY_HEADER, REGION_SUGGESTION_DISMISSED_COOKIE, suggestedRegion } from '@/lib/region-detection'
+import { SITE_TITLE, SITE_DESCRIPTION } from '@/lib/site-seo'
 
 // Country suggestions and saved preferences are specific to each visitor.
 export const dynamic = 'force-dynamic'
 
 export const metadata: Metadata = {
-  title: 'Choose your region — Regen',
-  description: 'Choose your Regen regional website, language and currency.',
-  alternates: { canonical: '/' },
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
+  alternates: {
+    canonical: '/',
+    languages: {
+      'x-default': '/',
+      ...Object.fromEntries(REGIONS.map((region) => [region.id === 'eu' ? 'en' : region.locale, regionPath(region.id)])),
+    },
+  },
 }
 
 export default async function HomePage() {

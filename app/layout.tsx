@@ -7,7 +7,7 @@ import { SmoothScroll } from '@/components/smooth-scroll'
 import { ConsultationProvider } from '@/components/consultation-modal'
 import { RegionProvider } from '@/components/region-provider'
 import { DEFAULT_REGION, REGION_HEADER, getRegion } from '@/lib/regions'
-import { HOME_TAGLINE } from '@/lib/home-copy'
+import { SITE_URL, SITE_NAME, SITE_TITLE, SITE_DESCRIPTION } from '@/lib/site-seo'
 import './globals.css'
 
 const ibmPlexSans = IBM_Plex_Sans({
@@ -24,18 +24,10 @@ const archivo = Archivo({
   display: 'swap',
 })
 
-const brandTitle = `Regen — ${HOME_TAGLINE.headline} ${HOME_TAGLINE.accent}`
-
 export const metadata: Metadata = {
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_SITE_URL ||
-    (process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL
-      ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL || process.env.VERCEL_URL}`
-      : 'http://localhost:3000'),
-  ),
-  title: brandTitle,
-  description:
-    'Regen develops and delivers advanced peptide therapies with uncompromising quality, traceability, and clinical precision.',
+  metadataBase: new URL(SITE_URL),
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   generator: 'v0.app',
   verification: {
     other: {
@@ -43,6 +35,7 @@ export const metadata: Metadata = {
     },
   },
   keywords: [
+    SITE_NAME,
     'Regen',
     'peptide',
     'research peptides',
@@ -52,9 +45,9 @@ export const metadata: Metadata = {
     'European Pharmacopoeia',
   ],
   openGraph: {
-    title: brandTitle,
-    description:
-      'Laboratory-grade research peptides with independent European lab testing and cold-chain shipping.',
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    siteName: SITE_NAME,
     type: 'website',
   },
 }

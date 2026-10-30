@@ -3,10 +3,12 @@ import { ArrowUpRight, Globe2 } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import { RegionSuggestion } from '@/components/region-suggestion'
 import { REGIONS, regionPath, type RegionId } from '@/lib/regions'
+import { SITE_IDENTITY } from '@/lib/site-seo'
 
 export function RegionLanding({ suggestedRegionId = null }: { suggestedRegionId?: RegionId | null }) {
   return (
     <main className="min-h-dvh bg-secondary p-4 sm:p-8 lg:flex lg:items-center lg:justify-center lg:p-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_IDENTITY).replace(/</g, '\\u003c') }} />
       <div className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-xl shadow-primary/5 lg:grid-cols-[0.82fr_1.18fr]">
         <section className="relative flex flex-col overflow-hidden bg-primary p-7 text-white sm:p-10 lg:p-12">
           <div className="pointer-events-none absolute -bottom-40 -left-40 size-[32rem] rounded-full border border-white/10" aria-hidden="true" />
@@ -15,7 +17,7 @@ export function RegionLanding({ suggestedRegionId = null }: { suggestedRegionId?
           <div className="relative mt-12 lg:my-auto lg:py-20">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/60">REGEN LONGEVITY LAB</p>
             <h1 className="mt-5 max-w-md text-balance font-display text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">One Regen.<br /><span className="text-[#f6a06e]">Your part of the world.</span></h1>
-            <p className="mt-6 max-w-sm text-pretty text-sm leading-relaxed text-white/75 sm:text-base">Explore our research catalog in your region, with the language and currency that feel familiar.</p>
+            <p className="mt-6 max-w-sm text-pretty text-sm leading-relaxed text-white/75 sm:text-base">Regen Longevity Lab offers research peptides and product information across seven regions. Choose your region for local language, currency and support.</p>
           </div>
           <p className="relative mt-10 flex items-center gap-2 text-xs text-white/60"><Globe2 className="size-4" aria-hidden="true" /> 7 regions. One research standard.</p>
         </section>

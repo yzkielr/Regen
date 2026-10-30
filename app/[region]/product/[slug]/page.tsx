@@ -12,6 +12,7 @@ import { getProduct } from '@/lib/products'
 import { getProductCopy } from '@/lib/product-copy'
 import { getRegion, regionPath } from '@/lib/regions'
 import { regionAlternates } from '@/lib/region-metadata'
+import { SITE_NAME } from '@/lib/site-seo'
 
 type Props = { params: Promise<{ region: string; slug: string }> }
 
@@ -20,12 +21,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const region = getRegion(id)
   const product = getProduct(slug)
   if (!region || !product) return { title: 'Product not found — Regen' }
-  const title = `${product.name} — Regen ${region.name} | ${region.currency}`
+  const title = `${product.name} | ${SITE_NAME} ${region.name}`
   const { description } = getProductCopy(product, region.language)
   return {
     title, description,
     alternates: regionAlternates(region, `/product/${slug}`),
-    openGraph: { title, description, type: 'website', url: regionPath(region.id, `/product/${slug}`), locale: region.locale.replace('-', '_') },
+    openGraph: { title, description, siteName: SITE_NAME, type: 'website', url: regionPath(region.id, `/product/${slug}`), locale: region.locale.replace('-', '_') },
   }
 }
 

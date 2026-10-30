@@ -1,4 +1,5 @@
 import type { MetadataRoute } from 'next'
+import { SITE_URL } from '@/lib/site-seo'
 
 /**
  * The authenticity verification pages are unlisted: they are only meant to be
@@ -9,6 +10,7 @@ export default function robots(): MetadataRoute.Robots {
   // /coa pages and PDFs send noindex metadata/headers. Allow crawling so
   // search engines can see that instruction; do not list them in a sitemap.
   return {
+    sitemap: `${SITE_URL}/sitemap.xml`,
     rules: {
       userAgent: '*',
       allow: '/',
