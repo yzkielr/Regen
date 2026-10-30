@@ -7,6 +7,7 @@ import { ConsultationButton } from '@/components/consultation-button'
 import { useRegion } from '@/components/region-provider'
 import { TrustCarousel } from '@/components/trust-carousel'
 import { homeCopy } from '@/lib/home-copy'
+import { SITE_NAME } from '@/lib/site-seo'
 
 const container: Variants = {
   hidden: {},
@@ -112,9 +113,9 @@ export function Hero() {
               animate="show"
             >
               <motion.div variants={item}>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white font-display">
-                  Regen Precision
-                </h2>
+                <h1 className="text-2xl sm:text-3xl font-bold text-white font-display">
+                  {SITE_NAME}
+                </h1>
                 <p className="text-sm font-semibold text-accent mt-0.5">
                   Your partner in peptide innovation.
                 </p>
