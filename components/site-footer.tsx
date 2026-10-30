@@ -7,6 +7,7 @@ import { ConsultationButton } from '@/components/consultation-button'
 import { RegionSwitcher } from '@/components/region-switcher'
 import { useRegion } from '@/components/region-provider'
 import { CONTACT_EMAIL, regionalSupportText, SUPPORT_COPY } from '@/lib/support-copy'
+import { SITE_SOCIAL_PROFILES } from '@/lib/site-seo'
 
 export function SiteFooter() {
   const { region, language, href } = useRegion()
@@ -121,6 +122,13 @@ export function SiteFooter() {
                 {regionalSupportText(copy.regionShipping, region)}
               </li>
             </ul>
+            <nav aria-label={language === 'en' ? 'Regen social media' : 'Media sosial Regen'} className="mt-3 flex flex-wrap gap-x-4 text-sm text-primary-foreground/80">
+              {SITE_SOCIAL_PROFILES.map((profile) => (
+                <a key={profile.name} href={profile.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-sm hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent">
+                  {profile.name}
+                </a>
+              ))}
+            </nav>
           </div>
         </div>
 

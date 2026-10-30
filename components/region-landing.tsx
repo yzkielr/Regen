@@ -3,7 +3,7 @@ import { ArrowUpRight, Globe2 } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import { RegionSuggestion } from '@/components/region-suggestion'
 import { REGIONS, regionPath, type RegionId } from '@/lib/regions'
-import { SITE_IDENTITY, SITE_NAME } from '@/lib/site-seo'
+import { SITE_IDENTITY, SITE_NAME, SITE_SOCIAL_PROFILES } from '@/lib/site-seo'
 
 export function RegionLanding({ suggestedRegionId = null }: { suggestedRegionId?: RegionId | null }) {
   return (
@@ -40,6 +40,13 @@ export function RegionLanding({ suggestedRegionId = null }: { suggestedRegionId?
             ))}
           </nav>
           <p className="mt-6 border-t border-border pt-5 text-xs leading-relaxed text-muted-foreground">For laboratory research only. Product availability, shipping and final pricing are confirmed by our team for your region.</p>
+          <nav aria-label="Regen social media" className="mt-2 flex flex-wrap gap-x-5 text-xs text-muted-foreground">
+            {SITE_SOCIAL_PROFILES.map((profile) => (
+              <a key={profile.name} href={profile.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center rounded-sm hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+                {profile.name}
+              </a>
+            ))}
+          </nav>
         </section>
       </div>
     </main>
