@@ -1,3 +1,5 @@
+import { existsSync } from 'node:fs'
+import path from 'node:path'
 import type { Metadata, Viewport } from 'next'
 import Image from 'next/image'
 import { Logo } from '@/components/logo'
@@ -35,6 +37,10 @@ export const viewport: Viewport = {
 }
 
 export default function TutorialPage() {
+  const availablePages = pages.filter((page) =>
+    existsSync(path.join(process.cwd(), 'public', 'tutorial', `${page.id}.png`)),
+  )
+
   return (
     <main lang="id" className="min-h-screen bg-[#edf2ef] text-primary">
       <header className="mx-auto flex max-w-[1008px] items-center justify-between gap-6 px-4 py-6 sm:px-6 sm:py-8">
@@ -45,12 +51,18 @@ export default function TutorialPage() {
         </div>
       </header>
 
+      {availablePages.length === 0 && (
+        <p className="mx-auto max-w-[1008px] px-4 py-12 text-center text-muted-foreground sm:px-6">
+          Materi tutorial sedang diperbarui.
+        </p>
+      )}
+
       <ol aria-label="Halaman tutorial" className="mx-auto flex max-w-[1008px] list-none flex-col gap-4 px-2 pb-8 sm:gap-6 sm:px-6 sm:pb-12">
-        {pages.map((page, index) => (
+        {availablePages.map((page, index) => (
           <li key={page.id} id={`halaman-${page.id}`} className="overflow-hidden rounded-sm bg-white shadow-sm ring-1 ring-black/5">
             <Image
               src={`/tutorial/${page.id}.png?v=${page.version}`}
-              alt={`Tutorial Regen Longevity Lab, halaman ${index + 1} dari ${pages.length}`}
+              alt={`Tutorial Regen Longevity Lab, halaman ${index + 1} dari ${availablePages.length}`}
               width={page.width}
               height={page.height}
               loading={index === 0 ? 'eager' : 'lazy'}

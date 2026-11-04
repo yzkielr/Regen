@@ -12,6 +12,11 @@ Enam foto katalog/tutorial ditampilkan sesuai urutan nama file:
 5. `05.png`
 6. `06.png` — foto paling bawah
 
+Simpan foto di `public/tutorial/`, bukan langsung di `public/`. Halaman hanya
+menampilkan file yang masih ada saat website dibangun. Jika semua foto dihapus,
+halaman menampilkan "Materi tutorial sedang diperbarui." tanpa gambar rusak.
+Penghapusan file juga harus masuk commit, push, dan deployment terbaru.
+
 Gunakan gambar PNG dengan nama `01.png` sampai `06.png`, termasuk angka nol di
 depan. Mengganti ekstensi file saja tidak mengubah format gambar.
 
