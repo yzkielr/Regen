@@ -24,6 +24,18 @@ const nextConfig = {
         { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
         { key: 'Referrer-Policy', value: 'no-referrer' },
       ],
+    }, {
+      source: '/Tutorial',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+      ],
+    }, {
+      source: '/tutorial/:path*',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+      ],
     }]
   },
   typescript: {
