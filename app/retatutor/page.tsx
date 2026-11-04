@@ -3,7 +3,7 @@ import Image from 'next/image'
 import { Logo } from '@/components/logo'
 
 const title = 'Tutorial | Regen Longevity Lab'
-const url = 'https://www.regenlongevitylab.com/Tutorial'
+const url = 'https://www.regenlongevitylab.com/retatutor'
 const pages = [
   { id: '01', width: 1165, height: 1655, version: '035d155ca1dd' },
   { id: '02', width: 1655, height: 1165, version: '6b7f6e7ea842' },

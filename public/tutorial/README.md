@@ -1,6 +1,7 @@
 # Foto halaman Tutorial
 
-URL: https://www.regenlongevitylab.com/Tutorial (huruf T besar).
+URL: https://www.regenlongevitylab.com/retatutor.
+Tautan lama `/Tutorial` diarahkan otomatis ke `/retatutor`.
 
 Enam foto katalog/tutorial ditampilkan sesuai urutan nama file:
 
@@ -19,7 +20,7 @@ proporsi foto tanpa dipotong. Ukuran yang disarankan: lebar 1200–1800 piksel,
 dengan tulisan tetap terbaca. Foto bisa diperbesar dengan pinch-to-zoom di ponsel.
 
 Setelah mengganti foto, sesuaikan `width`, `height`, dan `version` (12 karakter
-awal SHA-256 file) pada daftar `pages` di `app/Tutorial/page.tsx`. Ini menjaga
+awal SHA-256 file) pada daftar `pages` di `app/retatutor/page.tsx`. Ini menjaga
 proporsi saat gambar dimuat dan membuat browser mengambil foto terbaru.
 Lalu commit/push dan deploy ulang website agar gambar baru muncul di domain
 aktif. Mengganti file lokal saja tidak memperbarui website live.
