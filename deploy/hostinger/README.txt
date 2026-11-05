@@ -16,7 +16,13 @@ Files installed at /opt/regen-website:
   database.env (600; never commit or display)
   scheduler.py
   backup.sh
-  releases/20261105-migration/
+  releases/20261105-gallery/
+
+The gallery release combines the Hostinger runtime with the current main
+branch. /PenCartridge contains six images from public/PenCartridge, and
+/Basic contains three images from public/basic. Both pages remain unlisted
+and noindex. /Tutorial and /retatutor redirect to /PenCartridge.
+Keep regen-website:20261105-migration available for rollback.
 
 Required runtime environment keys:
   REGEN_ADMIN_BACKEND_ACCESS
