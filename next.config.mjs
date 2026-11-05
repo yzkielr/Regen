@@ -5,6 +5,7 @@ const nextConfig = {
     return [
       { source: '/Tutorial', destination: '/PenCartridge', permanent: true },
       { source: '/retatutor', destination: '/PenCartridge', permanent: true },
+      { source: '/tutorial/:path*', destination: '/PenCartridge/:path*', permanent: true },
     ]
   },
   // Include registered PDF files in production/serverless route bundles.
@@ -31,7 +32,7 @@ const nextConfig = {
         { key: 'Referrer-Policy', value: 'no-referrer' },
       ],
     }, {
-      source: '/PenCartridge',
+      source: '/PenCartridge/:path*',
       headers: [
         { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
         { key: 'Referrer-Policy', value: 'no-referrer' },

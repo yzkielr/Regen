@@ -11,12 +11,12 @@ export type TutorialImage = {
 }
 
 // The pages are built statically; file changes go live with the next deployment.
-export async function loadTutorialImages(folder: 'tutorial' | 'basic', count: number): Promise<TutorialImage[]> {
+export async function loadTutorialImages(folder: 'PenCartridge' | 'basic', count: number): Promise<TutorialImage[]> {
   const images: TutorialImage[] = []
   for (let index = 1; index <= count; index++) {
     const id = String(index).padStart(2, '0')
-    const matches = ['png', 'jpg', 'jpeg', 'webp']
-      .map((extension) => `${id}.${extension}`)
+    const matches = [...new Set([id, String(index)])]
+      .flatMap((stem) => ['png', 'jpg', 'jpeg', 'webp'].map((extension) => `${stem}.${extension}`))
       .filter((filename) => existsSync(path.join(process.cwd(), 'public', folder, filename)))
 
     if (matches.length === 0) continue

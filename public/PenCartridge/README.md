@@ -3,7 +3,7 @@
 URL: https://www.regenlongevitylab.com/PenCartridge
 
 Tautan lama /Tutorial dan /retatutor diarahkan ke /PenCartridge.
-Enam foto tetap disimpan di folder public/tutorial/:
+Enam foto tetap disimpan di folder public/PenCartridge/:
 
 1. 01.png - foto paling atas
 2. 02.png
@@ -12,6 +12,7 @@ Enam foto tetap disimpan di folder public/tutorial/:
 5. 05.png
 6. 06.png - foto paling bawah
 
+Nama tanpa nol di depan (1.png sampai 6.png) juga didukung.
 Format .jpg, .jpeg, dan .webp juga didukung, dengan nomor yang sama.
 Gunakan satu file untuk setiap nomor. Mengganti ekstensi saja tidak mengubah
 format gambar.

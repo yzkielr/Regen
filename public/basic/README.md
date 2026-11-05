@@ -9,6 +9,9 @@ Taruh empat foto di folder `public/basic/`, dengan nama:
 3. `03.png`
 4. `04.png` - foto paling bawah
 
+Nama tanpa nol di depan (`1.png` sampai `4.png`) juga didukung. Gunakan
+satu file per nomor, jangan menyimpan `01.png` dan `1.png` bersamaan.
+
 Format `.jpg`, `.jpeg`, dan `.webp` juga didukung, dengan nomor yang sama.
 Gunakan satu file untuk setiap nomor. Mengganti ekstensi saja tidak mengubah
 format gambar. File bernomor di atas 04 tidak ditampilkan.

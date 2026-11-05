@@ -26,5 +26,5 @@ export const viewport: Viewport = {
 }
 
 export default async function PenCartridgePage() {
-  return <TutorialGallery title="Pen Cartridge" images={await loadTutorialImages('tutorial', 6)} />
+  return <TutorialGallery title="Pen Cartridge" images={await loadTutorialImages('PenCartridge', 6)} />
 }
