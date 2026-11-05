@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Activity, ArrowUpRight, BookOpen, Bot, Box, CalendarDays, ChartNoAxesCombined, Check, ChevronRight, Code2, ContactRound, FileChartColumn, FileText, Globe, Headset, HeartPulse, Image, LayoutDashboard, List, LoaderCircle, LockKeyhole, LogOut, Menu, MessageCircle, MessagesSquare, Phone, Plug, Radio, RefreshCw, Search, Send, Settings2, ShieldCheck, SlidersHorizontal, Target, Truck, Users, Workflow, X } from 'lucide-react';
 import { navigation } from '../lib/module-catalog';
 import type { PageId } from '../lib/module-catalog';
-import type { OpsEnvelope, OpsAction } from '../lib/operations';
+import type { Entry, OpsEnvelope, OpsAction } from '../lib/operations';
 import { newerSnapshot, submitOperation } from '../lib/operations-sync';
 import { REGEN_CS_PHONE, displayPhone } from '../lib/regen-phone';
 import OperationsPanel from './operations-panels';
@@ -28,14 +28,14 @@ export default function OperationsConsole({displayName,role='admin'}:{displayNam
  useEffect(()=>{if(toast){const id=setTimeout(()=>setToast(''),5000);return()=>clearTimeout(id);}},[toast]);
  useEffect(()=>{const key=(e:KeyboardEvent)=>{if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();setMobile(true);search.current?.focus();}};window.addEventListener('keydown',key);return()=>window.removeEventListener('keydown',key);},[]);
  const paymentPending=data?.state.records.orders.some(o=>o.provider==='paper'&&o.status==='awaiting_payment'&&o.test!==true)===true;
- useEffect(()=>{let reading=false;const timer=setInterval(async()=>{if(reading||lock.current||document.visibilityState!=='visible')return;reading=true;try{const r=await adminFetch('/admin/api/operations',{cache:'no-store',signal:AbortSignal.timeout(12000)});if(!r.ok)return;const next=await r.json() as OpsEnvelope;if(!lock.current)accept(next);}catch{}finally{reading=false;}},paymentPending?3000:8000);return()=>clearInterval(timer);},[paymentPending,accept]);
+ useEffect(()=>{let reading=false;const timer=setInterval(async()=>{if(reading||lock.current||document.visibilityState!=='visible')return;reading=true;try{const r=await adminFetch('/admin/api/operations',{cache:'no-store',signal:AbortSignal.timeout(12000)});if(!r.ok)return;const next=await r.json() as OpsEnvelope;if(!lock.current)accept(next);}catch{}finally{reading=false;}},paymentPending||page==='chat'||page==='service'?3000:8000);return()=>clearInterval(timer);},[paymentPending,page,accept]);
  useEffect(()=>{const media=window.matchMedia('(max-width: 1024px)');const sync=()=>{if(sidebar.current)sidebar.current.inert=media.matches&&!mobile;if(main.current)main.current.inert=media.matches&&mobile;};sync();if(mobile&&media.matches)search.current?.focus();media.addEventListener('change',sync);const key=(e:KeyboardEvent)=>{if(!mobile||!media.matches)return;if(e.key==='Escape'){e.preventDefault();setMobile(false);requestAnimationFrame(()=>menuButton.current?.focus());}if(e.key==='Tab'){const items=Array.from(sidebar.current?.querySelectorAll<HTMLElement>('a[href],button:not([disabled]),input:not([disabled]),[tabindex="0"]')??[]).filter(el=>el.getClientRects().length);const first=items[0],last=items.at(-1);if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus();}}};window.addEventListener('keydown',key);return()=>{media.removeEventListener('change',sync);window.removeEventListener('keydown',key);if(main.current)main.current.inert=false;};},[mobile]);
  function navigate(p:PageId){if(!canOpenAdminPage(role,p))return;setPage(p);location.hash=p;setMobile(false);setQ('');setError('');}
- async function act(a:Omit<OpsAction,'requestId'>){
+ async function act(a:Omit<OpsAction,'requestId'>,editingBase?:Entry){
   const initial=dataRef.current;if(!initial||lock.current)return false;
   lock.current=true;setBusy(true);setError('');setToast('');
   try{
-   await submitOperation(async(version,action)=>{const r=await adminFetch('/admin/api/operations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({version,action}),signal:AbortSignal.timeout(180000)});return {ok:r.ok,status:r.status,data:await r.json()};},initial,{...a,requestId:crypto.randomUUID()},accept);
+   await submitOperation(async(version,action)=>{const r=await adminFetch('/admin/api/operations',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({version,action}),signal:AbortSignal.timeout(180000)});return {ok:r.ok,status:r.status,data:await r.json()};},initial,{...a,requestId:crypto.randomUUID()},accept,editingBase);
    setToast(a.type==='delete'?'Data berhasil dihapus.':a.type==='stock'?'Stok berhasil diperbarui.':'Perubahan tersimpan.');return true;
   }catch(e){setError(e instanceof Error?e.message:'Koneksi terputus. Muat ulang sebelum mencoba kembali.');return false;}
   finally{lock.current=false;setBusy(false);}
