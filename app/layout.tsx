@@ -78,7 +78,7 @@ export default async function RootLayout({
         {admin ? children : <RegionProvider initialRegion={region?.id ?? DEFAULT_REGION}>
           <ConsultationProvider>{children}</ConsultationProvider>
         </RegionProvider>}
-        {!admin && process.env.NODE_ENV === 'production' && <Analytics />}
+        {!admin && process.env.VERCEL === '1' && <Analytics />}
       </body>
     </html>
   )

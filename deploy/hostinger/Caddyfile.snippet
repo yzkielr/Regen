@@ -1,0 +1,20 @@
+# Append to the existing Caddy configuration; preserve unrelated sites.
+regenlongevitylab.com {
+    tls {
+        issuer acme
+        issuer acme https://acme.zerossl.com/v2/DV90 {
+            email contact@lorenic.com
+        }
+    }
+    redir https://www.regenlongevitylab.com{uri} permanent
+}
+
+www.regenlongevitylab.com {
+    encode zstd gzip
+    @workflow_internal path /.well-known/workflow/*
+    respond @workflow_internal 404
+    reverse_proxy regen_website:3000 {
+        header_up X-Real-IP {remote_host}
+        header_up -X-Vercel-Forwarded-For
+    }
+}

@@ -1,0 +1,73 @@
+name: regen-website
+services:
+  website:
+    build: ./releases/20261105-migration
+    image: regen-website:20261105-migration
+    container_name: regen_website
+    restart: unless-stopped
+    env_file:
+      - path: ./production.env
+        format: raw
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - '127.0.0.1:3090:3000'
+    networks:
+      - backend
+      - proxy
+    mem_limit: 1200m
+    cpus: 1.0
+    healthcheck:
+      test: ['CMD', 'node', '-e', "fetch('http://127.0.0.1:3000/api/healthz').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    logging:
+      driver: json-file
+      options: {max-size: '10m', max-file: '3'}
+  postgres:
+    image: postgres:17-alpine
+    container_name: regen_website_postgres
+    restart: unless-stopped
+    env_file: ./database.env
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks: [backend]
+    mem_limit: 256m
+    cpus: 0.4
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U regen -d regen_workflow']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    logging:
+      driver: json-file
+      options: {max-size: '10m', max-file: '3'}
+  scheduler:
+    image: python:3.12-alpine
+    container_name: regen_website_scheduler
+    restart: unless-stopped
+    env_file:
+      - path: ./production.env
+        format: raw
+    command: ['python', '/app/scheduler.py']
+    volumes:
+      - ./scheduler.py:/app/scheduler.py:ro
+    networks: [backend]
+    depends_on:
+      website:
+        condition: service_healthy
+    mem_limit: 64m
+    cpus: 0.1
+    logging:
+      driver: json-file
+      options: {max-size: '5m', max-file: '2'}
+networks:
+  backend:
+  proxy:
+    external: true
+    name: wearology-cs_default
+volumes:
+  postgres_data:
