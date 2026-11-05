@@ -1,0 +1,2 @@
+scripts/hostinger-start.sh text eol=lf
+deploy/hostinger/backup.sh text eol=lf
