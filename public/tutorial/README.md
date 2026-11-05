@@ -1,35 +1,31 @@
-# Foto halaman Tutorial
+# Foto halaman Pen Cartridge
 
-URL: https://www.regenlongevitylab.com/retatutor.
-Tautan lama `/Tutorial` diarahkan otomatis ke `/retatutor`.
+URL: https://www.regenlongevitylab.com/PenCartridge
 
-Enam foto katalog/tutorial ditampilkan sesuai urutan nama file:
+Tautan lama /Tutorial dan /retatutor diarahkan ke /PenCartridge.
+Enam foto tetap disimpan di folder public/tutorial/:
 
-1. `01.png` — foto paling atas
-2. `02.png`
-3. `03.png`
-4. `04.png`
-5. `05.png`
-6. `06.png` — foto paling bawah
+1. 01.png - foto paling atas
+2. 02.png
+3. 03.png
+4. 04.png
+5. 05.png
+6. 06.png - foto paling bawah
 
-Simpan foto di `public/tutorial/`, bukan langsung di `public/`. Halaman hanya
-menampilkan file yang masih ada saat website dibangun. Jika semua foto dihapus,
-halaman menampilkan "Materi tutorial sedang diperbarui." tanpa gambar rusak.
-Penghapusan file juga harus masuk commit, push, dan deployment terbaru.
+Format .jpg, .jpeg, dan .webp juga didukung, dengan nomor yang sama.
+Gunakan satu file untuk setiap nomor. Mengganti ekstensi saja tidak mengubah
+format gambar.
 
-Gunakan gambar PNG dengan nama `01.png` sampai `06.png`, termasuk angka nol di
-depan. Mengganti ekstensi file saja tidak mengubah format gambar.
+Foto ditampilkan utuh dalam satu kolom yang dapat di-scroll. Ukuran dan versi
+cache foto dibaca otomatis; tidak perlu mengedit kode saat mengganti foto.
+Foto yang dihapus tidak ditampilkan. Jika semua foto dihapus, halaman
+menampilkan "Materi tutorial sedang diperbarui."
 
-Foto ditampilkan utuh, satu kolom, sesuai urutan nama file. Tingginya menyesuaikan
-proporsi foto tanpa dipotong. Ukuran yang disarankan: lebar 1200–1800 piksel,
-dengan tulisan tetap terbaca. Foto bisa diperbesar dengan pinch-to-zoom di ponsel.
+Penambahan, penggantian, atau penghapusan foto perlu di-commit, di-push, dan
+di-deploy agar muncul pada website aktif. Pastikan file berasal dari folder
+ini dan masuk ke commit yang dipublikasikan.
 
-Setelah mengganti foto, sesuaikan `width`, `height`, dan `version` (12 karakter
-awal SHA-256 file) pada daftar `pages` di `app/retatutor/page.tsx`. Ini menjaga
-proporsi saat gambar dimuat dan membuat browser mengambil foto terbaru.
-Lalu commit/push dan deploy ulang website agar gambar baru muncul di domain
-aktif. Mengganti file lokal saja tidak memperbarui website live.
+Halaman tidak ditautkan di menu/footer dan tidak masuk sitemap. Halaman serta
+foto diberi noindex. Siapa pun yang memiliki tautan tetap dapat membukanya.
 
-Halaman tidak ditautkan dari menu/footer utama dan tidak masuk sitemap.
-Halaman dan gambar mengirim instruksi noindex agar tidak masuk hasil pencarian.
-Siapa pun yang memiliki tautannya dapat membukanya; halaman ini tidak memakai login.
+Empat foto halaman /Basic disimpan terpisah di public/basic/.

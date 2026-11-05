@@ -2,7 +2,10 @@ import { withWorkflow } from 'workflow/next';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   async redirects() {
-    return [{ source: '/Tutorial', destination: '/retatutor', permanent: true }]
+    return [
+      { source: '/Tutorial', destination: '/PenCartridge', permanent: true },
+      { source: '/retatutor', destination: '/PenCartridge', permanent: true },
+    ]
   },
   // Include registered PDF files in production/serverless route bundles.
   outputFileTracingIncludes: {
@@ -28,7 +31,19 @@ const nextConfig = {
         { key: 'Referrer-Policy', value: 'no-referrer' },
       ],
     }, {
-      source: '/retatutor',
+      source: '/PenCartridge',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+      ],
+    }, {
+      source: '/Basic',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+      ],
+    }, {
+      source: '/basic/:path*',
       headers: [
         { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
         { key: 'Referrer-Policy', value: 'no-referrer' },
