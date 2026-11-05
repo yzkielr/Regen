@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { TutorialGallery } from '@/components/tutorial-gallery'
 import { loadTutorialImages } from '@/lib/tutorial-images'
 
-const title = 'Basic | Regen Longevity Lab'
-const description = 'Tutorial Basic Regen Longevity Lab.'
+const title = 'Basic Package Guide | Regen Longevity Lab'
+const description = 'Basic Package Guide Regen Longevity Lab.'
 const url = 'https://www.regenlongevitylab.com/Basic'
 
 export const dynamic = 'force-static'
@@ -26,5 +26,5 @@ export const viewport: Viewport = {
 }
 
 export default async function BasicPage() {
-  return <TutorialGallery title="Basic" images={await loadTutorialImages('basic', 4)} />
+  return <TutorialGallery title="Basic Package Guide" images={await loadTutorialImages('basic', 4)} />
 }

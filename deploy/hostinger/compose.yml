@@ -1,8 +1,8 @@
 name: regen-website
 services:
   website:
-    build: ./releases/20261105-gallery-order
-    image: regen-website:20261105-gallery-order
+    build: ./releases/20261105-guide-titles
+    image: regen-website:20261105-guide-titles
     container_name: regen_website
     restart: unless-stopped
     env_file:

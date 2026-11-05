@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next'
 import { TutorialGallery } from '@/components/tutorial-gallery'
 import { loadTutorialImages } from '@/lib/tutorial-images'
 
-const title = 'Pen Cartridge | Regen Longevity Lab'
-const description = 'Tutorial Pen Cartridge Regen Longevity Lab.'
+const title = 'Pen and Cartridge Package Guide | Regen Longevity Lab'
+const description = 'Pen and Cartridge Package Guide Regen Longevity Lab.'
 const url = 'https://www.regenlongevitylab.com/PenCartridge'
 
 export const dynamic = 'force-static'
@@ -26,5 +26,5 @@ export const viewport: Viewport = {
 }
 
 export default async function PenCartridgePage() {
-  return <TutorialGallery title="Pen Cartridge" images={await loadTutorialImages('PenCartridge', 6)} />
+  return <TutorialGallery title="Pen and Cartridge Package Guide" images={await loadTutorialImages('PenCartridge', 6)} />
 }
