@@ -15,7 +15,9 @@ export function sameOrigin(request: Request) {
   const url = new URL(request.url);
   // Next.js may use its internal hostname in request.url behind a reverse proxy.
   // Host is set by the browser/hosting proxy and cannot be changed by browser JS.
-  const expected = `${url.protocol}//${request.headers.get('host') || url.host}`;
+  const hostedOrigin=process.env.REGEN_HOSTED_ORIGIN;
+  if(hostedOrigin&&request.headers.get('host')!==new URL(hostedOrigin).host)return false;
+  const expected = hostedOrigin||`${url.protocol}//${request.headers.get('host') || url.host}`;
   return request.headers.get('origin') === expected && !['cross-site','same-site'].includes(request.headers.get('sec-fetch-site') || '');
 }
 export function validAdminSession(value: unknown): value is string { return typeof value === 'string' && /^[a-f0-9]{64}$/.test(value); }
