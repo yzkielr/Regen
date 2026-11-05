@@ -44,6 +44,8 @@ an existing printed code.
 Website is bound to 127.0.0.1:3090 only. Existing Caddy container
 wearology-cs-proxy-1 supplies TLS and the public reverse proxy.
 Its existing configuration is preserved, with two Regen vhosts added.
+Caddyfile.snippet records the Regen-only additions. The apex domain uses
+ZeroSSL's free ACME service as a fallback if Let's Encrypt issuance fails.
 The public /.well-known/workflow/* path is denied; workers use loopback.
 PostgreSQL is internal-only, with a named persistent Docker volume.
 Never expose the worker endpoint or database on a public port.
