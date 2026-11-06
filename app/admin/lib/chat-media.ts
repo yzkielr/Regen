@@ -1,0 +1,1 @@
+export const CHAT_PHOTO_LIMIT=3_800_000;

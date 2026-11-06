@@ -1,7 +1,7 @@
 import { after, NextRequest } from 'next/server';
 import { adminBackendHeaders, adminBackendOrigin } from '@/lib/admin-gateway';
 import { regenDirectEnabled, wakeRegenQueue } from '@/lib/regen-queue';
-import { ADMIN_COOKIE, allowedAdminRoute, boundedAdminBody, sameOrigin, validAdminSession } from '@/lib/admin-gateway-policy';
+import { ADMIN_COOKIE, MAX_ADMIN_BODY, MAX_ADMIN_FILE_BODY, allowedAdminRoute, boundedAdminBody, sameOrigin, validAdminSession } from '@/lib/admin-gateway-policy';
 export const runtime='nodejs';export const dynamic='force-dynamic';export const maxDuration=300;
 const json=(error:string,status:number)=>Response.json({error},{status,headers:{'Cache-Control':'private, no-store'}});
 async function relay(request:NextRequest,{params}:{params:Promise<{path:string[]}>}){
@@ -13,7 +13,7 @@ async function relay(request:NextRequest,{params}:{params:Promise<{path:string[]
   const headers=adminBackendHeaders(session,request.headers.get('content-type')||undefined);
   if(request.headers.get('x-regen-user-active')==='1')headers.set('x-regen-user-active','1');
   if(request.method==='GET'&&path.join('/')==='files'&&request.headers.get('range'))headers.set('range',request.headers.get('range')!);
-  const body=request.method==='GET'?undefined:await boundedAdminBody(request);
+  const body=request.method==='GET'?undefined:await boundedAdminBody(request,path.join('/')==='files'&&request.method==='POST'?MAX_ADMIN_FILE_BODY:MAX_ADMIN_BODY);
   const upstream=await fetch(`${adminBackendOrigin()}/api/${path.join('/')}${request.nextUrl.search}`,{method:request.method,headers,body:body as BodyInit|undefined,cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(250000)});
   if(upstream.status>=300&&upstream.status<400)return json('Koneksi admin belum tersedia.',503);
   if(upstream.ok&&request.method==='POST'&&path.join('/')==='service/payment-test'){
@@ -34,6 +34,6 @@ async function relay(request:NextRequest,{params}:{params:Promise<{path:string[]
   for(const key of ['content-type','content-disposition','x-document-name','x-document-type','x-document-source']){const value=upstream.headers.get(key);if(value)out.set(key,value);}
   if(path.join('/')==='files')for(const key of ['content-range','accept-ranges','content-length','content-security-policy']){const value=upstream.headers.get(key);if(value)out.set(key,value);}
   return new Response(upstream.body,{status:upstream.status,headers:out});
- }catch(e){return json(e instanceof Error&&e.message==='too_large'?'Maksimal 4 MB untuk unggahan melalui domain admin.':'Koneksi dashboard belum tersedia. Coba kembali.',e instanceof Error&&e.message==='too_large'?413:503);}
+ }catch(e){return json(e instanceof Error&&e.message==='too_large'?(path.join('/')==='files'?'Lampiran terlalu besar. Video maksimal 10 MB; foto dan dokumen maksimal 3,8 MB.':'Maksimal 4 MB untuk permintaan admin.'):'Koneksi dashboard belum tersedia. Coba kembali.',e instanceof Error&&e.message==='too_large'?413:503);}
 }
 export const GET=relay;export const POST=relay;export const DELETE=relay;
