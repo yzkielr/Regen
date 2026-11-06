@@ -12,6 +12,7 @@ async function relay(request:NextRequest,{params}:{params:Promise<{path:string[]
  try{
   const headers=adminBackendHeaders(session,request.headers.get('content-type')||undefined);
   if(request.headers.get('x-regen-user-active')==='1')headers.set('x-regen-user-active','1');
+  if(request.method==='GET'&&path.join('/')==='files'&&request.headers.get('range'))headers.set('range',request.headers.get('range')!);
   const body=request.method==='GET'?undefined:await boundedAdminBody(request);
   const upstream=await fetch(`${adminBackendOrigin()}/api/${path.join('/')}${request.nextUrl.search}`,{method:request.method,headers,body:body as BodyInit|undefined,cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(250000)});
   if(upstream.status>=300&&upstream.status<400)return json('Koneksi admin belum tersedia.',503);
@@ -31,6 +32,7 @@ async function relay(request:NextRequest,{params}:{params:Promise<{path:string[]
   }
   const out=new Headers({'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow'});
   for(const key of ['content-type','content-disposition','x-document-name','x-document-type','x-document-source']){const value=upstream.headers.get(key);if(value)out.set(key,value);}
+  if(path.join('/')==='files')for(const key of ['content-range','accept-ranges','content-length','content-security-policy']){const value=upstream.headers.get(key);if(value)out.set(key,value);}
   return new Response(upstream.body,{status:upstream.status,headers:out});
  }catch(e){return json(e instanceof Error&&e.message==='too_large'?'Maksimal 4 MB untuk unggahan melalui domain admin.':'Koneksi dashboard belum tersedia. Coba kembali.',e instanceof Error&&e.message==='too_large'?413:503);}
 }
