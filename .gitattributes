@@ -1,2 +1,4 @@
 scripts/hostinger-start.sh text eol=lf
 deploy/hostinger/backup.sh text eol=lf
+# Preserve the original COA PDF bytes across Windows and Linux checkouts.
+lab-documents/**/*.pdf -text
