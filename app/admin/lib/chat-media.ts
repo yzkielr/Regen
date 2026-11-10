@@ -1,5 +1,5 @@
 import type {Conversation,ServiceMessage} from './service-types.ts';
-export const CHAT_PHOTO_LIMIT=3_800_000;
+export const CHAT_PHOTO_LIMIT=100_000_000;
 
 // Match the existing Admin inbox: actual messages determine activity, not
 // receipt updates, AI mode changes or the order returned by the server.

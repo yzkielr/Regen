@@ -2,6 +2,7 @@
 import {adminFetch} from './admin-client';
 import {useEffect,useRef,useState} from 'react';
 import {FileText,ImagePlus,Paperclip,Send,Video,X} from 'lucide-react';
+import {uploadChatAttachment} from '../lib/chat-upload-client';
 import {ResizableTextarea} from './resizable-textarea';
 import type {Conversation,ServiceAction} from '../lib/service-types';
 import {CHAT_VIDEO_LIMIT,videoName} from '../lib/chat-videos';
@@ -9,7 +10,7 @@ import {CHAT_PHOTO_LIMIT} from '../lib/chat-media';
 import {CHAT_DOCUMENT_ACCEPT,CHAT_DOCUMENT_LIMIT,documentMime,documentName} from '../lib/chat-documents';
 type Props={chat:Conversation;text:string;setText:(v:string)=>void;corrects:string;setCorrects:(v:string)=>void;busy:boolean;ready:boolean;run:(a:ServiceAction)=>Promise<boolean>};
 export function ChatComposer({chat,text,setText,corrects,setCorrects,busy,ready,run}:Props){
- const [file,setFile]=useState<File|null>(null),[kind,setKind]=useState<'image'|'document'|'video'>('image'),[preview,setPreview]=useState(''),[sending,setSending]=useState(false),[error,setError]=useState('');
+ const [file,setFile]=useState<File|null>(null),[kind,setKind]=useState<'image'|'document'|'video'>('image'),[preview,setPreview]=useState(''),[sending,setSending]=useState(false),[error,setError]=useState(''),[uploadProgress,setUploadProgress]=useState<number|null>(null);
  const uploaded=useRef<{file:File;id:string}|null>(null),photoPicker=useRef<HTMLInputElement>(null),filePicker=useRef<HTMLInputElement>(null),videoPicker=useRef<HTMLInputElement>(null),alive=useRef(true),lock=useRef(false);
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;};},[]);
  useEffect(()=>{if(!file||!['image','video'].includes(kind)){setPreview('');return;}const url=URL.createObjectURL(file);setPreview(url);return()=>URL.revokeObjectURL(url);},[file,kind]);
@@ -18,27 +19,25 @@ export function ChatComposer({chat,text,setText,corrects,setCorrects,busy,ready,
   setError('');if(!selected)return;
   try{
    if(type==='image'){
-    if(!['image/png','image/jpeg','image/webp'].includes(selected.type)||!selected.size||selected.size>CHAT_PHOTO_LIMIT)throw Error('Pilih foto PNG, JPG, atau WEBP maksimal 3,8 MB.');
+    if(!['image/png','image/jpeg','image/webp'].includes(selected.type)||!selected.size||selected.size>CHAT_PHOTO_LIMIT)throw Error('Pilih foto PNG, JPG, atau WEBP maksimal 100 MB.');
    }else if(type==='video'){
-    videoName(selected.name);if(!selected.size||selected.size>CHAT_VIDEO_LIMIT)throw Error('Pilih video MP4 maksimal 10 MB.');
+    videoName(selected.name);if(!selected.size||selected.size>CHAT_VIDEO_LIMIT)throw Error('Pilih video MP4 maksimal 100 MB.');
    }else{
     documentMime(documentName(selected.name));
-    if(!selected.size||selected.size>CHAT_DOCUMENT_LIMIT)throw Error('File harus berukuran 1 byte–3,8 MB.');
+    if(!selected.size||selected.size>CHAT_DOCUMENT_LIMIT)throw Error('File harus berukuran 1 byte–100 MB.');
    }
    uploaded.current=null;setKind(type);setFile(selected);
   }catch(e){setError(e instanceof Error?e.message:'File tidak valid.');}
  }
  function clearFile(){setFile(null);uploaded.current=null;}
  async function submit(){
-  if(lock.current||busy||(!text.trim()&&!file)||file&&text.length>900)return;lock.current=true;setSending(true);setError('');
+  if(lock.current||busy||(!text.trim()&&!file)||file&&text.length>900)return;lock.current=true;setSending(true);setError('');setUploadProgress(null);
   try{
    let media:Record<string,unknown>={};
    if(file){
     if(uploaded.current?.file!==file){
-     const form=new FormData();form.set('file',file);if(kind!=='image')form.set('purpose',kind==='video'?'chat-video':'chat-document');
-     const response=await adminFetch('/admin/api/files',{method:'POST',body:form,signal:AbortSignal.timeout(120000)}),result=await response.json() as {id?:string;error?:string};
-     if(!response.ok||!result.id)throw Error(result.error||'Lampiran gagal diunggah.');
-     uploaded.current={file,id:result.id};
+     const id=await uploadChatAttachment(file,kind,adminFetch,setUploadProgress);
+     uploaded.current={file,id};
     }
     media=kind==='image'?{image:{fileId:uploaded.current!.id}}:{attachment:{fileId:uploaded.current!.id,kind}};
    }
@@ -62,12 +61,12 @@ export function ChatComposer({chat,text,setText,corrects,setCorrects,busy,ready,
     <input ref={photoPicker} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={e=>{choose(e.target.files?.[0],'image');e.target.value='';}}/>
     <input ref={filePicker} type="file" accept={CHAT_DOCUMENT_ACCEPT} hidden onChange={e=>{choose(e.target.files?.[0],'document');e.target.value='';}}/>
     <input ref={videoPicker} type="file" accept="video/mp4,.mp4" hidden onChange={e=>{choose(e.target.files?.[0],'video');e.target.value='';}}/>
-    <button type="button" className="button" disabled={busy||sending} title="Video MP4 maksimal 10 MB." onClick={()=>videoPicker.current?.click()}><Video size={16}/>Tambah video</button>
+    <button type="button" className="button" disabled={busy||sending} title="Video MP4 maksimal 100 MB." onClick={()=>videoPicker.current?.click()}><Video size={16}/>Tambah video</button>
     <button type="button" className="button" disabled={busy||sending} onClick={()=>photoPicker.current?.click()}><ImagePlus size={16}/>Tambah foto</button>
-    <button type="button" className="button" disabled={busy||sending} title="PDF, Word, Excel, PowerPoint, TXT, CSV, RTF. Maksimal 3,8 MB." onClick={()=>filePicker.current?.click()}><Paperclip size={16}/>Tambah file</button>
+    <button type="button" className="button" disabled={busy||sending} title="PDF, Word, Excel, PowerPoint, TXT, CSV, RTF. Maksimal 100 MB." onClick={()=>filePicker.current?.click()}><Paperclip size={16}/>Tambah file</button>
    </>}
-   <span style={{flex:1}}>{file?(kind==='video'?'Video MP4 maksimal 10 MB.':'Maksimal 3,8 MB per lampiran.'):chat.test?'Balasan disimpan sebagai simulasi.':ready?'Balasan dikirim melalui WhatsApp.':'Balasan masuk antrean WhatsApp.'}</span>
-   <button className="button primary" disabled={busy||sending||(!text.trim()&&!file)||!!file&&text.length>900}><Send size={14}/>{sending?'Memproses…':file?kind==='document'?'Kirim file':kind==='video'?'Kirim video':'Kirim foto':chat.test?'Balas di simulasi':'Kirim ke buyer'}</button>
+   <span style={{flex:1}}>{file?(kind==='video'?'Video MP4 maksimal 100 MB.':'Maksimal 100 MB per lampiran.'):chat.test?'Balasan disimpan sebagai simulasi.':ready?'Balasan dikirim melalui WhatsApp.':'Balasan masuk antrean WhatsApp.'}</span>
+   <button className="button primary" disabled={busy||sending||(!text.trim()&&!file)||!!file&&text.length>900}><Send size={14}/>{sending?(uploadProgress!==null&&uploadProgress<100?'Mengunggah '+uploadProgress+'%':'Memproses…'):file?kind==='document'?'Kirim file':kind==='video'?'Kirim video':'Kirim foto':chat.test?'Balas di simulasi':'Kirim ke buyer'}</button>
   </div>
  </form>;
 }

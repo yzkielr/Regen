@@ -1,4 +1,4 @@
-export const CHAT_DOCUMENT_LIMIT=3_800_000;
+export const CHAT_DOCUMENT_LIMIT=100_000_000;
 export const DOCUMENT_TYPES:Record<string,string>={
  pdf:'application/pdf',doc:'application/msword',
  docx:'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
@@ -36,7 +36,7 @@ function zipContains(bytes:Uint8Array,entry:string):boolean {
 }
 export function validateChatDocument(originalName:string,bytes:Uint8Array){
  const name=documentName(originalName),mime=documentMime(name),ext=name.split('.').at(-1)!.toLowerCase();
- if(!bytes.length||bytes.length>CHAT_DOCUMENT_LIMIT)throw Error('File harus berukuran 1 byte–3,8 MB.');
+ if(!bytes.length||bytes.length>CHAT_DOCUMENT_LIMIT)throw Error('File harus berukuran 1 byte–100 MB.');
  const starts=(values:number[])=>values.every((v,i)=>bytes[i]===v);
  const head=new TextDecoder().decode(bytes.subarray(0,8));
  let valid=false;

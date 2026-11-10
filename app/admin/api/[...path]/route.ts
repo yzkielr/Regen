@@ -34,6 +34,6 @@ async function relay(request:NextRequest,{params}:{params:Promise<{path:string[]
   for(const key of ['content-type','content-disposition','x-document-name','x-document-type','x-document-source']){const value=upstream.headers.get(key);if(value)out.set(key,value);}
   if(path.join('/')==='files')for(const key of ['content-range','accept-ranges','content-length','content-security-policy']){const value=upstream.headers.get(key);if(value)out.set(key,value);}
   return new Response(upstream.body,{status:upstream.status,headers:out});
- }catch(e){return json(e instanceof Error&&e.message==='too_large'?(path.join('/')==='files'?'Lampiran terlalu besar. Video maksimal 10 MB; foto dan dokumen maksimal 3,8 MB.':'Maksimal 4 MB untuk permintaan admin.'):'Koneksi dashboard belum tersedia. Coba kembali.',e instanceof Error&&e.message==='too_large'?413:503);}
+ }catch(e){return json(e instanceof Error&&e.message==='too_large'?(path.join('/')==='files'?'Bagian unggahan terlalu besar. Muat ulang halaman, lalu coba lagi.':'Maksimal 4 MB untuk permintaan admin.'):'Koneksi dashboard belum tersedia. Coba kembali.',e instanceof Error&&e.message==='too_large'?413:503);}
 }
 export const GET=relay;export const POST=relay;export const DELETE=relay;
