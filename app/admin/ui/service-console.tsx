@@ -12,8 +12,10 @@ import { successfulPaymentSummary } from '../lib/payment-summary';
 import { PaymentTestPanel } from './payment-test-panel';
 import { PaymentMailPanel, WarehouseDelivery } from './payment-mail-panel';
 import { OrderDraftModal, OrderWorkflow } from './order-workflow';
+import {useWibMonth} from './order-period';
+import {ordersInMonth} from '../lib/order-periods';
 import { publicSourceUrl } from '../lib/research-sources';
-import { ArrowLeft, ArrowRight, Bot, Check, ClipboardCheck, FileText, Headset, MessageSquare, PackageCheck, Plus, Search, Send, Settings2, Sparkles, Wallet, X } from 'lucide-react';
+import { History, ArrowLeft, ArrowRight, Bot, Check, ClipboardCheck, FileText, Headset, MessageSquare, PackageCheck, Plus, Search, Send, Settings2, Sparkles, Wallet, X } from 'lucide-react';
 import { Card, dt, download, Heading, Invoice, Modal, Note, RecordManager } from './operations-components';
 import type { ModuleProps } from './operations-components';
 import { money, orderLines, orderTotal } from '../lib/operations';
@@ -25,14 +27,15 @@ import { WhatsAppTestSync } from './whatsapp-test-sync';
 import type { Conversation, Payment, ServiceAction } from '../lib/service-types';
 import type { AdminRole } from '../lib/admin-roles';
 type PaymentFilter='review'|'matched'|'all';
-type Tab='inbox'|'orders'|'payments'|'warehouse'|'content'|'setup';
+type Tab='inbox'|'orders'|'history'|'payments'|'warehouse'|'content'|'setup';
 type Props=ModuleProps&{role:AdminRole;refresh:()=>Promise<void>;navigate:(p:string)=>void};
-const tabs=[['inbox','Supervisi CS',MessageSquare],['orders','Order & Invoice',FileText],['payments','Pembayaran',Wallet],['warehouse','Gudang',PackageCheck],['content','FAQ → Konten',Sparkles],['setup','Pengaturan',Settings2]] as const;
+const tabs=[['inbox','Supervisi CS',MessageSquare],['orders','Order & Invoice',FileText],['history','History',History],['payments','Pembayaran',Wallet],['warehouse','Gudang',PackageCheck],['content','FAQ → Konten',Sparkles],['setup','Pengaturan',Settings2]] as const;
 const statusNames:Record<string,string>={draft:'Draft',awaiting_payment:'Menunggu pembayaran',confirmed:'Dikonfirmasi',paid:'PAID',ready_for_packing:'Siap dikemas',shipped:'Dikirim',completed:'Selesai',cancelled:'Dibatalkan',received:'Diterima',queued:'Antrean · belum dikirim',simulated:'Simulasi',sent:'Dikirim ke penyedia',delivered:'Tersampaikan',read:'Dibaca',failed:'Gagal',unknown:'Status belum pasti',blocked:'Menunggu koneksi',sending:'Sedang diproses',review:'Perlu diperiksa',matched:'Cocok',rejected:'Ditolak',approved:'Disetujui',archived:'Diarsipkan'};
 export const ServiceBadge=({status}:{status:string})=><span className={`svc-badge ${status}`}>{statusNames[status]||status}</span>;
 export default function ServiceConsole(props:Props){
  const {state,act,busy,notice,refresh}=props;const [tab,setTab]=useState<Tab>('inbox');const [error,setError]=useState('');const [aiBusy,setAiBusy]=useState(false);const [status,setStatus]=useState<Record<string,boolean|string>>({});const sv=serviceOf(state);
  const paid=successfulPaymentSummary(sv.payments);
+ const currentMonth=useWibMonth();
  const [paymentFilter,setPaymentFilter]=useState<PaymentFilter>('review');
  const paymentPanel=useRef<HTMLDivElement>(null);
  function openPayments(filter:PaymentFilter){
@@ -49,11 +52,12 @@ export default function ServiceConsole(props:Props){
  {status.whatsapp&&<WhatsAppCsPanel direct={status.direct===true} canManageConnection={status.canManageConnection===true} sync={sv.csSync} refresh={refresh} botEnabled={state.settings.botEnabled} enableBot={()=>act({type:'settings',data:{botEnabled:true}})}/>}
  {status.whatsappTestPrepared&&<WhatsAppTestSync refresh={refresh} ready={status.whatsappTest===true}/>}
  <div className="svc-ribbon"><span><i className={state.settings.botEnabled?'on':''}/>{state.settings.botEnabled?'AI diizinkan · mengikuti mode tiap chat':'AI global dijeda'}</span><span>{status.ai?'OpenAI terkonfigurasi':'OpenAI belum terhubung'} · {status.whatsapp?'WhatsApp CS terkonfigurasi':'WhatsApp live belum aktif'}</span></div>
- <div className="svc-metrics"><button onClick={()=>setTab('inbox')}><span>Perlu perhatian</span><strong>{sv.conversations.filter(c=>c.needsAttention).length}</strong><small>{props.role==='admin'?'Perlu tindak lanjut':'Antrean supervisor'}</small></button><button onClick={()=>setTab('orders')}><span>Menunggu pembayaran</span><strong>{state.records.orders.filter(o=>o.status==='awaiting_payment').length}</strong><small>Invoice diterbitkan</small></button><button onClick={()=>openPayments('review')}><span>Periksa pembayaran</span><strong>{sv.payments.filter(p=>p.status==='review').length}</strong><small>Belum mengubah status PAID</small></button><button className="svc-metric-success" onClick={()=>openPayments('matched')} aria-label={`Pembayaran berhasil: ${paid.count} pembayaran nyata, ${paid.simulatedCount} simulasi. Lihat daftar.`}><span>Pembayaran berhasil</span><strong>{paid.count}</strong><small>{money(paid.amount)} · pembayaran nyata</small>{paid.simulatedCount>0&&<small className="svc-metric-simulation">Simulasi: {paid.simulatedCount} · {money(paid.simulatedAmount)}</small>}</button><button onClick={()=>setTab('warehouse')}><span>Siap ditangani gudang</span><strong>{state.records.orders.filter(o=>['paid','ready_for_packing'].includes(String(o.status))).length}</strong><small>Termasuk data simulasi berlabel</small></button></div>
+ <div className="svc-metrics"><button onClick={()=>setTab('inbox')}><span>Perlu perhatian</span><strong>{sv.conversations.filter(c=>c.needsAttention).length}</strong><small>{props.role==='admin'?'Perlu tindak lanjut':'Antrean supervisor'}</small></button><button onClick={()=>setTab('orders')}><span>Menunggu pembayaran</span><strong>{ordersInMonth(state.records.orders,currentMonth).filter(o=>o.status==='awaiting_payment').length}</strong><small>Invoice bulan ini</small></button><button onClick={()=>openPayments('review')}><span>Periksa pembayaran</span><strong>{sv.payments.filter(p=>p.status==='review').length}</strong><small>Belum mengubah status PAID</small></button><button className="svc-metric-success" onClick={()=>openPayments('matched')} aria-label={`Pembayaran berhasil: ${paid.count} pembayaran nyata, ${paid.simulatedCount} simulasi. Lihat daftar.`}><span>Pembayaran berhasil</span><strong>{paid.count}</strong><small>{money(paid.amount)} · pembayaran nyata</small>{paid.simulatedCount>0&&<small className="svc-metric-simulation">Simulasi: {paid.simulatedCount} · {money(paid.simulatedAmount)}</small>}</button><button onClick={()=>setTab('warehouse')}><span>Siap ditangani gudang</span><strong>{state.records.orders.filter(o=>['paid','ready_for_packing'].includes(String(o.status))).length}</strong><small>Termasuk data simulasi berlabel</small></button></div>
  <div className="svc-tabs" role="tablist">{tabs.map(([id,label,Icon])=><button key={id} role="tab" aria-selected={tab===id} className={tab===id?'active':''} onClick={()=>setTab(id)}><Icon size={16}/>{id==='inbox'&&props.role==='admin'?'Layanan CS':label}</button>)}</div>
  {error&&<div className="ops-error" role="alert">{error}<button className="icon-button" onClick={()=>setError('')} aria-label="Tutup pesan"><X size={16}/></button></div>}
  {tab==='inbox'&&<Inbox {...props} openOrders={()=>setTab('orders')} run={run} ai={ai} aiBusy={aiBusy} whatsappReady={status.whatsapp===true}/>}
- {tab==='orders'&&<OrderWorkflow {...props} run={run} status={status} openInbox={()=>setTab('inbox')}/>}
+ {tab==='orders'&&<OrderWorkflow key="current-orders" {...props} run={run} status={status} openInbox={()=>setTab('inbox')}/>}
+ {tab==='history'&&<OrderWorkflow key="order-history" {...props} history run={run} status={status} openInbox={()=>setTab('inbox')}/>}
  {tab==='payments'&&<><div ref={paymentPanel} className="svc-payments-panel" tabIndex={-1} aria-label="Daftar pembayaran"><Payments {...props} run={run} filter={paymentFilter} setFilter={setPaymentFilter}/></div><PaymentMailPanel state={state} refresh={refresh} run={run}/><PaymentTestPanel state={state} refresh={refresh} run={run} role={props.role}/></>}
  {tab==='warehouse'&&<><WarehouseDelivery state={state} run={run}/><Warehouse {...props} run={run}/></>}
  {tab==='content'&&<Content {...props} run={run} ai={ai} aiBusy={aiBusy}/>}
