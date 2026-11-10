@@ -29,6 +29,26 @@ function recordContent(record: Entry | undefined) {
   const {updatedAt, ...content} = record;
   return content;
 }
+function draftContext(state: Operations, data: Record<string, unknown>) {
+  const editing = data.kind === 'order_update';
+  const order = editing ? state.records.orders.find(o => o.id === data.orderId) : undefined;
+  if (editing && (!order || order.status !== 'draft')) return null;
+  const chat = editing ? undefined : state.service?.conversations.find(c => c.id === data.conversationId);
+  if (!editing && !chat) return null;
+  const contact = state.records.contacts.find(c => c.id === (editing ? order!.contactId : chat!.contactId));
+  if (!contact || !Array.isArray(data.items) || !data.items.length) return null;
+  const products = data.items.map(item => state.records.products.find(p => p.id === item?.productId));
+  if (products.some(p => !p)) return null;
+  return {
+    order: recordContent(order), contact: recordContent(contact),
+    chat: chat && {id:chat.id,createdAt:chat.createdAt,contactId:chat.contactId,transport:chat.transport,test:chat.test},
+    products: products.map(recordContent),
+    taxPercent: editing ? order!.taxPercent : state.settings.taxPercent,
+    // Do not blindly create another draft if another admin saved one for this
+    // conversation while this request was in flight.
+    drafts: chat ? state.records.orders.filter(o => o.conversationId === chat.id && o.status === 'draft').map(recordContent) : undefined,
+  };
+}
 function replyContext(state: Operations, conversationId: unknown) {
   const chat = state.service?.conversations.find(c => c.id === conversationId);
   const contact = chat && state.records.contacts.find(c => c.id === chat.contactId);
@@ -60,9 +80,15 @@ export function canRetryOperation(before: Operations, after: Operations, action:
   if(action.type==='test_event')return true;
   if(action.type==='service'&&action.data){
     const d=action.data;
+    if(d.kind==='order_from_chat'||d.kind==='order_update') {
+      const previous=draftContext(before,d),current=draftContext(after,d);
+      // Saving reviewed line items does not depend on new chat bubbles, read
+      // receipts, AI mode or heartbeats. Revalidate the draft's actual inputs.
+      return !!previous&&!!current&&same(previous,current);
+    }
     if(d.kind==='config')return same(before.service?.config,after.service?.config);
     if(d.kind==='content_status')return same(before.service?.ideas.find(r=>r.id===d.ideaId),after.service?.ideas.find(r=>r.id===d.ideaId));
-    if(['order_update','cancel_order','fulfillment','invoice','invoice_send','paper_link'].includes(String(d.kind))) {
+    if(['cancel_order','fulfillment','invoice','invoice_send','paper_link'].includes(String(d.kind))) {
       const relevant=(s:Operations)=>{const order=s.records.orders.find(r=>r.id===d.orderId);return {
         order:recordContent(order),contact:recordContent(s.records.contacts.find(r=>r.id===order?.contactId)),
         chat:order?.conversationId?replyContext(s,order.conversationId):undefined,
@@ -169,6 +195,11 @@ export async function submitOperation(
         throw Error(retry
           ? 'Data sedang diperbarui. Balasan belum terkirim; silakan coba kembali.'
           : 'Percakapan berubah. Periksa pesan terbaru sebelum mengirim kembali.');
+      }
+      if (action.type === 'service' && ['order_from_chat','order_update'].includes(String(action.data?.kind))) {
+        throw Error(retry
+          ? 'Draf belum tersimpan karena data masih diperbarui. Isian tetap ada; coba simpan kembali.'
+          : 'Data pelanggan, produk, atau draf berubah. Isian tetap ada; periksa data terbaru sebelum menyimpan kembali.');
       }
     }
     if (result.status === 409 && next && ['save', 'delete', 'settings', 'knowledge_source', 'knowledge_import'].includes(action.type)) {
