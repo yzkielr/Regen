@@ -30,7 +30,7 @@ export async function GET(
         ...headers,
         'Content-Type': 'application/pdf',
         'Content-Length': String(bytes.byteLength),
-        'Content-Disposition': `inline; filename="regen-${code}-${id}.pdf"`,
+        'Content-Disposition': `inline; filename="${document.downloadFilename ?? `regen-${code}-${id}.pdf`}"`,
       },
     })
   } catch {

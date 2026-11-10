@@ -6,6 +6,9 @@ const nextConfig = {
       { source: '/Tutorial', destination: '/PenCartridge', permanent: true },
       { source: '/retatutor', destination: '/PenCartridge', permanent: true },
       { source: '/tutorial/:path*', destination: '/PenCartridge/:path*', permanent: true },
+      { source: '/coa/retatrutide', destination: '/coa/retatrutide-10mg', permanent: true },
+      { source: '/coa/retatrutide/document/report', destination: '/coa/retatrutide-10mg/document/report', permanent: true },
+      { source: '/coa/retatrutide/document/janoshik', destination: '/coa/retatrutide-60mg/document/janoshik', permanent: true },
     ]
   },
   // Include registered PDF files in production/serverless route bundles.
