@@ -162,7 +162,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 1_162_000, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 1_162_000, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 1_590_000, cartridge: 1_790_000, pen: 2_790_000 }, // Row 19.
-    'glutathione': { basic: 400_000, cartridge: 600_000, pen: 1_600_000 }, // Row 20.
+    'glutathione': { basic: 450_000, cartridge: 650_000, pen: 1_650_000 }, // I20 / R20 / AA20, refreshed 11 Nov 2026.
     'tirzepatide': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 1_230_400, pen: 2_230_400 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 1_299_000, pen: 2_299_000 }, // Row 23.
