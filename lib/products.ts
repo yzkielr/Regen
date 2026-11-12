@@ -61,6 +61,11 @@ export interface ProductStrength {
 }
 
 const PRODUCT_STRENGTHS: Readonly<Record<string, readonly ProductStrength[]>> = {
+  'mots-c': [
+    { id: '10mg', mg: 10, name: 'MOTS-C 10mg', priceKey: 'mots-c' },
+    { id: '30mg', mg: 30, name: 'MOTS-C 30mg', priceKey: 'mots-c-30mg' },
+    { id: '40mg', mg: 40, name: 'MOTS-C 40mg', priceKey: 'mots-c-40mg' },
+  ],
   retatrutide: [
     { id: '10mg', mg: 10, name: 'Retatrutide 10mg', priceKey: 'retatrutide' },
     { id: '20mg', mg: 20, name: 'Retatrutide 20mg', priceKey: 'retatrutide-20mg' },

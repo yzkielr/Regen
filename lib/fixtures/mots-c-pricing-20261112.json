@@ -1,0 +1,44 @@
+{
+  "sourceUrl": "https://docs.google.com/spreadsheets/d/1kBjIQ498O3CDZ3d2GzyNS8zG6SJDJbM5A7kwonf6qQk/edit?gid=1759888008",
+  "sheet": "idr pricing v2",
+  "sheetId": 1759888008,
+  "retrievedOn": "2026-11-12",
+  "currency": "IDR",
+  "columns": [
+    "I",
+    "R",
+    "AA"
+  ],
+  "rows": [
+    {
+      "row": 15,
+      "product": "MOTS-c",
+      "strength": "10 mg",
+      "prices": [
+        1176000,
+        1376000,
+        2376000
+      ]
+    },
+    {
+      "row": 27,
+      "product": "MOTS-c",
+      "strength": "30 mg",
+      "prices": [
+        2576000,
+        2376000,
+        3576000
+      ]
+    },
+    {
+      "row": 28,
+      "product": "MOTS-c",
+      "strength": "40 mg",
+      "prices": [
+        3276000,
+        3176000,
+        4176000
+      ]
+    }
+  ]
+}

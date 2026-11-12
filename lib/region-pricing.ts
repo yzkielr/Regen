@@ -11,6 +11,7 @@ type ProductPriceTable = Readonly<Record<string, Readonly<Record<VariantId, numb
  * Blank prices stay null; sold-out and unavailable formats retain their statuses.
  * I9 says "out of stock": GHK-Cu 50mg Basic stays unpriced.
  * Source values and cell references: fixtures/pricing-v2-after-discount.json.
+ * MOTS-C 30mg/40mg IDR additions from sheet rows 27/28, checked 12 November 2026.
  * Retatrutide 20mg/60mg IDR additions supplied by the owner on 12 November 2026.
  * Owner override, 26 October 2026: Retatrutide 10mg Cartridge IDR 1,099,000.
  */
@@ -23,6 +24,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'cjc-1295-ipamorelin': { basic: 130, cartridge: 180, pen: 270 }, // Row 14.
     'klow80': { basic: 180, cartridge: 240, pen: 320 }, // Row 13.
     'mots-c': { basic: 130, cartridge: 190, pen: 270 }, // Row 15.
+    'mots-c-30mg': { basic: null, cartridge: null, pen: null },
+    'mots-c-40mg': { basic: null, cartridge: null, pen: null },
     'nad-plus': { basic: 130, cartridge: 190, pen: 270 }, // Row 11.
     'tesamorelin': { basic: 150, cartridge: 210, pen: 290 }, // Row 7.
     'bpc-157': { basic: 130, cartridge: 190, pen: 270 }, // Row 18.
@@ -47,6 +50,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'cjc-1295-ipamorelin': { basic: 80, cartridge: 110, pen: 160 }, // Row 14.
     'klow80': { basic: 110, cartridge: 150, pen: 200 }, // Row 13.
     'mots-c': { basic: 80, cartridge: 120, pen: 170 }, // Row 15.
+    'mots-c-30mg': { basic: null, cartridge: null, pen: null },
+    'mots-c-40mg': { basic: null, cartridge: null, pen: null },
     'nad-plus': { basic: 80, cartridge: 120, pen: 170 }, // Row 11.
     'tesamorelin': { basic: 90, cartridge: 130, pen: 180 }, // Row 7.
     'bpc-157': { basic: 80, cartridge: 120, pen: 170 }, // Row 18.
@@ -71,6 +76,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'cjc-1295-ipamorelin': { basic: 90, cartridge: 130, pen: 180 }, // Row 14.
     'klow80': { basic: 130, cartridge: 170, pen: 220 }, // Row 13.
     'mots-c': { basic: 90, cartridge: 130, pen: 190 }, // Row 15.
+    'mots-c-30mg': { basic: null, cartridge: null, pen: null },
+    'mots-c-40mg': { basic: null, cartridge: null, pen: null },
     'nad-plus': { basic: 90, cartridge: 130, pen: 190 }, // Row 11.
     'tesamorelin': { basic: 100, cartridge: 140, pen: 200 }, // Row 7.
     'bpc-157': { basic: 90, cartridge: 130, pen: 190 }, // Row 18.
@@ -95,6 +102,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'cjc-1295-ipamorelin': { basic: 70, cartridge: 100, pen: 140 }, // Row 14.
     'klow80': { basic: 100, cartridge: 130, pen: 170 }, // Row 13.
     'mots-c': { basic: 70, cartridge: 100, pen: 140 }, // Row 15.
+    'mots-c-30mg': { basic: null, cartridge: null, pen: null },
+    'mots-c-40mg': { basic: null, cartridge: null, pen: null },
     'nad-plus': { basic: 70, cartridge: 100, pen: 140 }, // Row 11.
     'tesamorelin': { basic: 80, cartridge: 110, pen: 150 }, // Row 7.
     'bpc-157': { basic: 70, cartridge: 100, pen: 140 }, // Row 18.
@@ -119,6 +128,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'cjc-1295-ipamorelin': { basic: 110, cartridge: 160, pen: 240 }, // Row 14.
     'klow80': { basic: 160, cartridge: 210, pen: 290 }, // Row 13.
     'mots-c': { basic: 120, cartridge: 170, pen: 240 }, // Row 15.
+    'mots-c-30mg': { basic: null, cartridge: null, pen: null },
+    'mots-c-40mg': { basic: null, cartridge: null, pen: null },
     'nad-plus': { basic: 120, cartridge: 170, pen: 240 }, // Row 11.
     'tesamorelin': { basic: 130, cartridge: 180, pen: 260 }, // Row 7.
     'bpc-157': { basic: 120, cartridge: 170, pen: 240 }, // Row 18.
@@ -143,6 +154,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'cjc-1295-ipamorelin': { basic: 370, cartridge: 530, pen: 750 }, // Row 14.
     'klow80': { basic: 530, cartridge: 690, pen: 910 }, // Row 13.
     'mots-c': { basic: 380, cartridge: 540, pen: 770 }, // Row 15.
+    'mots-c-30mg': { basic: null, cartridge: null, pen: null },
+    'mots-c-40mg': { basic: null, cartridge: null, pen: null },
     'nad-plus': { basic: 380, cartridge: 540, pen: 770 }, // Row 11.
     'tesamorelin': { basic: 430, cartridge: 590, pen: 820 }, // Row 7.
     'bpc-157': { basic: 380, cartridge: 540, pen: 770 }, // Row 18.
@@ -167,6 +180,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'cjc-1295-ipamorelin': { basic: 1_098_000, cartridge: 1_298_000, pen: 2_298_000 }, // Row 14.
     'klow80': { basic: 1_800_000, cartridge: 2_000_000, pen: 3_000_000 }, // Row 13.
     'mots-c': { basic: 1_176_000, cartridge: 1_376_000, pen: 2_376_000 }, // Row 15.
+    'mots-c-30mg': { basic: 2_576_000, cartridge: 2_376_000, pen: 3_576_000 }, // Row 27.
+    'mots-c-40mg': { basic: 3_276_000, cartridge: 3_176_000, pen: 4_176_000 }, // Row 28.
     'nad-plus': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 11.
     'tesamorelin': { basic: 1_372_000, cartridge: 1_572_000, pen: 2_572_000 }, // Row 7.
     'bpc-157': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 18.
