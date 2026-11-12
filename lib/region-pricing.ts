@@ -11,11 +11,14 @@ type ProductPriceTable = Readonly<Record<string, Readonly<Record<VariantId, numb
  * Blank prices stay null; sold-out and unavailable formats retain their statuses.
  * I9 says "out of stock": GHK-Cu 50mg Basic stays unpriced.
  * Source values and cell references: fixtures/pricing-v2-after-discount.json.
+ * Retatrutide 20mg/60mg IDR additions supplied by the owner on 12 November 2026.
  * Owner override, 26 October 2026: Retatrutide 10mg Cartridge IDR 1,099,000.
  */
 export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTable>> = {
   // AUD normal prices: Basic E, Cartridge N, Pen W.
   au: {
+    'retatrutide-20mg': { basic: null, cartridge: null, pen: null },
+    'retatrutide-60mg': { basic: null, cartridge: null, pen: null },
     'retatrutide': { basic: 170, cartridge: 230, pen: 310 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 130, cartridge: 180, pen: 270 }, // Row 14.
     'klow80': { basic: 180, cartridge: 240, pen: 320 }, // Row 13.
@@ -38,6 +41,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // EUR normal prices: Basic C, Cartridge L, Pen U.
   eu: {
+    'retatrutide-20mg': { basic: null, cartridge: null, pen: null },
+    'retatrutide-60mg': { basic: null, cartridge: null, pen: null },
     'retatrutide': { basic: 100, cartridge: 140, pen: 190 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 80, cartridge: 110, pen: 160 }, // Row 14.
     'klow80': { basic: 110, cartridge: 150, pen: 200 }, // Row 13.
@@ -60,6 +65,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // USD normal prices: Basic G, Cartridge P, Pen Y.
   us: {
+    'retatrutide-20mg': { basic: null, cartridge: null, pen: null },
+    'retatrutide-60mg': { basic: null, cartridge: null, pen: null },
     'retatrutide': { basic: 120, cartridge: 160, pen: 210 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 90, cartridge: 130, pen: 180 }, // Row 14.
     'klow80': { basic: 130, cartridge: 170, pen: 220 }, // Row 13.
@@ -82,6 +89,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // GBP normal prices: Basic D, Cartridge M, Pen V.
   uk: {
+    'retatrutide-20mg': { basic: null, cartridge: null, pen: null },
+    'retatrutide-60mg': { basic: null, cartridge: null, pen: null },
     'retatrutide': { basic: 90, cartridge: 120, pen: 160 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 70, cartridge: 100, pen: 140 }, // Row 14.
     'klow80': { basic: 100, cartridge: 130, pen: 170 }, // Row 13.
@@ -104,6 +113,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // SGD normal prices: Basic F, Cartridge O, Pen X.
   sg: {
+    'retatrutide-20mg': { basic: null, cartridge: null, pen: null },
+    'retatrutide-60mg': { basic: null, cartridge: null, pen: null },
     'retatrutide': { basic: 150, cartridge: 200, pen: 270 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 110, cartridge: 160, pen: 240 }, // Row 14.
     'klow80': { basic: 160, cartridge: 210, pen: 290 }, // Row 13.
@@ -126,6 +137,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // MYR normal prices: Basic H, Cartridge Q, Pen Z.
   my: {
+    'retatrutide-20mg': { basic: null, cartridge: null, pen: null },
+    'retatrutide-60mg': { basic: null, cartridge: null, pen: null },
     'retatrutide': { basic: 480, cartridge: 640, pen: 870 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 370, cartridge: 530, pen: 750 }, // Row 14.
     'klow80': { basic: 530, cartridge: 690, pen: 910 }, // Row 13.
@@ -148,6 +161,8 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // IDR after-discount prices: Basic I, Cartridge R, Pen AA.
   id: {
+    'retatrutide-20mg': { basic: null, cartridge: 1_799_000, pen: 3_499_000 },
+    'retatrutide-60mg': { basic: null, cartridge: 3_999_000, pen: 4_999_000 },
     'retatrutide': { basic: 1_599_000, cartridge: 1_099_000, pen: 2_799_000 }, // Row 6; Cartridge overridden by owner 26 Oct 2026.
     'cjc-1295-ipamorelin': { basic: 1_098_000, cartridge: 1_298_000, pen: 2_298_000 }, // Row 14.
     'klow80': { basic: 1_800_000, cartridge: 2_000_000, pen: 3_000_000 }, // Row 13.
@@ -206,6 +221,8 @@ const OUT_OF_STOCK: Partial<Record<RegionId, Readonly<Record<string, readonly Va
 
 /** L16:S17 and U16:AB17 are dashes, so these formats are not available. */
 const UNAVAILABLE_FORMATS: Readonly<Record<string, readonly VariantId[]>> = {
+  'retatrutide-20mg': ['basic'],
+  'retatrutide-60mg': ['basic'],
   semax: ['cartridge', 'pen'],
   selank: ['cartridge', 'pen'],
 }

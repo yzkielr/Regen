@@ -61,6 +61,11 @@ export interface ProductStrength {
 }
 
 const PRODUCT_STRENGTHS: Readonly<Record<string, readonly ProductStrength[]>> = {
+  retatrutide: [
+    { id: '10mg', mg: 10, name: 'Retatrutide 10mg', priceKey: 'retatrutide' },
+    { id: '20mg', mg: 20, name: 'Retatrutide 20mg', priceKey: 'retatrutide-20mg' },
+    { id: '60mg', mg: 60, name: 'Retatrutide 60mg', priceKey: 'retatrutide-60mg' },
+  ],
   tesamorelin: [
     { id: '10mg', mg: 10, name: 'Tesamorelin 10mg', priceKey: 'tesamorelin' },
     { id: '20mg', mg: 20, name: 'Tesamorelin 20mg', priceKey: 'tesamorelin-20mg' },
