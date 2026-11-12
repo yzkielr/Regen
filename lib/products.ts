@@ -53,6 +53,7 @@ export interface Product {
 export interface ProductStrength {
   id: string
   mg: number
+  label?: string
   name: string
   /** Internal pricing key; the public product URL stays unchanged. */
   priceKey: string
@@ -61,6 +62,10 @@ export interface ProductStrength {
 }
 
 const PRODUCT_STRENGTHS: Readonly<Record<string, readonly ProductStrength[]>> = {
+  'bpc-157': [
+    { id: '10mg', mg: 10, label: 'BPC-157 10 mg', name: 'BPC-157 10mg', priceKey: 'bpc-157' },
+    { id: 'tb-500', mg: 10, label: 'BPC-157 + TB-500 10 mg', name: 'BPC-157 + TB-500 10mg', priceKey: 'bpc-157-tb-500' },
+  ],
   'mots-c': [
     { id: '10mg', mg: 10, name: 'MOTS-C 10mg', priceKey: 'mots-c' },
     { id: '30mg', mg: 30, name: 'MOTS-C 30mg', priceKey: 'mots-c-30mg' },

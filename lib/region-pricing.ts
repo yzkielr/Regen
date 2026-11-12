@@ -11,6 +11,7 @@ type ProductPriceTable = Readonly<Record<string, Readonly<Record<VariantId, numb
  * Blank prices stay null; sold-out and unavailable formats retain their statuses.
  * I9 says "out of stock": GHK-Cu 50mg Basic stays unpriced.
  * Source values and cell references: fixtures/pricing-v2-after-discount.json.
+ * BPC-157 + TB-500 10mg IDR prices supplied by the owner, sheet row 29, 12 November 2026.
  * MOTS-C 30mg/40mg IDR additions from sheet rows 27/28, checked 12 November 2026.
  * Retatrutide 20mg/60mg IDR additions supplied by the owner on 12 November 2026.
  * Owner override, 26 October 2026: Retatrutide 10mg Cartridge IDR 1,099,000.
@@ -29,6 +30,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'nad-plus': { basic: 130, cartridge: 190, pen: 270 }, // Row 11.
     'tesamorelin': { basic: 150, cartridge: 210, pen: 290 }, // Row 7.
     'bpc-157': { basic: 130, cartridge: 190, pen: 270 }, // Row 18.
+    'bpc-157-tb-500': { basic: null, cartridge: null, pen: null },
     'ghk-cu': { basic: 130, cartridge: 180, pen: 260 }, // Row 10.
     'tesamorelin-20mg': { basic: 160, cartridge: 220, pen: 300 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 160, pen: 250 }, // Row 9.
@@ -55,6 +57,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'nad-plus': { basic: 80, cartridge: 120, pen: 170 }, // Row 11.
     'tesamorelin': { basic: 90, cartridge: 130, pen: 180 }, // Row 7.
     'bpc-157': { basic: 80, cartridge: 120, pen: 170 }, // Row 18.
+    'bpc-157-tb-500': { basic: null, cartridge: null, pen: null },
     'ghk-cu': { basic: 80, cartridge: 110, pen: 160 }, // Row 10.
     'tesamorelin-20mg': { basic: 100, cartridge: 130, pen: 180 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 100, pen: 150 }, // Row 9.
@@ -81,6 +84,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'nad-plus': { basic: 90, cartridge: 130, pen: 190 }, // Row 11.
     'tesamorelin': { basic: 100, cartridge: 140, pen: 200 }, // Row 7.
     'bpc-157': { basic: 90, cartridge: 130, pen: 190 }, // Row 18.
+    'bpc-157-tb-500': { basic: null, cartridge: null, pen: null },
     'ghk-cu': { basic: 90, cartridge: 130, pen: 180 }, // Row 10.
     'tesamorelin-20mg': { basic: 110, cartridge: 150, pen: 210 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 110, pen: 170 }, // Row 9.
@@ -107,6 +111,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'nad-plus': { basic: 70, cartridge: 100, pen: 140 }, // Row 11.
     'tesamorelin': { basic: 80, cartridge: 110, pen: 150 }, // Row 7.
     'bpc-157': { basic: 70, cartridge: 100, pen: 140 }, // Row 18.
+    'bpc-157-tb-500': { basic: null, cartridge: null, pen: null },
     'ghk-cu': { basic: 70, cartridge: 100, pen: 140 }, // Row 10.
     'tesamorelin-20mg': { basic: 80, cartridge: 110, pen: 160 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 90, pen: 130 }, // Row 9.
@@ -133,6 +138,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'nad-plus': { basic: 120, cartridge: 170, pen: 240 }, // Row 11.
     'tesamorelin': { basic: 130, cartridge: 180, pen: 260 }, // Row 7.
     'bpc-157': { basic: 120, cartridge: 170, pen: 240 }, // Row 18.
+    'bpc-157-tb-500': { basic: null, cartridge: null, pen: null },
     'ghk-cu': { basic: 110, cartridge: 160, pen: 230 }, // Row 10.
     'tesamorelin-20mg': { basic: 140, cartridge: 190, pen: 260 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 150, pen: 220 }, // Row 9.
@@ -159,6 +165,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'nad-plus': { basic: 380, cartridge: 540, pen: 770 }, // Row 11.
     'tesamorelin': { basic: 430, cartridge: 590, pen: 820 }, // Row 7.
     'bpc-157': { basic: 380, cartridge: 540, pen: 770 }, // Row 18.
+    'bpc-157-tb-500': { basic: null, cartridge: null, pen: null },
     'ghk-cu': { basic: 360, cartridge: 520, pen: 750 }, // Row 10.
     'tesamorelin-20mg': { basic: 460, cartridge: 620, pen: 840 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 470, pen: 700 }, // Row 9.
@@ -185,6 +192,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'nad-plus': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 11.
     'tesamorelin': { basic: 1_372_000, cartridge: 1_572_000, pen: 2_572_000 }, // Row 7.
     'bpc-157': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 18.
+    'bpc-157-tb-500': { basic: 1_526_850, cartridge: 1_526_850, pen: 2_526_850 }, // Row 29.
     'ghk-cu': { basic: 1_078_000, cartridge: 1_278_000, pen: 2_278_000 }, // Row 10.
     'tesamorelin-20mg': { basic: 1_492_800, cartridge: 1_692_800, pen: 2_692_800 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 1_051_000, pen: 2_051_000 }, // Row 9.

@@ -1,0 +1,21 @@
+{
+  "source": "owner-request",
+  "date": "2026-11-12",
+  "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1kBjIQ498O3CDZ3d2GzyNS8zG6SJDJbM5A7kwonf6qQk/edit?gid=1759888008",
+  "sheet": "idr pricing v2",
+  "sheetId": 1759888008,
+  "row": 29,
+  "product": "BPC-157 + TB-500",
+  "strength": "10 mg",
+  "columns": [
+    "I",
+    "R",
+    "AA"
+  ],
+  "currency": "IDR",
+  "prices": [
+    1526850,
+    1526850,
+    2526850
+  ]
+}
