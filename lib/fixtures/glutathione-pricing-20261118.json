@@ -1,0 +1,49 @@
+{
+  "sheet": "idr pricing v2",
+  "sheetId": 1759888008,
+  "row": 20,
+  "product": "glutathione",
+  "strength": "1500 mg",
+  "sourceUrl": "https://docs.google.com/spreadsheets/d/1kBjIQ498O3CDZ3d2GzyNS8zG6SJDJbM5A7kwonf6qQk/edit?gid=1759888008",
+  "verifiedDate": "2026-11-18",
+  "rateDate": "Wed, 18 Nov 2026 00:02:31 +0000",
+  "rateSource": "https://open.er-api.com/v6/latest/IDR",
+  "rounding": "up to next multiple of 10",
+  "prices": {
+    "au": [
+      50,
+      50,
+      210
+    ],
+    "eu": [
+      30,
+      30,
+      130
+    ],
+    "us": [
+      40,
+      40,
+      150
+    ],
+    "uk": [
+      30,
+      30,
+      110
+    ],
+    "sg": [
+      40,
+      40,
+      190
+    ],
+    "my": [
+      130,
+      130,
+      590
+    ],
+    "id": [
+      550000,
+      550000,
+      1650000
+    ]
+  }
+}

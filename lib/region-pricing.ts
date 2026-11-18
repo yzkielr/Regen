@@ -40,7 +40,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 130, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 130, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 170, cartridge: 220, pen: 300 }, // Row 19.
-    'glutathione': { basic: 70, cartridge: 130, pen: 210 }, // Row 20.
+    'glutathione': { basic: 50, cartridge: 50, pen: 210 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 130, cartridge: 190, pen: 270 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 180, pen: 260 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 180, pen: 270 }, // Row 23.
@@ -67,7 +67,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 80, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 80, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 100, cartridge: 140, pen: 190 }, // Row 19.
-    'glutathione': { basic: 40, cartridge: 80, pen: 130 }, // Row 20.
+    'glutathione': { basic: 30, cartridge: 30, pen: 130 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 80, cartridge: 120, pen: 170 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 110, pen: 160 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 110, pen: 160 }, // Row 23.
@@ -94,7 +94,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 90, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 90, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 120, cartridge: 160, pen: 210 }, // Row 19.
-    'glutathione': { basic: 50, cartridge: 90, pen: 150 }, // Row 20.
+    'glutathione': { basic: 40, cartridge: 40, pen: 150 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 90, cartridge: 130, pen: 190 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 120, pen: 180 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 130, pen: 180 }, // Row 23.
@@ -121,7 +121,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 70, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 70, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 90, cartridge: 120, pen: 160 }, // Row 19.
-    'glutathione': { basic: 40, cartridge: 70, pen: 110 }, // Row 20.
+    'glutathione': { basic: 30, cartridge: 30, pen: 110 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 70, cartridge: 100, pen: 140 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 90, pen: 140 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 100, pen: 140 }, // Row 23.
@@ -148,7 +148,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 120, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 120, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 150, cartridge: 200, pen: 270 }, // Row 19.
-    'glutathione': { basic: 60, cartridge: 110, pen: 190 }, // Row 20.
+    'glutathione': { basic: 40, cartridge: 40, pen: 190 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 120, cartridge: 170, pen: 240 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 160, pen: 230 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 160, pen: 240 }, // Row 23.
@@ -175,7 +175,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 380, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 380, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 480, cartridge: 640, pen: 870 }, // Row 19.
-    'glutathione': { basic: 210, cartridge: 370, pen: 590 }, // Row 20.
+    'glutathione': { basic: 130, cartridge: 130, pen: 590 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 380, cartridge: 540, pen: 770 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 510, pen: 740 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 530, pen: 750 }, // Row 23.
@@ -202,7 +202,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 1_162_000, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 1_162_000, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 1_590_000, cartridge: 1_790_000, pen: 2_790_000 }, // Row 19.
-    'glutathione': { basic: 450_000, cartridge: 650_000, pen: 1_650_000 }, // I20 / R20 / AA20, refreshed 11 Nov 2026.
+    'glutathione': { basic: 550000, cartridge: 550000, pen: 1_650_000 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 1_230_400, pen: 2_230_400 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 1_299_000, pen: 2_299_000 }, // Row 23.
