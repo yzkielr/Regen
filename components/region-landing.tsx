@@ -3,8 +3,9 @@ import { ArrowUpRight, Globe2 } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import { RegionSuggestion } from '@/components/region-suggestion'
 import { SocialIcon } from '@/components/social-icon'
-import { REGIONS, regionPath, type RegionId } from '@/lib/regions'
+import { DEFAULT_REGION, REGIONS, regionPath, type RegionId } from '@/lib/regions'
 import { SITE_IDENTITY, SITE_NAME, SITE_SOCIAL_PROFILES } from '@/lib/site-seo'
+import { CONTACT_EMAIL } from '@/lib/support-copy'
 
 export function RegionLanding({ suggestedRegionId = null }: { suggestedRegionId?: RegionId | null }) {
   return (
@@ -18,7 +19,8 @@ export function RegionLanding({ suggestedRegionId = null }: { suggestedRegionId?
           <div className="relative mt-12 lg:my-auto lg:py-20">
             <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/60">RESEARCH PEPTIDES</p>
             <h1 className="mt-5 max-w-md text-balance font-display text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">{SITE_NAME}</h1>
-            <p className="mt-6 max-w-sm text-pretty text-sm leading-relaxed text-white/75 sm:text-base">Regen Longevity Lab offers research peptides and product information across seven regions. Choose your region for local language, currency and support.</p>
+            <p className="mt-6 max-w-sm text-pretty text-sm leading-relaxed text-white/75 sm:text-base">Regen Longevity Lab, also known as Regen Longevity, offers a research peptide catalog and product information across seven regions. Choose your region for local language, currency and support.</p>
+            <Link href={regionPath(DEFAULT_REGION, '/about')} className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white underline decoration-white/40 underline-offset-4 hover:decoration-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">About Regen Longevity Lab <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
           </div>
           <p className="relative mt-10 flex items-center gap-2 text-xs text-white/60"><Globe2 className="size-4" aria-hidden="true" /> 7 regions. One research standard.</p>
         </section>
@@ -49,6 +51,7 @@ export function RegionLanding({ suggestedRegionId = null }: { suggestedRegionId?
               </a>
             ))}
           </nav>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="mt-3 inline-flex min-h-11 items-center break-all text-sm text-muted-foreground underline underline-offset-4 hover:text-primary">{CONTACT_EMAIL}</a>
         </section>
       </div>
     </main>

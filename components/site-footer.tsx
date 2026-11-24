@@ -9,6 +9,7 @@ import { RegionSwitcher } from '@/components/region-switcher'
 import { useRegion } from '@/components/region-provider'
 import { CONTACT_EMAIL, regionalSupportText, SUPPORT_COPY } from '@/lib/support-copy'
 import { SITE_SOCIAL_PROFILES } from '@/lib/site-seo'
+import { BRAND_PROFILE } from '@/lib/brand-profile'
 
 export function SiteFooter() {
   const { region, language, href } = useRegion()
@@ -91,6 +92,11 @@ export function SiteFooter() {
               {copy.company}
             </h3>
             <ul className="mt-4 flex flex-col gap-2 text-sm text-primary-foreground/80">
+              <li>
+                <a href={href('/about')} className="hover:text-accent">
+                  {BRAND_PROFILE[language].link}
+                </a>
+              </li>
               <li>
                 <a href={href('#kualitas')} className="hover:text-accent">
                   {copy.quality}

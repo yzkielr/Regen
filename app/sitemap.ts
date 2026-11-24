@@ -10,12 +10,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     Object.entries(regionAlternates(REGIONS[0], path)!.languages!).map(([language, url]) => [language, absolute(String(url))]),
   )
 
-  // Only public catalog pages belong here. COAs, QR verification, admin pages
+  // Public catalog and brand profile pages belong here. COAs, QR verification, admin pages
   // and the draft privacy policy must stay out of search discovery.
   return [
     { url: absolute('/'), alternates: { languages: languages() } },
     ...REGIONS.flatMap((region) => [
       { url: absolute(regionPath(region.id)), alternates: { languages: languages() } },
+      { url: absolute(regionPath(region.id, '/about')), alternates: { languages: languages('/about') } },
       ...products.map((product) => {
         const path = `/product/${product.slug}`
         return { url: absolute(regionPath(region.id, path)), alternates: { languages: languages(path) } }
