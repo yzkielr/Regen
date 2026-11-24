@@ -2,7 +2,6 @@ import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
 import { Archivo, IBM_Plex_Sans } from 'next/font/google'
 import { headers } from 'next/headers'
-import { LoadingScreen } from '@/components/loading-screen'
 import { SmoothScroll } from '@/components/smooth-scroll'
 import { ConsultationProvider } from '@/components/consultation-modal'
 import { RegionProvider } from '@/components/region-provider'
@@ -73,7 +72,6 @@ export default async function RootLayout({
       className={`light bg-background ${ibmPlexSans.variable} ${archivo.variable}`}
     >
       <body className="font-sans antialiased">
-        {!admin && <LoadingScreen />}
         {!admin && <SmoothScroll />}
         {admin ? children : <RegionProvider initialRegion={region?.id ?? DEFAULT_REGION}>
           <ConsultationProvider>{children}</ConsultationProvider>
