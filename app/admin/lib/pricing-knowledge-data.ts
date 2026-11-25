@@ -1,9 +1,11 @@
-// Selected normal-price columns only, verified against the original workbook.
+// Verified Google Sheets prices, with the owner's 26 October 2026 override:
+// Retatrutide 10 mg Cartridge Set IDR = 1,099,000. All other prices unchanged.
 export const pricingKnowledgeData = {
-  "sourceName": "regen pricing web.xlsx",
+  "sourceName": "regen pricing web (Google Sheets)",
+  "sourceUrl": "https://docs.google.com/spreadsheets/d/1kBjIQ498O3CDZ3d2GzyNS8zG6SJDJbM5A7kwonf6qQk/edit?gid=1759888008",
   "sheet": "idr pricing v2",
-  "sourceHash": "f6203f1e8da5039536c6ccf29c1983dbaad9bddef4d82d74ebbd10c10457691c",
-  "normalPriceColumns": {
+  "sourceHash": "eaa901f51f67a26918959de201847116767cb91eabf2386188377d6543b7f4d8",
+  "priceColumns": {
     "EUR": [
       "C",
       "L",
@@ -35,9 +37,9 @@ export const pricingKnowledgeData = {
       "Z"
     ],
     "IDR": [
-      "J",
-      "S",
-      "AB"
+      "I",
+      "R",
+      "AA"
     ]
   },
   "rows": [
@@ -77,9 +79,9 @@ export const pricingKnowledgeData = {
           870
         ],
         "IDR": [
-          2099000,
-          2799000,
-          3799000
+          1599000,
+          1099000,
+          2799000
         ]
       },
       "availability": [
@@ -119,9 +121,9 @@ export const pricingKnowledgeData = {
           "Z6"
         ],
         "IDR": [
-          "J6",
-          "S6",
-          "AB6"
+          "I6",
+          "R6",
+          "AA6"
         ]
       }
     },
@@ -161,9 +163,9 @@ export const pricingKnowledgeData = {
           820
         ],
         "IDR": [
-          1872000,
-          2572000,
-          3572000
+          1372000,
+          1572000,
+          2572000
         ]
       },
       "availability": [
@@ -203,9 +205,9 @@ export const pricingKnowledgeData = {
           "Z7"
         ],
         "IDR": [
-          "J7",
-          "S7",
-          "AB7"
+          "I7",
+          "R7",
+          "AA7"
         ]
       }
     },
@@ -245,9 +247,9 @@ export const pricingKnowledgeData = {
           840
         ],
         "IDR": [
-          1992800,
-          2692800,
-          3692800
+          1492800,
+          1692800,
+          2692800
         ]
       },
       "availability": [
@@ -287,9 +289,9 @@ export const pricingKnowledgeData = {
           "Z8"
         ],
         "IDR": [
-          "J8",
-          "S8",
-          "AB8"
+          "I8",
+          "R8",
+          "AA8"
         ]
       }
     },
@@ -330,8 +332,8 @@ export const pricingKnowledgeData = {
         ],
         "IDR": [
           null,
-          2051000,
-          3051000
+          1051000,
+          2051000
         ]
       },
       "availability": [
@@ -371,9 +373,9 @@ export const pricingKnowledgeData = {
           "Z9"
         ],
         "IDR": [
-          "J9",
-          "S9",
-          "AB9"
+          "I9",
+          "R9",
+          "AA9"
         ]
       }
     },
@@ -413,9 +415,9 @@ export const pricingKnowledgeData = {
           750
         ],
         "IDR": [
-          1578000,
-          2278000,
-          3278000
+          1078000,
+          1278000,
+          2278000
         ]
       },
       "availability": [
@@ -455,9 +457,9 @@ export const pricingKnowledgeData = {
           "Z10"
         ],
         "IDR": [
-          "J10",
-          "S10",
-          "AB10"
+          "I10",
+          "R10",
+          "AA10"
         ]
       }
     },
@@ -497,9 +499,9 @@ export const pricingKnowledgeData = {
           770
         ],
         "IDR": [
-          1662000,
-          2362000,
-          3362000
+          1162000,
+          1362000,
+          2362000
         ]
       },
       "availability": [
@@ -539,9 +541,9 @@ export const pricingKnowledgeData = {
           "Z11"
         ],
         "IDR": [
-          "J11",
-          "S11",
-          "AB11"
+          "I11",
+          "R11",
+          "AA11"
         ]
       }
     },
@@ -581,9 +583,9 @@ export const pricingKnowledgeData = {
           810
         ],
         "IDR": [
-          1830000,
-          2530000,
-          3530000
+          1330000,
+          1530000,
+          2530000
         ]
       },
       "availability": [
@@ -623,9 +625,9 @@ export const pricingKnowledgeData = {
           "Z12"
         ],
         "IDR": [
-          "J12",
-          "S12",
-          "AB12"
+          "I12",
+          "R12",
+          "AA12"
         ]
       }
     },
@@ -665,9 +667,9 @@ export const pricingKnowledgeData = {
           910
         ],
         "IDR": [
-          2300000,
-          3000000,
-          4000000
+          1800000,
+          2000000,
+          3000000
         ]
       },
       "availability": [
@@ -707,9 +709,9 @@ export const pricingKnowledgeData = {
           "Z13"
         ],
         "IDR": [
-          "J13",
-          "S13",
-          "AB13"
+          "I13",
+          "R13",
+          "AA13"
         ]
       }
     },
@@ -749,9 +751,9 @@ export const pricingKnowledgeData = {
           750
         ],
         "IDR": [
-          1598000,
-          2298000,
-          3298000
+          1098000,
+          1298000,
+          2298000
         ]
       },
       "availability": [
@@ -791,9 +793,9 @@ export const pricingKnowledgeData = {
           "Z14"
         ],
         "IDR": [
-          "J14",
-          "S14",
-          "AB14"
+          "I14",
+          "R14",
+          "AA14"
         ]
       }
     },
@@ -833,9 +835,9 @@ export const pricingKnowledgeData = {
           770
         ],
         "IDR": [
-          1676000,
-          2376000,
-          3376000
+          1176000,
+          1376000,
+          2376000
         ]
       },
       "availability": [
@@ -875,9 +877,9 @@ export const pricingKnowledgeData = {
           "Z15"
         ],
         "IDR": [
-          "J15",
-          "S15",
-          "AB15"
+          "I15",
+          "R15",
+          "AA15"
         ]
       }
     },
@@ -917,7 +919,7 @@ export const pricingKnowledgeData = {
           null
         ],
         "IDR": [
-          1662000,
+          1162000,
           null,
           null
         ]
@@ -959,9 +961,9 @@ export const pricingKnowledgeData = {
           "Z16"
         ],
         "IDR": [
-          "J16",
-          "S16",
-          "AB16"
+          "I16",
+          "R16",
+          "AA16"
         ]
       }
     },
@@ -1001,7 +1003,7 @@ export const pricingKnowledgeData = {
           null
         ],
         "IDR": [
-          1662000,
+          1162000,
           null,
           null
         ]
@@ -1043,9 +1045,9 @@ export const pricingKnowledgeData = {
           "Z17"
         ],
         "IDR": [
-          "J17",
-          "S17",
-          "AB17"
+          "I17",
+          "R17",
+          "AA17"
         ]
       }
     },
@@ -1085,9 +1087,9 @@ export const pricingKnowledgeData = {
           770
         ],
         "IDR": [
-          1662000,
-          2362000,
-          3362000
+          1162000,
+          1362000,
+          2362000
         ]
       },
       "availability": [
@@ -1127,9 +1129,9 @@ export const pricingKnowledgeData = {
           "Z18"
         ],
         "IDR": [
-          "J18",
-          "S18",
-          "AB18"
+          "I18",
+          "R18",
+          "AA18"
         ]
       }
     },
@@ -1169,9 +1171,9 @@ export const pricingKnowledgeData = {
           870
         ],
         "IDR": [
-          2090000,
-          2790000,
-          3790000
+          1590000,
+          1790000,
+          2790000
         ]
       },
       "availability": [
@@ -1211,9 +1213,9 @@ export const pricingKnowledgeData = {
           "Z19"
         ],
         "IDR": [
-          "J19",
-          "S19",
-          "AB19"
+          "I19",
+          "R19",
+          "AA19"
         ]
       }
     },
@@ -1253,9 +1255,9 @@ export const pricingKnowledgeData = {
           590
         ],
         "IDR": [
-          900000,
-          1600000,
-          2600000
+          400000,
+          600000,
+          1600000
         ]
       },
       "availability": [
@@ -1295,9 +1297,9 @@ export const pricingKnowledgeData = {
           "Z20"
         ],
         "IDR": [
-          "J20",
-          "S20",
-          "AB20"
+          "I20",
+          "R20",
+          "AA20"
         ]
       }
     },
@@ -1337,9 +1339,9 @@ export const pricingKnowledgeData = {
           770
         ],
         "IDR": [
-          1662000,
-          2362000,
-          3362000
+          1162000,
+          1362000,
+          2362000
         ]
       },
       "availability": [
@@ -1379,9 +1381,9 @@ export const pricingKnowledgeData = {
           "Z21"
         ],
         "IDR": [
-          "J21",
-          "S21",
-          "AB21"
+          "I21",
+          "R21",
+          "AA21"
         ]
       }
     },
@@ -1422,8 +1424,8 @@ export const pricingKnowledgeData = {
         ],
         "IDR": [
           null,
-          2230400,
-          3230400
+          1230400,
+          2230400
         ]
       },
       "availability": [
@@ -1463,9 +1465,9 @@ export const pricingKnowledgeData = {
           "Z22"
         ],
         "IDR": [
-          "J22",
-          "S22",
-          "AB22"
+          "I22",
+          "R22",
+          "AA22"
         ]
       }
     },
@@ -1506,8 +1508,8 @@ export const pricingKnowledgeData = {
         ],
         "IDR": [
           null,
-          2299000,
-          3299000
+          1299000,
+          2299000
         ]
       },
       "availability": [
@@ -1547,9 +1549,9 @@ export const pricingKnowledgeData = {
           "Z23"
         ],
         "IDR": [
-          "J23",
-          "S23",
-          "AB23"
+          "I23",
+          "R23",
+          "AA23"
         ]
       }
     },
@@ -1589,9 +1591,9 @@ export const pricingKnowledgeData = {
           710
         ],
         "IDR": [
-          1389000,
-          2099000,
-          3099000
+          889000,
+          1099000,
+          2099000
         ]
       },
       "availability": [
@@ -1631,9 +1633,9 @@ export const pricingKnowledgeData = {
           "Z24"
         ],
         "IDR": [
-          "J24",
-          "S24",
-          "AB24"
+          "I24",
+          "R24",
+          "AA24"
         ]
       }
     }

@@ -16,6 +16,14 @@ async function relay(request:NextRequest,{params}:{params:Promise<{path:string[]
   const body=request.method==='GET'?undefined:await boundedAdminBody(request,path.join('/')==='files'&&request.method==='POST'?MAX_ADMIN_FILE_BODY:MAX_ADMIN_BODY);
   const upstream=await fetch(`${adminBackendOrigin()}/api/${path.join('/')}${request.nextUrl.search}`,{method:request.method,headers,body:body as BodyInit|undefined,cache:'no-store',redirect:'manual',signal:AbortSignal.timeout(250000)});
   if(upstream.status>=300&&upstream.status<400)return json('Koneksi admin belum tersedia.',503);
+  if(upstream.ok&&path.join('/')==='knowledge/sync'){
+   const {ensureKnowledgeSchedule}=await import('@/lib/regen-knowledge-schedule');
+   if(request.method==='POST'){
+    const state=await upstream.json();try{await ensureKnowledgeSchedule();}catch{state.schedulerError='Pengaturan tersimpan, tetapi penjadwal belum berjalan. Klik Coba sinkron lagi.';}
+    return Response.json(state,{headers:{'Cache-Control':'private, no-store'}});
+   }
+   after(async()=>{try{await ensureKnowledgeSchedule();}catch{console.warn('Knowledge scheduler could not start.');}});
+  }
   if(upstream.ok&&request.method==='POST'&&path.join('/')==='service/payment-test'){
    const {runId}=await upstream.json();const {sendPaymentTestEmail}=await import('@/lib/payment-test-mail');
    const result=await sendPaymentTestEmail(runId);const {collectPaperMail}=await import('@/lib/paper-mail-worker');const {ensureMailSchedule}=await import('@/lib/regen-mail-schedule');
@@ -31,7 +39,7 @@ async function relay(request:NextRequest,{params}:{params:Promise<{path:string[]
     await wakeRegenQueue();}catch{console.warn('Regen background processing could not start after a confirmed admin write.');}});
   }
   const out=new Headers({'Cache-Control':'private, no-store','X-Content-Type-Options':'nosniff','X-Robots-Tag':'noindex, nofollow'});
-  for(const key of ['content-type','content-disposition','x-document-name','x-document-type','x-document-source']){const value=upstream.headers.get(key);if(value)out.set(key,value);}
+  for(const key of ['content-type','content-disposition','x-document-name','x-document-type','x-document-source','x-document-warnings','x-document-original-id','x-document-original-type','x-document-category','x-document-keywords']){const value=upstream.headers.get(key);if(value)out.set(key,value);}
   if(path.join('/')==='files')for(const key of ['content-range','accept-ranges','content-length','content-security-policy']){const value=upstream.headers.get(key);if(value)out.set(key,value);}
   return new Response(upstream.body,{status:upstream.status,headers:out});
  }catch(e){return json(e instanceof Error&&e.message==='too_large'?(path.join('/')==='files'?'Bagian unggahan terlalu besar. Muat ulang halaman, lalu coba lagi.':'Maksimal 4 MB untuk permintaan admin.'):'Koneksi dashboard belum tersedia. Coba kembali.',e instanceof Error&&e.message==='too_large'?413:503);}

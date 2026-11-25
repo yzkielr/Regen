@@ -6,7 +6,8 @@ import postcss from 'postcss';
 const root=process.cwd(), source=path.join(root,'sites/regen-inbox'), target=path.join(root,'app/admin');
 const ui=['chat-composer','chat-message-media','owner-escalation-panel','stock-adjustment','executive-reports','executive-report-pdf','resizable-textarea','admin-accounts-panel','operations-console','operations-panels','operations-components','service-console','payment-mail-panel','payment-test-panel','order-workflow','knowledge-importer','whatsapp-test-sync','whatsapp-cs-panel','dashboard','admin-panels'];
 const libs=['chat-media','chat-documents','chat-videos','owner-escalation','message-author','reply-language','executive-report','operations-sync','admin-session-policy','admin-roles','admin-password-policy','operations','module-catalog','regen-phone','service','service-types','payment-automation','payment-test','payment-summary','handoff-consent','product-tests','canned-replies','order-invoice','research-sources','knowledge','whatsapp-test','whatsapp-cs','flip','document-extract','admin','types'];
-libs.push('pricing-knowledge','pricing-knowledge-data');
+libs.push('pricing-knowledge','pricing-knowledge-data','image-message','testimonials','excel-launch','file-preview','pricing-reply','chat-deletion','bot-policy','website-knowledge','website-knowledge-data');
+ui.push('file-viewer');
 fs.mkdirSync(path.join(target,'ui'),{recursive:true});fs.mkdirSync(path.join(target,'lib'),{recursive:true});fs.mkdirSync(path.join(root,'public/admin-assets'),{recursive:true});
 for(const name of libs){const data=fs.readFileSync(path.join(source,`lib/${name}.ts`),'utf8').replace(/(from\s+['"]\.\.?\/[^'"]+)\.ts(['"])/g,'$1$2').replaceAll("import('pdfjs-dist/","import('pdfjs-dist-admin/").replaceAll('/pdf.worker.min.mjs','/admin-assets/pdf.worker.min.mjs').replaceAll('/pdf-assets/','/admin-assets/pdf-assets/');fs.writeFileSync(path.join(target,`lib/${name}.ts`),data);}
 for(const name of ui){
@@ -14,6 +15,7 @@ for(const name of ui){
  data=data.replaceAll('/pdf-assets/','/admin-assets/pdf-assets/').replaceAll('/api/','/admin/api/').replaceAll('/regen-logo-green.png','/admin-assets/regen-logo-green.png').replaceAll('/regen-logo-white.png','/admin-assets/regen-logo-white.png');
  data=data.replaceAll('/signin-with-chatgpt?return_to=%2F','/admin/login');
  data=data.replaceAll('href="/#','href="/admin#');
+ data=data.replaceAll('href={`/files?','href={`/admin/files?');
  data=data.replaceAll('href="/admin-access"','href="https://regen-inbox.hello-wearology.chatgpt.site/admin-access"');
  data=data.replace(/<a[^>]*href="\/signout-with-chatgpt\?return_to=%2F"[^>]*>([\s\S]*?)<\/a>/g,'<button type="button" onClick={()=>void logoutAdmin()} aria-label="Keluar">$1</button>');
  data=data.replace(/\bfetch\(/g,'adminFetch(');
@@ -26,7 +28,7 @@ for(const name of ui){
  if(imports.length)data=data.replace(/(['"]use client['"];?)/,`$1\nimport { ${imports.join(', ')} } from './admin-client';`);
  fs.writeFileSync(path.join(target,`ui/${name}.tsx`),data);
 }
-const styles=['globals','admin','comfortable','live','operations','service','knowledge','responsive'];
+const styles=['globals','admin','comfortable','live','operations','service','knowledge','responsive','file-viewer'];
 let css='/* Generated from the existing Regen Admin styles; scoped to /admin. */\n';
 for(const name of styles){const tree=postcss.parse(fs.readFileSync(path.join(source,`app/${name}.css`),'utf8'));tree.walkAtRules('import',r=>r.remove());tree.walkRules(rule=>{if(rule.parent?.type==='atrule'&&/keyframes$/.test(rule.parent.name))return;rule.selectors=rule.selectors.map(selector=>{if(selector.includes(':root'))return selector.replaceAll(':root','.regen-admin');if(/^(html|body)(?=[\s.:#\[]|$)/.test(selector))return selector.replace(/^(html|body)/,'.regen-admin');return `.regen-admin ${selector}`;});});css+=tree.toString()+'\n';}
 fs.writeFileSync(path.join(target,'admin-ui.css'),css.trimEnd()+'\n');

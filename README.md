@@ -98,7 +98,8 @@ After deploying this project to `https://www.regenlongevitylab.com`, append:
 | KLOW80 | `/coa/klow80` |
 | BPC-157 | `/coa/bpc-157` |
 | Semax | `/coa/semax` |
-| Retatrutide | `/coa/retatrutide` |
+| Retatrutide 10 mg | `/coa/retatrutide-10mg` |
+| Retatrutide 60 mg | `/coa/retatrutide-60mg` |
 | TB-500 | `/coa/tb-500` |
 | HGH 191AA | `/coa/hgh-191aa` |
 | KPV | `/coa/kpv` |
@@ -111,6 +112,10 @@ After deploying this project to `https://www.regenlongevitylab.com`, append:
 | BPC-157 + TB-500 | `/coa/bpc-157-tb-500` |
 | AOD-9604 | `/coa/aod-9604` |
 | Epithalon | `/coa/epithalon` |
+
+The old `/coa/retatrutide` page and its `/document/report` PDF permanently
+redirect to the 10 mg URLs. Its `/document/janoshik` PDF permanently redirects
+to `/coa/retatrutide-60mg/document/janoshik`.
 
 Run `npm run test:coa` to check the registry and file coverage. To add or replace
 a report, update its registered filename and page count as well as the PDF.
@@ -198,12 +203,14 @@ No reference-site image or recording is shipped with the website.
 
 ### Prices and catalog assets
 
-`lib/region-pricing.ts` contains the normal website prices from the supplied
-`regen pricing web.xlsx`, tab **idr pricing v2**, checked on 10 October 2026.
+`lib/region-pricing.ts` contains the published prices from the supplied Google
+Sheet, tab **idr pricing v2**, with subsequent approved updates recorded in
+`lib/fixtures/` through 18 November 2026. IDR uses final after-discount amounts;
+the six foreign currencies use their approved listed prices.
 The 19 rows (6–24) cover 16 catalog products and the additional selectable
 Tesamorelin 20mg, GHK-Cu 50mg and NAD+ 1000mg strengths.
 
-| Currency / region | Basic normal price | Cartridge normal price | Pen normal price |
+| Currency / region | Basic price | Cartridge price | Pen price |
 | --- | --- | --- | --- |
 | EUR / EU | C | L | U |
 | GBP / UK | D | M | V |
@@ -211,20 +218,15 @@ Tesamorelin 20mg, GHK-Cu 50mg and NAD+ 1000mg strengths.
 | SGD / SG | F | O | X |
 | USD / US | G | P | Y |
 | MYR / MY | H | Q | Z |
-| IDR / ID | J | S | AB |
+| IDR / ID | I | R | AA |
 
-Only normal prices are published. After-voucher/discount columns I, R and AA
-and voucher-amount columns K, T and AC are not website prices and are not
-included in the runtime price data. There is no currency conversion or
-voucher calculation in the website.
+IDR uses final after-voucher/discount values from I, R and AA directly.
+Voucher amounts K, T and AC are never subtracted again. There is no currency
+conversion. The source snapshot in `lib/fixtures/pricing-v2-after-discount.json`
+records all 399 slots: 350 numeric prices and 49 unpriced slots. All 50 numeric
+IDR prices changed; foreign-currency prices and availability are preserved.
 
-The independent source snapshot in `lib/fixtures/pricing-v2.json` records the
-workbook SHA-256, row labels, strength, normal-price columns and all 399 slots.
-The 350 numeric amounts are positive whole values. The remaining 49 slots
-stay unpriced (blank, out of stock or unavailable). Normal-price formula
-results were checked against their precedents and cached workbook values.
-
-GHK-Cu 50mg Basic has a source formula error at J9 because I9 says
+GHK-Cu 50mg Basic cell I9 says
 `out of stock`; the IDR website keeps it sold out with no numeric price.
 Semaglutide and Cagrilintide Basic are also sold out in IDR. Their foreign
 Basic prices are blank and remain inquiries. Semax and Selank have only
@@ -232,7 +234,7 @@ priced Basic packages; Cartridge and Pen are unavailable in every region.
 
 Catalog cards, recommendations and the carousel use the first priced package.
 Product details show the chosen strength and package price. For example,
-Retatrutide IDR normal prices are 2,099,000 / 2,799,000 / 3,799,000 for
+Retatrutide 10 mg IDR prices are 1,599,000 / 1,099,000 / 2,799,000 for
 Basic / Cartridge / Pen. Formatting uses comma grouping for IDR.
 The existing catalog, package images, strength selectors and consultation
 flows are preserved.
@@ -241,7 +243,7 @@ Run the pricing checks with Node.js 22.6+:
 ```bash
 node --experimental-strip-types --test lib/region-pricing.test.mjs lib/product-pricing-ui.test.mjs
 ```
-They compare every source slot, independently check the screenshot's IDR
+They compare every source slot, independently check the live Sheet's IDR
 amounts, and exercise real product components for catalog prices, package
 selection, strength changes, region switches, photo selection and unavailable
 formats. Update this source snapshot and its checks when approved prices change.
@@ -267,7 +269,15 @@ dismissal, keyboard focus and uniform region-card sizing.
 
 ## Built with v0
 
-This repository is linked to a [v0](https://v0.app) project. You can continue developing by visiting the link below -- start new chats to make changes, and v0 will push commits directly to this repo. Every merge to `main` will automatically deploy.
+This project was originally created with [v0](https://v0.app). The production
+website now runs on Hostinger using the Docker configuration documented in
+`deploy/hostinger/README.txt`. Pushing to GitHub saves the source code; it does
+not rebuild or restart the Hostinger website. Deploy a reviewed release
+separately when production needs to be updated.
+
+The repository contains the storefront and its shared Admin client. Private
+backend checkouts, environment files, build output, and exported design files
+are excluded by `.gitignore`.
 
 [Continue working on v0 →](https://v0.app/chat/projects/prj_2etLWhwVkjtaWGv6qMSCs3fyDb7L)
 

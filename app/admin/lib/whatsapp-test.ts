@@ -1,3 +1,5 @@
+import {testimonialJobAllowed} from './testimonials';
+import {incomingImage} from './image-message';
 import type { Operations } from './operations';
 import type { Conversation, ServiceJob } from './service-types';
 import { botMessageSendAllowed } from './service-types';
@@ -10,7 +12,7 @@ export const META_TEST_TRANSPORT = 'meta-test' as const;
 export const isWhatsAppTest = (c:Conversation) => c.transport === META_TEST_TRANSPORT && c.test;
 export const isSimulation = (c:Conversation) => c.test && !isWhatsAppTest(c);
 
-export type TestEvent = {kind:'incoming'|'delivery';providerId:string;at:number;text?:string;name?:string;status?:string;unsupported?:boolean};
+export type TestEvent = {kind:'incoming'|'delivery';providerId:string;at:number;text?:string;name?:string;status?:string;unsupported?:boolean;image?:{mediaId:string;mime:string}};
 export function parseTestEvent(value:unknown,now=Date.now()):TestEvent {
   const v=value as Record<string,unknown>;
   if(!v||typeof v!=='object'||v.phoneNumberId!==META_TEST_PHONE_ID||v.customerPhone!==META_TEST_RECIPIENT)throw new Error('Event di luar saluran uji.');
@@ -18,17 +20,20 @@ export function parseTestEvent(value:unknown,now=Date.now()):TestEvent {
   if(typeof v.at!=='number'||!Number.isSafeInteger(v.at)||v.at<1||v.at>now+300000)throw new Error('Waktu pesan uji tidak valid.');
   if(v.kind==='incoming'){
     if(typeof v.text!=='string'||!v.text.trim()||v.text.length>4000||typeof v.name!=='string'||v.name.length>200)throw new Error('Isi pesan uji tidak valid.');
-    return {kind:'incoming',providerId:v.providerId,at:v.at,text:v.text,name:v.name,unsupported:v.unsupported===true};
+    return {kind:'incoming',providerId:v.providerId,at:v.at,text:v.text,name:v.name,unsupported:v.unsupported===true,...(v.image?{image:incomingImage(v.image)}:{})};
   }
   if(v.kind==='delivery'&&['sent','delivered','read','failed'].includes(String(v.status)))return {kind:'delivery',providerId:v.providerId,at:v.at,status:String(v.status)};
   throw new Error('Jenis event uji tidak didukung.');
 }
 export function testSendAllowed(state:Operations,j:ServiceJob,now:number):boolean {
+ if(!testimonialJobAllowed(state,j))return false;
   const c=state.service?.conversations.find(c=>c.id===j.conversationId);
   const m=c?.messages.find(m=>m.id===j.messageId);
+  if(JSON.stringify(m?.image)!==JSON.stringify(j.image)||m?.text!==j.text)return false;
   if(!c||!isWhatsAppTest(c)||j.transport!==META_TEST_TRANSPORT||j.kind!=='customer'||j.destination!==META_TEST_RECIPIENT||!m||!['admin','bot'].includes(m.role))return false;
   if(!['blocked','queued','sending'].includes(j.status)||!['queued'].includes(m.status))return false;
   if(!c.lastInboundAt||now-c.lastInboundAt>=24*60*60*1000||c.lastInboundAt>now+300000)return false;
+  if(m.purpose==='handoff_offer'&&state.service?.config.handoffMode!=='automatic')return false;
   if(m.role==='bot'&&!botMessageSendAllowed(c,m,state.settings.botEnabled))return false;
   return true;
 }

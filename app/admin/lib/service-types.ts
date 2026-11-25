@@ -2,25 +2,40 @@ import type {ReplyLocale} from './reply-language';
 import type { ResearchEvidence } from './research-sources';
 export type ChatMode = 'bot' | 'off' | 'human';
 export type MessageStatus = 'received' | 'draft' | 'queued' | 'simulated' | 'sent' | 'delivered' | 'read' | 'failed' | 'cancelled' | 'unknown';
-export type ChatImage = {fileId?:string;mediaId?:string;mime?:string;analysis?:string;error?:string};
-export type ChatAttachment = {fileId?:string;kind:'image'|'video'|'audio'|'document';mime:string;name:string;size?:number;status:'pending'|'ready'|'unavailable';error?:string};
-export type ServiceMessage = { id:string; at:number; role:'customer'|'bot'|'admin'|'owner'|'note'; authorName?:string; ownerTicketId?:string; text:string; status:MessageStatus; providerId?:string; source?:string; confidence?:number; corrects?:string; replyTo?:string; purpose?:'handoff'|'handoff_offer'|'invoice'|'owner_reply'; research?:ResearchEvidence; image?:ChatImage; attachment?:ChatAttachment };
-export type Conversation = { ownerRevision?:number; replyLocale?:ReplyLocale; id:string; contactId:string; test:boolean; transport?:'meta-test'|'meta-cs'|'waha'; lastInboundAt?:number; mode:ChatMode; epoch:number; assignee:string; needsAttention:boolean; reason:string; createdAt:number; updatedAt:number; messages:ServiceMessage[]; pendingHandoff?:{questionId:string;offerId:string;at:number;reason:string}; orderSuggestion?:{questionId:string;draftOrderId?:string;items:{productId:string;quantity:number}[]} };
+export type ChatImage={fileId?:string;mediaId?:string;mime?:string;sourceId?:string;analysis?:string;error?:string};
+export type ChatAttachment={fileId?:string;kind:'image'|'video'|'audio'|'document';mime:string;name:string;size?:number;status:'pending'|'ready'|'unavailable';error?:string};
+export type ServiceMessage = { attachment?:ChatAttachment; image?:ChatImage; id:string; at:number; role:'customer'|'bot'|'admin'|'owner'|'note'; authorName?:string; ownerTicketId?:string; text:string; status:MessageStatus; providerId?:string; source?:string; confidence?:number; corrects?:string; replyTo?:string; purpose?:'handoff'|'handoff_offer'|'invoice'|'owner_reply'|'testimonial'; research?:ResearchEvidence };
+export type OrderAlert = {messageId:string;at:number;text:string;readAt?:number;readBy?:string};
+export type Conversation = { orderAlert?:OrderAlert; ownerRevision?:number; replyLocale?:ReplyLocale; id:string; contactId:string; test:boolean; transport?:'meta-test'|'meta-cs'|'waha'; lastInboundAt?:number; mode:ChatMode; epoch:number; assignee:string; needsAttention:boolean; reason:string; createdAt:number; updatedAt:number; messages:ServiceMessage[]; pendingHandoff?:{questionId:string;offerId:string;at:number;reason:string}; orderSuggestion?:{questionId:string;draftOrderId?:string;items:{productId:string;quantity:number}[]} };
 export type OwnerTicket = {id:string;conversationId:string;questionId:string;consentMessageId:string;revision:number;createdAt:number;ownerId:string;ownerName:string;ownerPhone:string;buyerPhone:string;status:'open'|'queued'|'replied'|'review'|'cancelled';reason:string;notificationJobId?:string;reply?:{providerId:string;raw:string;receivedAt:number;language:string;status:'pending'|'processing'|'queued'|'review';lease?:string;until?:number;formatted?:string;reason?:string}};
 export type Payment = { id:string; provider:'flip'|'paper'|'manual'; transactionId:string; reference:string; amount:number; currency:string; customer:string; occurredAt:number; receivedAt:number; verified:boolean; test:boolean; status:'matched'|'review'|'rejected'; reason:string; orderId:string; evidence:string; emailId?:string; billId?:string; paymentStatus?:string; reviewedBy?:string; reviewedAt?:number };
 export type WarehousePart={status:'pending'|'sending'|'sent'|'failed'|'unknown';updatedAt:number;attemptId?:string;providerId?:string;reason?:string;delivery?:'sent'|'delivered'|'read'|'failed'};
 export type PaymentMail={id:string;hash:string;from:string;subject:string;receivedAt:number;body:string;reference:string;amount:number;currency:string;transactionId:string;customer:string;authenticated:boolean;success:boolean;evidenceKey:string;status:'review'|'matched';reason:string;paymentId:string};
 export type PaymentTestRun={id:string;reference:string;amount:number;destination:string;createdAt:number;expiresAt:number;subject:string;body:string;packingText:string;emailStatus:'queued'|'sending'|'sent'|'failed'|'unknown';emailReason:string;attemptId?:string;receivedAt?:number;evidenceKey?:string;emailHash?:string;jobId?:string};
 export type MailSync={webhookLastAt?:number;webhookProcessedAt?:number;webhookProcessedEventAt?:number;intervalSeconds?:number;mailbox:string;lastAt:number;until:number;lease:string;uid:number;uidValidity:string;error:string;scanned:number;generation?:string;scheduleUntil?:number};
-export type ServiceJob = { id:string; ownerId?:string; ownerTicketId?:string; testRunId?:string; kind:'customer'|'warehouse'|'flip_invoice'|'owner'; orderId?:string; conversationId?:string; messageId?:string; destination:string; text:string; test:boolean; transport?:'meta-test'|'meta-cs'|'waha'; status:'queued'|'blocked'|'sending'|'sent'|'failed'|'unknown'|'cancelled'|'simulated'; reason:string; createdAt:number; updatedAt:number; providerId?:string; attemptId?:string;warehouse?:{text:WarehousePart;evidence?:WarehousePart} };
+export type ServiceJob = { attachment?:ChatAttachment; image?:ChatImage; id:string; ownerId?:string; ownerTicketId?:string; testRunId?:string; kind:'customer'|'warehouse'|'flip_invoice'|'owner'; orderId?:string; conversationId?:string; messageId?:string; destination:string; text:string; test:boolean; transport?:'meta-test'|'meta-cs'|'waha'; status:'queued'|'blocked'|'sending'|'sent'|'failed'|'unknown'|'cancelled'|'simulated'; reason:string; createdAt:number; updatedAt:number; providerId?:string; attemptId?:string;warehouse?:{text:WarehousePart;evidence?:WarehousePart} };
 export type ContentIdea = { id:string; topic:string; format:string; hook:string; outline:string; cta:string; sourceIds:string[]; status:'draft'|'approved'|'archived'; createdAt:number; engine:string };
-export type ServiceConfig = { warehousePhone:string; invoiceEmail:string; paymentProvider:'paper'|'flip'; tone:string; contentPrompt:string; emailSender:string };
+export type ServiceConfig = { handoffMode?:'manual'|'automatic'; warehousePhone:string; invoiceEmail:string; paymentProvider:'paper'|'flip'; tone:string; contentPrompt:string; emailSender:string };
 export type ServiceState = { ownerTickets?:OwnerTicket[]; ownerInbound?:Record<string,number>; ownerEvents?:string[]; conversations:Conversation[]; payments:Payment[]; jobs:ServiceJob[]; ideas:ContentIdea[]; config:ServiceConfig; lastEventAt:number; lastAiAt:number; aiBusyUntil:number; aiLease?:string; paymentTests?:PaymentTestRun[];paymentMail?:PaymentMail[];mailSync?:MailSync; csSync?:{lease:string;until:number;cursor:number;lastAt:number;error:string;lastBackgroundAt?:number}; testSync?:{lease:string;until:number;cursor:number;lastAt:number;error:string} };
 export type ServiceAction = { kind:string; [key:string]:unknown };
 export type ServiceContext = { trusted?:boolean; actor?:string; whatsappReady?:boolean; whatsappTestReady?:boolean; flipReady?:boolean };
+// Notes and invoice notices do not answer a buyer. A human reply does, including
+// queued or uncertain sends: resuming AI must never produce a second answer.
+export function unansweredCustomerMessage(c:Conversation):ServiceMessage|undefined {
+ const index=c.messages.findLastIndex(m=>m.role==='customer');
+ if(index<0)return;
+ const latest=c.messages[index];
+ const handled=c.messages.some((m,i)=>{
+  if(m.status==='cancelled')return false;
+  if(m.role==='bot')return m.replyTo===latest.id;
+  if((m.role==='admin'||m.role==='owner')&&m.purpose!=='invoice'&&m.status!=='draft')return m.replyTo?m.replyTo===latest.id:i>index;
+  return false;
+ });
+ return handled?undefined:latest;
+}
 export function botMessageSendAllowed(c:Conversation,m:ServiceMessage,botEnabled:boolean):boolean {
  if(!botEnabled||m.role!=='bot'||!m.replyTo)return false;
  if(m.purpose==='handoff')return c.mode==='human'&&c.needsAttention&&c.messages.some(v=>v.role==='customer'&&v.id===m.replyTo);
  return c.mode==='bot'&&c.messages.filter(v=>v.role==='customer').at(-1)?.id===m.replyTo;
 }
-export function createService():ServiceState {return {conversations:[],payments:[],jobs:[],ideas:[],lastEventAt:0,lastAiAt:0,aiBusyUntil:0,config:{warehousePhone:'',invoiceEmail:'',emailSender:'',paymentProvider:'paper',tone:'Ramah, jelas, ringkas. Gunakan bahasa pelanggan. Jangan mengarang fakta atau janji.',contentPrompt:'Buat konten edukasi dari pertanyaan pelanggan. Hindari data pribadi, klaim kesehatan yang tidak didukung, serta janji hasil.'}};}
+export function createService():ServiceState {return {conversations:[],payments:[],jobs:[],ideas:[],lastEventAt:0,lastAiAt:0,aiBusyUntil:0,config:{handoffMode:'manual',warehousePhone:'',invoiceEmail:'',emailSender:'',paymentProvider:'paper',tone:'Ramah, jelas, ringkas. Gunakan bahasa pelanggan. Jangan mengarang fakta atau janji.',contentPrompt:'Buat konten edukasi dari pertanyaan pelanggan. Hindari data pribadi, klaim kesehatan yang tidak didukung, serta janji hasil.'}};}

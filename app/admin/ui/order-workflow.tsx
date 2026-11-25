@@ -7,6 +7,7 @@ import {orderMonthLabel} from '../lib/order-periods';
 import { FileText, X } from 'lucide-react';
 import { Card, Invoice, Modal, Note, download } from './operations-components';
 import type { ModuleProps } from './operations-components';
+import {catalogPrice,invoicePriceOptions} from '../lib/invoice-pricing';
 import { money, orderLines, orderTotal } from '../lib/operations';
 import type { Entry } from '../lib/operations';
 import type { Conversation, ServiceAction } from '../lib/service-types';
@@ -17,22 +18,39 @@ const labels:Record<string,string>={draft:'Draft',awaiting_payment:'Menunggu pem
 const Badge=({status}:{status:string})=><span className={`svc-badge ${status}`}>{labels[status]||status}</span>;
 
 export function OrderDraftModal(p:Props&{chat?:Conversation;order?:Entry;close:()=>void;saved?:()=>void}) {
+ type DraftLine={productId:string;quantity:number;price:number;pricingVariant?:string;pricingPackage?:string;name?:string};
  const customer=p.state.records.contacts.find(c=>c.id===(p.order?.contactId||p.chat?.contactId));
- const [items,setItems]=useState<{productId:string;quantity:number;price:number}[]>(()=>p.order?orderLines(p.order):p.chat?.orderSuggestion?.items.map(i=>({...i,price:Number(p.state.records.products.find(product=>product.id===i.productId)?.price||0)}))||[]);
- const [productId,setProduct]=useState(''),[qty,setQty]=useState(1);
+ const productFor=(id:string)=>p.state.records.products.find(product=>product.id===id);
+ const original=(id:string)=>p.order&&orderLines(p.order).find(line=>line.productId===id);
+ const [items,setItems]=useState<DraftLine[]>(()=>p.order?orderLines(p.order):p.chat?.orderSuggestion?.items.map(i=>{
+  const product=productFor(i.productId),choices=invoicePriceOptions(product),choice=choices.length===1?choices[0]:undefined;
+  return {...i,...(choice?.price!=null?choice:{}),price:catalogPrice(product)??(choices.length?0:Number(product?.price||0))};
+ })||[]);
+ const [productId,setProduct]=useState(''),[selectedPackage,setPackage]=useState(''),[qty,setQty]=useState(1);
  const [address,setAddress]=useState(String(p.order?.address||customer?.address||'')),[notes,setNotes]=useState(String(p.order?.notes||''));
  const [shipping,setShipping]=useState(Number(p.order?.shipping||0)),[discount,setDiscount]=useState(Number(p.order?.discount||0));
  const tax=Number(p.order?.taxPercent??p.state.settings.taxPercent);
  const total=orderTotal({id:'preview',createdAt:0,updatedAt:0,items:JSON.stringify(items),shipping,discount,taxPercent:tax});
  const products=p.state.records.products.filter(product=>product.archived!==true&&(p.order?.test===true||p.chat?.test||product.demoOnly!==true)&&!items.some(i=>i.productId===product.id));
+ const product=productFor(productId),choices=invoicePriceOptions(product),choice=choices.find(c=>c.pricingPackage===selectedPackage);
+ const newPrice=choice?choice.price:choices.length?null:catalogPrice(product)===null?null:Number(product?.price||0);
+ const unchanged=(item:DraftLine)=>{const old=original(item.productId);return !!old&&(old.pricingVariant||'')===(item.pricingVariant||'')&&(old.pricingPackage||'')===(item.pricingPackage||'');};
+ const needsChoice=(item:DraftLine)=>!unchanged(item)&&catalogPrice(productFor(item.productId))===null&&!invoicePriceOptions(productFor(item.productId)).some(c=>c.pricingVariant===item.pricingVariant&&c.pricingPackage===item.pricingPackage&&c.price!==null);
+ function selectProduct(id:string){setProduct(id);const options=invoicePriceOptions(productFor(id));setPackage(options.length===1?options[0].pricingPackage:'');}
+ function selectLinePackage(index:number,label:string){setItems(items.map((item,i)=>{
+  if(i!==index)return item;
+  const option=invoicePriceOptions(productFor(item.productId)).find(c=>c.pricingPackage===label);
+  if(option?.price!=null)return {...item,...option,price:option.price};
+  const old=original(item.productId);return old?{...old,quantity:item.quantity}:{...item,pricingVariant:undefined,pricingPackage:undefined,price:0};
+ }));}
  return <Modal title={`${p.order?'Edit':'Draft'} pesanan · ${customer?.name||''}`} onClose={p.close}><form className="ops-form" onSubmit={async e=>{e.preventDefault();const ok=p.order?await p.run({kind:'order_update',orderId:p.order.id,items,address,notes,shipping,discount}):await p.run({kind:'order_from_chat',conversationId:p.chat?.id,items,address,notes,shipping,discount});if(ok){p.close();p.saved?.();}}}>
- <Note>{p.order?.test===true||p.chat?.test?'SIMULASI — tidak membuat tagihan nyata.':'Draft untuk diperiksa admin. Stok belum direservasi dan invoice belum dikirim.'} Harga awal mengikuti katalog internal.</Note>
- <div className="svc-add-line"><select aria-label="Produk" value={productId} onChange={e=>setProduct(e.target.value)}><option value="">Pilih produk</option>{products.map(product=><option key={product.id} value={product.id}>{product.name} · {money(Number(product.price))}</option>)}</select><input aria-label="Jumlah produk baru" type="number" min={1} step={1} value={qty} onChange={e=>setQty(Number(e.target.value))}/><button type="button" className="button" disabled={!productId||!Number.isInteger(qty)||qty<1} onClick={()=>{const product=products.find(product=>product.id===productId)!;setItems([...items,{productId,quantity:qty,price:Number(product.price)}]);setProduct('');setQty(1);}}>Tambah</button></div>
- {items.map((item,index)=><div className="svc-draft-item" key={item.productId}><strong>{p.state.records.products.find(product=>product.id===item.productId)?.name}</strong><label>Jumlah<input type="number" min={1} step={1} required value={item.quantity} onChange={e=>setItems(items.map((value,i)=>i===index?{...value,quantity:Number(e.target.value)}:value))}/></label><label>Harga satuan (Rp)<input type="number" min={0} step={1} required value={item.price} onChange={e=>setItems(items.map((value,i)=>i===index?{...value,price:Number(e.target.value)}:value))}/></label><span>{money(item.price*item.quantity)}</span><button type="button" className="icon-button" onClick={()=>setItems(items.filter((_,i)=>i!==index))} aria-label="Hapus item"><X size={16}/></button></div>)}
+ <Note>{p.order?.test===true||p.chat?.test?'SIMULASI — tidak membuat tagihan nyata.':'Draft untuk diperiksa admin. Stok belum direservasi dan invoice belum dikirim.'} Pilih paket sesuai pesanan pelanggan. Harga mengikuti nilai setelah diskon; paket yang tidak tersedia tidak dapat dipilih. Harga draft lama tetap sampai paketnya diubah.</Note>
+ <div className="svc-add-line"><div className="ops-field"><select aria-label="Produk" value={productId} onChange={e=>selectProduct(e.target.value)}><option value="">Pilih produk</option>{products.map(product=><option key={product.id} value={product.id} disabled={catalogPrice(product)===null&&!invoicePriceOptions(product).some(c=>c.price!==null)}>{product.name}{invoicePriceOptions(product).length?' · pilih paket':catalogPrice(product)===null?' · lengkapi kekuatan produk':' · '+money(Number(product.price))}</option>)}</select>{choices.length>0&&<select aria-label="Paket produk baru" value={selectedPackage} onChange={e=>setPackage(e.target.value)}><option value="">Pilih paket</option>{choices.map(c=><option key={c.pricingPackage} value={c.pricingPackage} disabled={c.price===null}>{c.pricingPackage} · {c.price===null?'Tidak tersedia':money(c.price)}</option>)}</select>}</div><input aria-label="Jumlah produk baru" type="number" min={1} step={1} value={qty} onChange={e=>setQty(Number(e.target.value))}/><button type="button" className="button" disabled={!productId||newPrice===null||!Number.isInteger(qty)||qty<1} onClick={()=>{if(newPrice===null)return;setItems([...items,{productId,quantity:qty,...(choice||{}),price:newPrice}]);setProduct('');setPackage('');setQty(1);}}>Tambah</button></div>
+ {items.map((item,index)=>{const product=productFor(item.productId),options=invoicePriceOptions(product);return <div className="svc-draft-item" key={item.productId}><div><strong>{item.pricingVariant||item.name||product?.name}</strong>{options.length>0&&<label>Paket<select aria-label={`Paket ${product?.name}`} value={item.pricingPackage||''} onChange={e=>selectLinePackage(index,e.target.value)}><option value="">{original(item.productId)?'Pertahankan harga draft lama':'Pilih paket'}</option>{options.map(c=><option key={c.pricingPackage} value={c.pricingPackage} disabled={c.price===null}>{c.pricingPackage} · {c.price===null?'Tidak tersedia':money(c.price)}</option>)}</select></label>}</div><label>Jumlah<input type="number" min={1} step={1} required value={item.quantity} onChange={e=>setItems(items.map((value,i)=>i===index?{...value,quantity:Number(e.target.value)}:value))}/></label><label>Harga satuan (Rp)<input type="number" min={0} step={1} required readOnly={!unchanged(item)&&catalogPrice(product)!==undefined} value={item.price} onChange={e=>setItems(items.map((value,i)=>i===index?{...value,price:Number(e.target.value)}:value))}/></label><span>{needsChoice(item)?'Pilih paket dahulu':money(item.price*item.quantity)}</span><button type="button" className="icon-button" onClick={()=>setItems(items.filter((_,i)=>i!==index))} aria-label="Hapus item"><X size={16}/></button></div>;})}
  <label className="ops-field"><span>Alamat kirim</span><ResizableTextarea value={address} onChange={e=>setAddress(e.target.value)} maxLength={2000} placeholder="Boleh dilengkapi sebelum invoice diterbitkan."/></label>
  <div className="ops-form-grid"><label className="ops-field"><span>Ongkir (Rp)</span><input type="number" min={0} step={1} required value={shipping} onChange={e=>setShipping(Number(e.target.value))}/></label><label className="ops-field"><span>Diskon (Rp)</span><input type="number" min={0} max={items.reduce((n,i)=>n+i.price*i.quantity,0)} step={1} required value={discount} onChange={e=>setDiscount(Number(e.target.value))}/></label></div>
  <label className="ops-field"><span>Catatan</span><ResizableTextarea value={notes} onChange={e=>setNotes(e.target.value)} maxLength={2000}/></label>
- <footer><strong>Total: {money(total)} <small>termasuk pajak {tax}% dan ongkir</small></strong><button className="button primary" disabled={p.busy||!items.length}>Simpan draft</button></footer>
+ <footer><strong>Total: {money(total)} <small>termasuk pajak {tax}% dan ongkir</small></strong><button className="button primary" disabled={p.busy||!items.length||items.some(needsChoice)}>Simpan draft</button></footer>
  </form></Modal>;
 }
 

@@ -55,7 +55,7 @@ export function ChatComposer({chat,text,setText,corrects,setCorrects,busy,ready,
   </div>}
   {error&&<p role="alert" style={{color:'#b42318'}}>{error}</p>}
   {file&&text.length>900&&<p role="alert" style={{color:'#b42318'}}>Keterangan lampiran maksimal 900 karakter.</p>}
-  <ResizableTextarea compact aria-label={file?'Keterangan lampiran':'Balasan admin'} rows={2} placeholder={file?'Keterangan lampiran (boleh kosong)':'Tulis balasan admin… AI akan dijeda untuk chat ini.'} required={!file} maxLength={file?900:4000} disabled={busy||sending} value={text} onChange={e=>setText(e.target.value)}/>
+  <ResizableTextarea compact aria-label={file?'Keterangan lampiran':'Balasan admin'} rows={2} placeholder={file?'Keterangan lampiran (boleh kosong)':'Tulis balasan admin… AI akan dijeda untuk chat ini.'} required={!file} maxLength={file?900:4000} disabled={sending} value={text} onChange={e=>setText(e.target.value)}/>
   <div style={{flexWrap:'wrap',gap:8}}>
    {canAttach&&<>
     <input ref={photoPicker} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={e=>{choose(e.target.files?.[0],'image');e.target.value='';}}/>

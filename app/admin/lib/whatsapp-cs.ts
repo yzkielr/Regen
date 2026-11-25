@@ -1,3 +1,5 @@
+import {testimonialJobAllowed} from './testimonials';
+import {incomingImage} from './image-message';
 import {ownerNotificationAllowed,ownerBuyerMessageAllowed} from './owner-escalation';
 import type { Operations } from './operations';
 import type { ServiceJob, ServiceState } from './service-types';
@@ -22,7 +24,7 @@ export function whatsappConnectionStatus(configured:boolean|null|undefined,sync?
  if(now-base.lastAt<0||now-base.lastAt>300000)return {...base,state:'stale',label:'WhatsApp perlu sinkronisasi',shortLabel:'Perlu sinkronisasi',detail:'Belum ada sinkronisasi berhasil dalam 5 menit terakhir. Periksa sinkronisasi di Pusat CS.'};
  return {...base,active:true,state:'active',label:'WhatsApp live aktif',shortLabel:'Live aktif',detail:'Koneksi WhatsApp sudah dikonfigurasi dan sinkronisasi terakhir berhasil. Status terkirim atau tersampaikan dapat dilihat pada setiap pesan.'};
 }
-export type CsEvent={kind:'incoming'|'delivery';customerPhone:string;providerId:string;at:number;replyToProviderId?:string;name?:string;text?:string;unsupported?:boolean;status?:string};
+export type CsEvent={kind:'incoming'|'delivery';customerPhone:string;providerId:string;at:number;replyToProviderId?:string;name?:string;text?:string;unsupported?:boolean;image?:{mediaId:string;mime:string};status?:string};
 export function parseCsEvent(raw:unknown,now=Date.now()):CsEvent {
  const v=raw as Record<string,unknown>;
  if(!v||v.phoneNumberId!==CS_PHONE_ID||v.businessPhone!==REGEN_CS_PHONE)throw new Error('Nomor bisnis berbeda.');
@@ -33,19 +35,22 @@ export function parseCsEvent(raw:unknown,now=Date.now()):CsEvent {
  const base={customerPhone:v.customerPhone,providerId:v.providerId,at:v.at,...(typeof v.replyToProviderId==='string'?{replyToProviderId:v.replyToProviderId}:{})};
  if(v.kind==='incoming'){
   if(typeof v.text!=='string'||!v.text.trim()||v.text.length>4096||typeof v.name!=='string'||v.name.length>200)throw new Error('Isi pesan tidak valid.');
-  return {...base,kind:'incoming',text:v.text.trim(),name:v.name,unsupported:v.unsupported===true};
+  return {...base,kind:'incoming',text:v.text.trim(),name:v.name,unsupported:v.unsupported===true,...(v.image?{image:incomingImage(v.image)}:{})};
  }
  if(v.kind==='delivery'&&['sent','delivered','read','failed'].includes(String(v.status)))return {...base,kind:'delivery',status:String(v.status)};
  throw new Error('Jenis pesan tidak didukung.');
 }
 export function csSendAllowed(s:Operations,j:ServiceJob,now=Date.now()){
  if(j.kind==='owner')return ownerNotificationAllowed(s,j,now);
+ if(!testimonialJobAllowed(s,j))return false;
  const c=s.service?.conversations.find(c=>c.id===j.conversationId),m=c?.messages.find(m=>m.id===j.messageId);
+ if(JSON.stringify(m?.image)!==JSON.stringify(j.image)||m?.text!==j.text)return false;
  const contact=s.records.contacts.find(v=>v.id===c?.contactId);
  if(!c||c.test||c.transport!=='meta-cs'||j.test||j.transport!=='meta-cs'||j.kind!=='customer'||!m||!['bot','admin','owner'].includes(m.role)||contact?.demoOnly===true||j.destination!==contact?.phone)return false;
  if(!/^\+[1-9]\d{6,14}$/.test(j.destination)||j.destination===REGEN_CS_PHONE||!['blocked','queued','sending'].includes(j.status)||m.status!=='queued')return false;
  if(!c.lastInboundAt||now-c.lastInboundAt>=86400000||c.lastInboundAt>now+300000)return false;
  if(j.orderId){const o=s.records.orders.find(o=>o.id===j.orderId);if(!o||o.status!=='awaiting_payment'||!o.paymentLink||o.test===true||o.contactId!==c.contactId||o.conversationId!==c.id||m.purpose!=='invoice'||m.text!==j.text)return false;}
+ if(m.purpose==='handoff_offer'&&s.service?.config.handoffMode!=='automatic')return false;
  if(m.role==='bot'&&!botMessageSendAllowed(c,m,s.settings.botEnabled))return false;
  if(m.role==='owner'&&!ownerBuyerMessageAllowed(s,c,m,j,now))return false;
  return true;
