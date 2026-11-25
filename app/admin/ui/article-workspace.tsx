@@ -115,7 +115,6 @@ export default function ArticleWorkspace({ page, navigate, author, supervisor }:
           initial={active}
           cards={data.records.flatMap((record) => (record.publishedCard ? [record.publishedCard] : []))}
           settings={data.settings}
-          supervisor={supervisor}
           onSaved={(record) => {
             setActive((current) => (current?.draft.id === record.draft.id ? record : current))
             setData(
@@ -277,7 +276,7 @@ export default function ArticleWorkspace({ page, navigate, author, supervisor }:
           </section>
           <button className="button primary">Simpan pengaturan</button>
         </fieldset>
-        <p>Admin dapat mengelola penulis dan kategori. Supervisor dan Pemilik juga dapat menerbitkan artikel, mengubah bahasa awal, dan mengatur target kata.</p>
+        <p>Admin dapat mengelola penulis dan kategori, serta langsung menerbitkan artikel. Supervisor dan Pemilik juga dapat mengubah bahasa awal dan target kata.</p>
         <p role="status">{error || message}</p>
       </form>
     )
@@ -373,13 +372,11 @@ function Editor({
   initial,
   cards,
   settings,
-  supervisor,
   onSaved,
 }: {
   initial: ArticleRecord
   cards: ArticleCard[]
   settings: ArticleSettings
-  supervisor: boolean
   onSaved: (r: ArticleRecord) => void
 }) {
   const [a, setA] = useState(() => {
@@ -821,15 +818,13 @@ function Editor({
             >
               Ajukan review
             </button>
-            {supervisor && (
-              <button
-                className="button primary"
-                disabled={busy || Boolean(uploading)}
-                onClick={() => requestPublication('publish')}
-              >
-                Terbitkan
-              </button>
-            )}
+            <button
+              className="button primary"
+              disabled={busy || Boolean(uploading)}
+              onClick={() => requestPublication('publish')}
+            >
+              Terbitkan
+            </button>
           </div>
         </div>
       </section>

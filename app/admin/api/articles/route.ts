@@ -31,8 +31,6 @@ export async function POST(request: Request) {
   if (!input || !Number.isSafeInteger(input.revision) || input.revision < 0)
     return fail('Revisi tidak valid.', 400)
   const { action, revision } = input
-  if (action === 'publish' && !canSupervise(user.role))
-    return fail('Perlu izin supervisor.', 403)
   try {
     let next
     if (action === 'settings') {

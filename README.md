@@ -307,8 +307,9 @@ To learn more, take a look at the following resources:
 
 ## Article CMS
 
-In Regen Admin, open **Artikel** (menus 28–30). Signed-in admins can write and request review.
-Supervisors can publish each translation independently and change editorial settings.
+In Regen Admin, open **Artikel** (menus 28–30). Signed-in admins can publish each translation
+directly or request a review. They can also manage authors and categories. Supervisors and
+owners can additionally change the default language and target word count.
 Public pages under `/articles`, `/articles/ms`, and `/articles/id` read the last published version.
 
 The website server uses `REGEN_ARTICLES_DATABASE_URL` when supplied, otherwise the existing
