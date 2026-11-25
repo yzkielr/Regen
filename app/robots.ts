@@ -10,7 +10,7 @@ export default function robots(): MetadataRoute.Robots {
   // /coa pages and PDFs send noindex metadata/headers. Allow crawling so
   // search engines can see that instruction; do not list them in a sitemap.
   return {
-    sitemap: `${SITE_URL}/sitemap.xml`,
+    sitemap: [`${SITE_URL}/sitemap.xml`, `${SITE_URL}/articles/sitemap.xml`],
     rules: {
       userAgent: '*',
       allow: '/',

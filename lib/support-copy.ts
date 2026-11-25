@@ -370,7 +370,7 @@ export function buildConsultationWhatsAppUrl({
   productName,
 }: {
   language: Language
-  region: Region
+  region?: Region
   productName?: string
 }) {
   const greetings = {
@@ -381,7 +381,7 @@ export function buildConsultationWhatsAppUrl({
   const message = [
     greetings[language],
     ...(productName ? [`${language === 'en' ? 'Product' : 'Produk'}: ${productName}`] : []),
-    `Region: ${region.name} · ${region.currency}`,
+    ...(region ? [`Region: ${region.name} · ${region.currency}`] : []),
   ].join('\n\n')
 
   return `https://api.whatsapp.com/send?phone=${CONSULTATION_WHATSAPP_NUMBER}&text=${encodeURIComponent(message)}`

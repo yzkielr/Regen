@@ -175,6 +175,9 @@ importers:
       nodemailer:
         specifier: ^10.0.16
         version: 10.0.16
+      pg:
+        specifier: 8.20.0
+        version: 8.20.0
       pdfjs-dist:
         specifier: ^5.6.205
         version: 5.7.284
@@ -190,6 +193,9 @@ importers:
       shadcn:
         specifier: ^4.8.0
         version: 4.10.0(@types/node@24.10.4)(supports-color@8.1.1)(typescript@5.7.3)
+      sharp:
+        specifier: ^0.35.3
+        version: 0.35.3(@types/node@24.10.4)
       tailwind-merge:
         specifier: ^3.3.1
         version: 3.4.0
@@ -206,6 +212,9 @@ importers:
       '@types/node':
         specifier: ^24
         version: 24.10.4
+      '@types/pg':
+        specifier: 8.23.1
+        version: 8.23.1
       '@types/react':
         specifier: ^19
         version: 19.2.14
@@ -215,9 +224,6 @@ importers:
       postcss:
         specifier: ^8.5
         version: 8.5.6
-      sharp:
-        specifier: ^0.35.3
-        version: 0.35.3(@types/node@24.10.4)
       tailwindcss:
         specifier: ^4.2.0
         version: 4.2.0

@@ -1,6 +1,7 @@
 // Copy the existing admin client into the storefront without copying server code or data.
 // Run locally after changing the Site client; generated files are checked into the storefront.
 import fs from 'node:fs';
+import { withArticleNavigation } from './sync-article-navigation.mjs';
 import path from 'node:path';
 import postcss from 'postcss';
 const root=process.cwd(), source=path.join(root,'sites/regen-inbox'), target=path.join(root,'app/admin');
@@ -9,7 +10,7 @@ const libs=['chat-media','chat-documents','chat-videos','owner-escalation','mess
 libs.push('pricing-knowledge','pricing-knowledge-data','image-message','testimonials','excel-launch','file-preview','pricing-reply','chat-deletion','bot-policy','website-knowledge','website-knowledge-data');
 ui.push('file-viewer');
 fs.mkdirSync(path.join(target,'ui'),{recursive:true});fs.mkdirSync(path.join(target,'lib'),{recursive:true});fs.mkdirSync(path.join(root,'public/admin-assets'),{recursive:true});
-for(const name of libs){const data=fs.readFileSync(path.join(source,`lib/${name}.ts`),'utf8').replace(/(from\s+['"]\.\.?\/[^'"]+)\.ts(['"])/g,'$1$2').replaceAll("import('pdfjs-dist/","import('pdfjs-dist-admin/").replaceAll('/pdf.worker.min.mjs','/admin-assets/pdf.worker.min.mjs').replaceAll('/pdf-assets/','/admin-assets/pdf-assets/');fs.writeFileSync(path.join(target,`lib/${name}.ts`),data);}
+for(const name of libs){const data=fs.readFileSync(path.join(source,`lib/${name}.ts`),'utf8').replace(/(from\s+['"]\.\.?\/[^'"]+)\.ts(['"])/g,'$1$2').replaceAll("import('pdfjs-dist/","import('pdfjs-dist-admin/").replaceAll('/pdf.worker.min.mjs','/admin-assets/pdf.worker.min.mjs').replaceAll('/pdf-assets/','/admin-assets/pdf-assets/');fs.writeFileSync(path.join(target,`lib/${name}.ts`),withArticleNavigation(name,data));}
 for(const name of ui){
  let data=fs.readFileSync(path.join(source,`app/${name}.tsx`),'utf8');
  data=data.replaceAll('/pdf-assets/','/admin-assets/pdf-assets/').replaceAll('/api/','/admin/api/').replaceAll('/regen-logo-green.png','/admin-assets/regen-logo-green.png').replaceAll('/regen-logo-white.png','/admin-assets/regen-logo-white.png');
@@ -26,7 +27,7 @@ for(const name of ui){
  data=data.replaceAll('Memberi akses login dilakukan melalui pengaturan berbagi Site.','Username dan password dashboard dikelola pemilik melalui Kelola login admin.');
  const imports=[];if(data.includes('adminFetch('))imports.push('adminFetch');if(data.includes('logoutAdmin('))imports.push('logoutAdmin');
  if(imports.length)data=data.replace(/(['"]use client['"];?)/,`$1\nimport { ${imports.join(', ')} } from './admin-client';`);
- fs.writeFileSync(path.join(target,`ui/${name}.tsx`),data);
+ fs.writeFileSync(path.join(target,`ui/${name}.tsx`),withArticleNavigation(name,data));
 }
 const styles=['globals','admin','comfortable','live','operations','service','knowledge','responsive','file-viewer'];
 let css='/* Generated from the existing Regen Admin styles; scoped to /admin. */\n';

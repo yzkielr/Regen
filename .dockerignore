@@ -9,3 +9,4 @@ sites
 output
 *.log
 *.tsbuildinfo
+tmp/

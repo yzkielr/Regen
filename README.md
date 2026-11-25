@@ -304,3 +304,29 @@ To learn more, take a look at the following resources:
 - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
 - [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 - [v0 Documentation](https://v0.app/docs) - learn about v0 and how to use it.
+
+## Article CMS
+
+In Regen Admin, open **Artikel** (menus 28–30). Signed-in admins can write and request review.
+Supervisors can publish each translation independently and change editorial settings.
+Public pages under `/articles`, `/articles/ms`, and `/articles/id` read the last published version.
+
+The website server uses `REGEN_ARTICLES_DATABASE_URL` when supplied, otherwise the existing
+`WORKFLOW_POSTGRES_URL`. Use a development PostgreSQL database and development admin login
+for local editing. The first authenticated workspace request creates `regen_articles` and
+`regen_article_settings`; the database user needs permission to create tables. If a separate
+database is used, include it in backups. Drafts are only available through the authenticated
+admin API. The word-count target is an editorial suggestion configurable by a supervisor.
+
+For isolated CMS testing on localhost, install the development fixture tools once:
+
+```sh
+npm install --prefix ./tmp/cms-tools --ignore-scripts --no-audit --no-fund @electric-sql/pglite@0.6.0 @electric-sql/pglite-socket@0.3.0
+```
+
+Run `node scripts/dev-article-cms.mjs` alongside `npm run dev`, then open
+`http://localhost:3000/admin/login`. Use `editor-lokal` and the generated password in
+`tmp/local-article-cms/password.txt`. The fixture persists articles in a private local
+directory, verifies the test password, and provides a loopback-only admin backend.
+It creates `.env.development.local` for Next.js and refuses to overwrite an existing
+different configuration. Restart the fixture with the same command after a reboot.

@@ -2,3 +2,4 @@ sites/
 artifacts/
 tests/
 **/*.test.mjs
+tmp/

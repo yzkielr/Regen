@@ -6,6 +6,7 @@ import { usePathname } from 'next/navigation'
 import { Menu, X } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import { Button } from '@/components/ui/button'
+import { articlePath } from '@/lib/articles'
 import { cn } from '@/lib/utils'
 import { useRegion } from '@/components/region-provider'
 import { RegionSwitcher } from '@/components/region-switcher'
@@ -25,6 +26,7 @@ export function SiteHeader({ forceSolid = false }: { forceSolid?: boolean }) {
     { label: text.quality, href: href('#kualitas') },
     { label: text.reviews, href: href('#ulasan') },
     { label: text.faq, href: href('#faq') },
+    { label: language === 'en' ? 'Articles' : 'Artikel', href: articlePath(language) },
   ]
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
