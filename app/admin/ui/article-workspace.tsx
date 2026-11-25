@@ -159,10 +159,11 @@ export default function ArticleWorkspace({ page, navigate, author, supervisor }:
         }}
       >
         <h2>Pengaturan Artikel</h2>
-        <fieldset disabled={!supervisor || busy}>
+        <fieldset disabled={busy}>
           <label>
             Bahasa awal artikel
             <select
+              disabled={!supervisor}
               value={settings.language}
               onChange={(e) => setSettings({ ...settings, language: e.target.value as ArticleLanguage })}
             >
@@ -180,6 +181,7 @@ export default function ArticleWorkspace({ page, navigate, author, supervisor }:
               required
               min="0"
               max="10000"
+              disabled={!supervisor}
               value={settings.minimumWords}
               onChange={(e) => setSettings({ ...settings, minimumWords: Number(e.target.value) })}
             />
@@ -273,9 +275,9 @@ export default function ArticleWorkspace({ page, navigate, author, supervisor }:
               Tambah kategori
             </button>
           </section>
-          {supervisor && <button className="button primary">Simpan pengaturan</button>}
+          <button className="button primary">Simpan pengaturan</button>
         </fieldset>
-        <p>Admin dapat menulis dan meminta review. Supervisor dapat menerbitkan dan mengubah pengaturan.</p>
+        <p>Admin dapat mengelola penulis dan kategori. Supervisor dan Pemilik juga dapat menerbitkan artikel, mengubah bahasa awal, dan mengatur target kata.</p>
         <p role="status">{error || message}</p>
       </form>
     )

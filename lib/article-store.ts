@@ -62,12 +62,14 @@ export async function workspace() {
   const records = await db().query<ArticleRecord>(
     `SELECT ${cardFields} AS "publishedCard",draft,revision,status,publication->>'slug' AS "publishedSlug",publication IS NOT NULL AS published FROM regen_articles ORDER BY lower(draft->>'title')`,
   )
-  const settings = (await db().query('SELECT settings,revision FROM regen_article_settings WHERE id=1'))
-    .rows[0]
+  return { records: records.rows, ...(await readSettings()) }
+}
+export async function readSettings() {
+  await initialize()
+  const { rows } = await db().query('SELECT settings,revision FROM regen_article_settings WHERE id=1')
   return {
-    records: records.rows,
-    settings: (settings?.settings ?? defaultSettings) as ArticleSettings,
-    settingsRevision: Number(settings?.revision ?? 0),
+    settings: (rows[0]?.settings ?? defaultSettings) as ArticleSettings,
+    settingsRevision: Number(rows[0]?.revision ?? 0),
   }
 }
 export async function saveSettings(settings: ArticleSettings, revision: number) {

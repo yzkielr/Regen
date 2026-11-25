@@ -2,7 +2,7 @@ import { currentAdmin } from '@/lib/admin-gateway'
 import { boundedAdminBody, sameOrigin } from '@/lib/admin-gateway-policy'
 import { canSupervise } from '@/app/admin/lib/admin-roles'
 import { articleLanguages, articleSlug, safeUrl, publishErrors, validArticle } from '@/lib/articles'
-import { saveDraft, saveSettings, workspace } from '@/lib/article-store'
+import { readSettings, saveDraft, saveSettings, workspace } from '@/lib/article-store'
 export const dynamic = 'force-dynamic'
 const json = (value: unknown, status = 200) =>
   Response.json(value, { status, headers: { 'Cache-Control': 'private, no-store' } })
@@ -31,7 +31,7 @@ export async function POST(request: Request) {
   if (!input || !Number.isSafeInteger(input.revision) || input.revision < 0)
     return fail('Revisi tidak valid.', 400)
   const { action, revision } = input
-  if (['settings', 'publish'].includes(action) && !canSupervise(user.role))
+  if (action === 'publish' && !canSupervise(user.role))
     return fail('Perlu izin supervisor.', 403)
   try {
     let next
@@ -71,7 +71,16 @@ export async function POST(request: Request) {
         if (new Set(s.authors.map((p: { name: string }) => p.name.toLowerCase())).size !== s.authors.length)
           return fail('Nama penulis harus unik.', 400)
       }
-      next = await saveSettings(s, revision)
+      if (canSupervise(user.role)) {
+        next = await saveSettings(s, revision)
+      } else {
+        const { settings, settingsRevision } = await readSettings()
+        if (revision !== settingsRevision)
+          return fail('Pengaturan sudah berubah. Muat ulang sebelum menyimpan.', 409)
+        if (s.language !== settings.language || s.minimumWords !== settings.minimumWords)
+          return fail('Bahasa awal dan target kata memerlukan izin supervisor.', 403)
+        next = await saveSettings({ ...settings, authors: s.authors, categories: s.categories }, revision)
+      }
     } else {
       const a = input.article
       if (!['save', 'review', 'publish'].includes(action) || !validArticle(a))
