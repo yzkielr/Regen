@@ -191,7 +191,7 @@ export function ProductDetail({ product }: { product: Product }) {
               })}
             </div>
             <p className="text-xs leading-relaxed text-muted-foreground">
-              {strength && strength.id !== defaultStrength?.id && !strength.image
+              {strength && !strength.label && strength.id !== defaultStrength?.id && !strength.image
                 ? copy.strengthPhotoNotice
                 : copy.photoNotice}
             </p>
@@ -227,7 +227,7 @@ export function ProductDetail({ product }: { product: Product }) {
             {strengths.length > 1 && (
               <fieldset className="mt-6">
                 <legend className="text-sm font-medium text-foreground">
-                  {copy.selectStrength}
+                  {strengths.some((option) => option.label) ? copy.selectProductVariant : copy.selectStrength}
                 </legend>
                 <div className="mt-3 grid grid-cols-2 gap-3">
                   {strengths.map((option) => (
@@ -236,13 +236,13 @@ export function ProductDetail({ product }: { product: Product }) {
                       type="button"
                       onClick={() => selectStrength(option.id)}
                       aria-pressed={option.id === strength?.id}
-                      className={`min-h-[72px] min-w-0 whitespace-nowrap rounded-2xl border px-2 py-4 text-left font-display text-2xl font-bold text-primary transition-colors sm:min-h-[80px] sm:px-5 sm:py-5 sm:text-3xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${
+                      className={`min-h-[72px] min-w-0 rounded-2xl border px-2 py-4 text-left font-display font-bold text-primary transition-colors sm:min-h-[80px] sm:px-5 sm:py-5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent ${option.label ? 'whitespace-normal text-base sm:text-lg' : 'whitespace-nowrap text-2xl sm:text-3xl'} ${
                         option.id === strength?.id
                           ? 'border-accent bg-accent/5 ring-1 ring-accent'
                           : 'border-border bg-card hover:border-accent/50'
                       }`}
                     >
-                      {option.mg} mg
+                      {option.label ?? `${option.mg} mg`}
                     </button>
                   ))}
                 </div>

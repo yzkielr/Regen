@@ -1,4 +1,4 @@
-/** Original PDFs supplied in the Regen Drive COA folder on 5 October 2026.
+/** PDFs supplied by Regen through Drive or direct owner upload.
  * Server-side allowlist only. These pages are unlisted, not password protected.
  * Keep this registry out of storefront navigation, catalog data and sitemaps.
  */
@@ -6,8 +6,10 @@ export interface CoaDocument {
   id: string
   title: string
   filename: string
+  downloadFilename?: string
   pages: number
-  sourceId: string
+  sourceId?: string
+  sourceKind?: 'owner-upload'
 }
 
 export interface CoaReport {
@@ -17,6 +19,24 @@ export interface CoaReport {
 }
 
 export const COA_REPORTS: readonly CoaReport[] = [
+  {
+    slug: 'glutathione',
+    name: 'Glutathione',
+    documents: [{ id: 'report', title: 'COA summary — 03 Aug 2026', filename: 'Regen_Glutathione_COA_Summary.pdf', pages: 1, sourceKind: 'owner-upload' }],
+  },
+  {
+    "slug": "mots-c",
+    "name": "MOTS-C",
+    "documents": [
+      {
+        "id": "report",
+        "title": "Janoshik test report - batch LREGENMS06",
+        "filename": "Regen_MOTS-C_COA_Report.pdf",
+        "pages": 1,
+        "sourceId": "1uVJLTaaABMsDwFYF56SPuO4BjADgnkxe"
+      }
+    ]
+  },
   {
     "slug": "tesamorelin",
     "name": "Tesamorelin",
@@ -174,20 +194,28 @@ export const COA_REPORTS: readonly CoaReport[] = [
     ]
   },
   {
-    "slug": "retatrutide",
-    "name": "Retatrutide",
+    "slug": "retatrutide-10mg",
+    "name": "Retatrutide 10 mg",
     "documents": [
       {
         "id": "report",
-        "title": "COA summary",
-        "filename": "Regen_Retatrutide_COA_Summary.pdf",
-        "pages": 3,
-        "sourceId": "1qqySa-wu78GpoCMobOlNkQdkgPFAIOld"
-      },
+        "title": "COA Reta 10 mg",
+        "filename": "Regen_Retatrutide_10mg_COA_Vanguard.pdf",
+        "downloadFilename": "coa-reta-10-mg.pdf",
+        "pages": 1,
+        "sourceKind": "owner-upload"
+      }
+    ]
+  },
+  {
+    "slug": "retatrutide-60mg",
+    "name": "Retatrutide 60 mg",
+    "documents": [
       {
         "id": "janoshik",
-        "title": "Janoshik laboratory reports",
+        "title": "COA Reta 60 mg - Janoshik",
         "filename": "Copy of merged janoshik reta regen 5 pages.pdf",
+        "downloadFilename": "coa-reta-60-mg-janoshik.pdf",
         "pages": 5,
         "sourceId": "1QgT-MuxJ00578XDEYZ0_AXJ87bwaU_Lf"
       }

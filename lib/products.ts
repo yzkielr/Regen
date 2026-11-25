@@ -53,6 +53,7 @@ export interface Product {
 export interface ProductStrength {
   id: string
   mg: number
+  label?: string
   name: string
   /** Internal pricing key; the public product URL stays unchanged. */
   priceKey: string
@@ -61,6 +62,20 @@ export interface ProductStrength {
 }
 
 const PRODUCT_STRENGTHS: Readonly<Record<string, readonly ProductStrength[]>> = {
+  'bpc-157': [
+    { id: '10mg', mg: 10, label: 'BPC-157 10 mg', name: 'BPC-157 10mg', priceKey: 'bpc-157' },
+    { id: 'tb-500', mg: 10, label: 'BPC-157 + TB-500 10 mg', name: 'BPC-157 + TB-500 10mg', priceKey: 'bpc-157-tb-500' },
+  ],
+  'mots-c': [
+    { id: '10mg', mg: 10, name: 'MOTS-C 10mg', priceKey: 'mots-c' },
+    { id: '30mg', mg: 30, name: 'MOTS-C 30mg', priceKey: 'mots-c-30mg' },
+    { id: '40mg', mg: 40, name: 'MOTS-C 40mg', priceKey: 'mots-c-40mg' },
+  ],
+  retatrutide: [
+    { id: '10mg', mg: 10, name: 'Retatrutide 10mg', priceKey: 'retatrutide' },
+    { id: '20mg', mg: 20, name: 'Retatrutide 20mg', priceKey: 'retatrutide-20mg' },
+    { id: '60mg', mg: 60, name: 'Retatrutide 60mg', priceKey: 'retatrutide-60mg' },
+  ],
   tesamorelin: [
     { id: '10mg', mg: 10, name: 'Tesamorelin 10mg', priceKey: 'tesamorelin' },
     { id: '20mg', mg: 20, name: 'Tesamorelin 20mg', priceKey: 'tesamorelin-20mg' },

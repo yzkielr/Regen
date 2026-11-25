@@ -58,6 +58,7 @@ export function switchRegionPath(pathname: string, nextRegion: RegionId): string
   const current = getRegionFromPath(pathname)
   const suffix = current ? pathname.slice(current.id.length + 1) : pathname
   if (suffix === '' || suffix === '/') return regionPath(nextRegion)
+  if (current && /^\/about\/?$/.test(suffix)) return regionPath(nextRegion, '/about')
   if (/^\/product\/[^/]+\/?$/.test(suffix)) return regionPath(nextRegion, suffix)
   return regionPath(nextRegion)
 }

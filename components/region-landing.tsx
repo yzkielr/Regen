@@ -2,20 +2,25 @@ import Link from 'next/link'
 import { ArrowUpRight, Globe2 } from 'lucide-react'
 import { Logo } from '@/components/logo'
 import { RegionSuggestion } from '@/components/region-suggestion'
-import { REGIONS, regionPath, type RegionId } from '@/lib/regions'
+import { SocialIcon } from '@/components/social-icon'
+import { DEFAULT_REGION, REGIONS, regionPath, type RegionId } from '@/lib/regions'
+import { SITE_IDENTITY, SITE_NAME, SITE_SOCIAL_PROFILES } from '@/lib/site-seo'
+import { CONTACT_EMAIL } from '@/lib/support-copy'
 
 export function RegionLanding({ suggestedRegionId = null }: { suggestedRegionId?: RegionId | null }) {
   return (
     <main className="min-h-dvh bg-secondary p-4 sm:p-8 lg:flex lg:items-center lg:justify-center lg:p-12">
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(SITE_IDENTITY).replace(/</g, '\\u003c') }} />
       <div className="mx-auto grid w-full max-w-6xl overflow-hidden rounded-3xl border border-primary/10 bg-white shadow-xl shadow-primary/5 lg:grid-cols-[0.82fr_1.18fr]">
         <section className="relative flex flex-col overflow-hidden bg-primary p-7 text-white sm:p-10 lg:p-12">
           <div className="pointer-events-none absolute -bottom-40 -left-40 size-[32rem] rounded-full border border-white/10" aria-hidden="true" />
           <div className="pointer-events-none absolute -bottom-24 -left-24 size-[24rem] rounded-full border border-white/10" aria-hidden="true" />
           <Logo variant="light" />
           <div className="relative mt-12 lg:my-auto lg:py-20">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/60">REGEN LONGEVITY LAB</p>
-            <h1 className="mt-5 max-w-md text-balance font-display text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">One Regen.<br /><span className="text-[#f6a06e]">Your part of the world.</span></h1>
-            <p className="mt-6 max-w-sm text-pretty text-sm leading-relaxed text-white/75 sm:text-base">Explore our research catalog in your region, with the language and currency that feel familiar.</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/60">RESEARCH PEPTIDES</p>
+            <h1 className="mt-5 max-w-md text-balance font-display text-4xl font-semibold leading-[1.1] tracking-tight sm:text-5xl">{SITE_NAME}</h1>
+            <p className="mt-6 max-w-sm text-pretty text-sm leading-relaxed text-white/75 sm:text-base">Regen Longevity Lab, also known as Regen Longevity, offers a research peptide catalog and product information across seven regions. Choose your region for local language, currency and support.</p>
+            <Link href={regionPath(DEFAULT_REGION, '/about')} className="mt-5 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-white underline decoration-white/40 underline-offset-4 hover:decoration-white focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white">About Regen Longevity Lab <ArrowUpRight className="size-4" aria-hidden="true" /></Link>
           </div>
           <p className="relative mt-10 flex items-center gap-2 text-xs text-white/60"><Globe2 className="size-4" aria-hidden="true" /> 7 regions. One research standard.</p>
         </section>
@@ -38,6 +43,15 @@ export function RegionLanding({ suggestedRegionId = null }: { suggestedRegionId?
             ))}
           </nav>
           <p className="mt-6 border-t border-border pt-5 text-xs leading-relaxed text-muted-foreground">For laboratory research only. Product availability, shipping and final pricing are confirmed by our team for your region.</p>
+          <nav aria-label="Regen social media" className="mt-3 flex flex-wrap gap-x-5 gap-y-1 text-sm font-medium text-muted-foreground">
+            {SITE_SOCIAL_PROFILES.map((profile) => (
+              <a key={profile.name} href={profile.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap rounded-sm hover:text-primary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary">
+                <SocialIcon platform={profile.name} />
+                {profile.name}
+              </a>
+            ))}
+          </nav>
+          <a href={`mailto:${CONTACT_EMAIL}`} className="mt-3 inline-flex min-h-11 items-center break-all text-sm text-muted-foreground underline underline-offset-4 hover:text-primary">{CONTACT_EMAIL}</a>
         </section>
       </div>
     </main>

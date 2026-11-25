@@ -1,6 +1,16 @@
 import { withWorkflow } from 'workflow/next';
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      { source: '/Tutorial', destination: '/PenCartridge', permanent: true },
+      { source: '/retatutor', destination: '/PenCartridge', permanent: true },
+      { source: '/tutorial/:path*', destination: '/PenCartridge/:path*', permanent: true },
+      { source: '/coa/retatrutide', destination: '/coa/retatrutide-10mg', permanent: true },
+      { source: '/coa/retatrutide/document/report', destination: '/coa/retatrutide-10mg/document/report', permanent: true },
+      { source: '/coa/retatrutide/document/janoshik', destination: '/coa/retatrutide-60mg/document/janoshik', permanent: true },
+    ]
+  },
   // Include registered PDF files in production/serverless route bundles.
   outputFileTracingIncludes: {
     '/coa/*/document/*': ['./lab-documents/coa/**/*.pdf'],
@@ -20,6 +30,30 @@ const nextConfig = {
       ],
     }, {
       source: '/coa/:path*',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+      ],
+    }, {
+      source: '/PenCartridge/:path*',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+      ],
+    }, {
+      source: '/Basic',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+      ],
+    }, {
+      source: '/basic/:path*',
+      headers: [
+        { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
+        { key: 'Referrer-Policy', value: 'no-referrer' },
+      ],
+    }, {
+      source: '/tutorial/:path*',
       headers: [
         { key: 'X-Robots-Tag', value: 'noindex, nofollow, noarchive, noimageindex' },
         { key: 'Referrer-Policy', value: 'no-referrer' },

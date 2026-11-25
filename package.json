@@ -18,6 +18,8 @@
     "@xmldom/xmldom": "^0.9.12",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "docx-preview": "0.4.1",
+    "exceljs": "4.4.0",
     "fflate": "^0.8.3",
     "framer-motion": "^12.42.2",
     "html-to-text": "10.0.1",

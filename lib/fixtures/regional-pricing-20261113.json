@@ -1,0 +1,220 @@
+{
+  "spreadsheetUrl": "https://docs.google.com/spreadsheets/d/1kBjIQ498O3CDZ3d2GzyNS8zG6SJDJbM5A7kwonf6qQk/edit",
+  "sheet": "idr pricing v2",
+  "sheetId": 1759888008,
+  "verifiedDate": "2026-11-13",
+  "rateDate": "2026-11-13",
+  "rounding": "Up to next multiple of 10",
+  "rows": [
+    {
+      "row": 25,
+      "priceKey": "retatrutide-20mg",
+      "prices": {
+        "au": [
+          null,
+          150,
+          290
+        ],
+        "eu": [
+          null,
+          90,
+          180
+        ],
+        "us": [
+          null,
+          100,
+          200
+        ],
+        "uk": [
+          null,
+          80,
+          150
+        ],
+        "sg": [
+          null,
+          130,
+          250
+        ],
+        "my": [
+          null,
+          410,
+          790
+        ],
+        "id": [
+          null,
+          1799000,
+          3499000
+        ]
+      },
+      "product": "Retatrutide 20 mg"
+    },
+    {
+      "row": 26,
+      "priceKey": "retatrutide-60mg",
+      "prices": {
+        "au": [
+          null,
+          330,
+          410
+        ],
+        "eu": [
+          null,
+          200,
+          250
+        ],
+        "us": [
+          null,
+          220,
+          280
+        ],
+        "uk": [
+          null,
+          170,
+          210
+        ],
+        "sg": [
+          null,
+          290,
+          360
+        ],
+        "my": [
+          null,
+          900,
+          1120
+        ],
+        "id": [
+          null,
+          3999000,
+          4999000
+        ]
+      },
+      "product": "Retatrutide 60 mg"
+    },
+    {
+      "row": 27,
+      "priceKey": "mots-c-30mg",
+      "prices": {
+        "au": [
+          210,
+          200,
+          290
+        ],
+        "eu": [
+          130,
+          120,
+          180
+        ],
+        "us": [
+          150,
+          140,
+          200
+        ],
+        "uk": [
+          110,
+          100,
+          150
+        ],
+        "sg": [
+          190,
+          170,
+          260
+        ],
+        "my": [
+          580,
+          540,
+          810
+        ],
+        "id": [
+          2576000,
+          2376000,
+          3576000
+        ]
+      },
+      "product": "MOTS-c 30 mg"
+    },
+    {
+      "row": 28,
+      "priceKey": "mots-c-40mg",
+      "prices": {
+        "au": [
+          270,
+          260,
+          340
+        ],
+        "eu": [
+          170,
+          160,
+          210
+        ],
+        "us": [
+          180,
+          180,
+          230
+        ],
+        "uk": [
+          140,
+          140,
+          180
+        ],
+        "sg": [
+          240,
+          230,
+          300
+        ],
+        "my": [
+          740,
+          720,
+          940
+        ],
+        "id": [
+          3276000,
+          3176000,
+          4176000
+        ]
+      },
+      "product": "MOTS-c 40 mg"
+    },
+    {
+      "row": 29,
+      "priceKey": "bpc-157-tb-500",
+      "prices": {
+        "au": [
+          130,
+          130,
+          210
+        ],
+        "eu": [
+          80,
+          80,
+          130
+        ],
+        "us": [
+          90,
+          90,
+          140
+        ],
+        "uk": [
+          70,
+          70,
+          110
+        ],
+        "sg": [
+          110,
+          110,
+          180
+        ],
+        "my": [
+          350,
+          350,
+          570
+        ],
+        "id": [
+          1526850,
+          1526850,
+          2526850
+        ]
+      },
+      "product": "BPC-157 + TB-500 10 mg"
+    }
+  ]
+}

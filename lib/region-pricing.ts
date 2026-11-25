@@ -3,24 +3,36 @@ import type { Region, RegionId } from './regions'
 
 type ProductPriceTable = Readonly<Record<string, Readonly<Record<VariantId, number | null>>>>
 
-/** Normal prices from "regen pricing web.xlsx", tab "idr pricing v2" (10 October 2026).
+/** Website prices from "regen pricing web", tab "idr pricing v2" (19 October 2026).
  * Rows 6-24 cover 16 catalog products and 3 additional selectable strengths.
- * IDR uses J / S / AB, never the after-voucher or voucher-amount columns.
- * Other currencies use their normal-price columns directly, without conversion.
+ * IDR uses final after-voucher/discount values from I / R / AA directly.
+ * Do not subtract voucher amounts again or publish normal-price J / S / AB.
+ * Other currencies use the verified Sheet values directly, without runtime conversion.
+ * Rows 25-29: foreign prices refreshed 13 November 2026, rounded up to tens.
+ * Source: fixtures/regional-pricing-20261113.json. IDR prices are unchanged.
  * Blank prices stay null; sold-out and unavailable formats retain their statuses.
- * J9 is #VALUE! because I9 says "out of stock": GHK-Cu 50mg Basic stays unpriced.
- * The source snapshot and cell references are in fixtures/pricing-v2.json.
+ * I9 says "out of stock": GHK-Cu 50mg Basic stays unpriced.
+ * Source values and cell references: fixtures/pricing-v2-after-discount.json.
+ * BPC-157 + TB-500 10mg IDR prices supplied by the owner, sheet row 29, 12 November 2026.
+ * MOTS-C 30mg/40mg IDR additions from sheet rows 27/28, checked 12 November 2026.
+ * Retatrutide 20mg/60mg IDR additions supplied by the owner on 12 November 2026.
+ * Owner override, 26 October 2026: Retatrutide 10mg Cartridge IDR 1,099,000.
  */
 export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTable>> = {
   // AUD normal prices: Basic E, Cartridge N, Pen W.
   au: {
+    'retatrutide-20mg': { basic: null, cartridge: 150, pen: 290 },
+    'retatrutide-60mg': { basic: null, cartridge: 330, pen: 410 },
     'retatrutide': { basic: 170, cartridge: 230, pen: 310 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 130, cartridge: 180, pen: 270 }, // Row 14.
     'klow80': { basic: 180, cartridge: 240, pen: 320 }, // Row 13.
     'mots-c': { basic: 130, cartridge: 190, pen: 270 }, // Row 15.
+    'mots-c-30mg': { basic: 210, cartridge: 200, pen: 290 },
+    'mots-c-40mg': { basic: 270, cartridge: 260, pen: 340 },
     'nad-plus': { basic: 130, cartridge: 190, pen: 270 }, // Row 11.
     'tesamorelin': { basic: 150, cartridge: 210, pen: 290 }, // Row 7.
     'bpc-157': { basic: 130, cartridge: 190, pen: 270 }, // Row 18.
+    'bpc-157-tb-500': { basic: 130, cartridge: 130, pen: 210 },
     'ghk-cu': { basic: 130, cartridge: 180, pen: 260 }, // Row 10.
     'tesamorelin-20mg': { basic: 160, cartridge: 220, pen: 300 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 160, pen: 250 }, // Row 9.
@@ -28,7 +40,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 130, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 130, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 170, cartridge: 220, pen: 300 }, // Row 19.
-    'glutathione': { basic: 70, cartridge: 130, pen: 210 }, // Row 20.
+    'glutathione': { basic: 50, cartridge: 50, pen: 210 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 130, cartridge: 190, pen: 270 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 180, pen: 260 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 180, pen: 270 }, // Row 23.
@@ -36,13 +48,18 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // EUR normal prices: Basic C, Cartridge L, Pen U.
   eu: {
+    'retatrutide-20mg': { basic: null, cartridge: 90, pen: 180 },
+    'retatrutide-60mg': { basic: null, cartridge: 200, pen: 250 },
     'retatrutide': { basic: 100, cartridge: 140, pen: 190 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 80, cartridge: 110, pen: 160 }, // Row 14.
     'klow80': { basic: 110, cartridge: 150, pen: 200 }, // Row 13.
     'mots-c': { basic: 80, cartridge: 120, pen: 170 }, // Row 15.
+    'mots-c-30mg': { basic: 130, cartridge: 120, pen: 180 },
+    'mots-c-40mg': { basic: 170, cartridge: 160, pen: 210 },
     'nad-plus': { basic: 80, cartridge: 120, pen: 170 }, // Row 11.
     'tesamorelin': { basic: 90, cartridge: 130, pen: 180 }, // Row 7.
     'bpc-157': { basic: 80, cartridge: 120, pen: 170 }, // Row 18.
+    'bpc-157-tb-500': { basic: 80, cartridge: 80, pen: 130 },
     'ghk-cu': { basic: 80, cartridge: 110, pen: 160 }, // Row 10.
     'tesamorelin-20mg': { basic: 100, cartridge: 130, pen: 180 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 100, pen: 150 }, // Row 9.
@@ -50,7 +67,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 80, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 80, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 100, cartridge: 140, pen: 190 }, // Row 19.
-    'glutathione': { basic: 40, cartridge: 80, pen: 130 }, // Row 20.
+    'glutathione': { basic: 30, cartridge: 30, pen: 130 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 80, cartridge: 120, pen: 170 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 110, pen: 160 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 110, pen: 160 }, // Row 23.
@@ -58,13 +75,18 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // USD normal prices: Basic G, Cartridge P, Pen Y.
   us: {
+    'retatrutide-20mg': { basic: null, cartridge: 100, pen: 200 },
+    'retatrutide-60mg': { basic: null, cartridge: 220, pen: 280 },
     'retatrutide': { basic: 120, cartridge: 160, pen: 210 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 90, cartridge: 130, pen: 180 }, // Row 14.
     'klow80': { basic: 130, cartridge: 170, pen: 220 }, // Row 13.
     'mots-c': { basic: 90, cartridge: 130, pen: 190 }, // Row 15.
+    'mots-c-30mg': { basic: 150, cartridge: 140, pen: 200 },
+    'mots-c-40mg': { basic: 180, cartridge: 180, pen: 230 },
     'nad-plus': { basic: 90, cartridge: 130, pen: 190 }, // Row 11.
     'tesamorelin': { basic: 100, cartridge: 140, pen: 200 }, // Row 7.
     'bpc-157': { basic: 90, cartridge: 130, pen: 190 }, // Row 18.
+    'bpc-157-tb-500': { basic: 90, cartridge: 90, pen: 140 },
     'ghk-cu': { basic: 90, cartridge: 130, pen: 180 }, // Row 10.
     'tesamorelin-20mg': { basic: 110, cartridge: 150, pen: 210 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 110, pen: 170 }, // Row 9.
@@ -72,7 +94,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 90, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 90, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 120, cartridge: 160, pen: 210 }, // Row 19.
-    'glutathione': { basic: 50, cartridge: 90, pen: 150 }, // Row 20.
+    'glutathione': { basic: 40, cartridge: 40, pen: 150 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 90, cartridge: 130, pen: 190 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 120, pen: 180 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 130, pen: 180 }, // Row 23.
@@ -80,13 +102,18 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // GBP normal prices: Basic D, Cartridge M, Pen V.
   uk: {
+    'retatrutide-20mg': { basic: null, cartridge: 80, pen: 150 },
+    'retatrutide-60mg': { basic: null, cartridge: 170, pen: 210 },
     'retatrutide': { basic: 90, cartridge: 120, pen: 160 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 70, cartridge: 100, pen: 140 }, // Row 14.
     'klow80': { basic: 100, cartridge: 130, pen: 170 }, // Row 13.
     'mots-c': { basic: 70, cartridge: 100, pen: 140 }, // Row 15.
+    'mots-c-30mg': { basic: 110, cartridge: 100, pen: 150 },
+    'mots-c-40mg': { basic: 140, cartridge: 140, pen: 180 },
     'nad-plus': { basic: 70, cartridge: 100, pen: 140 }, // Row 11.
     'tesamorelin': { basic: 80, cartridge: 110, pen: 150 }, // Row 7.
     'bpc-157': { basic: 70, cartridge: 100, pen: 140 }, // Row 18.
+    'bpc-157-tb-500': { basic: 70, cartridge: 70, pen: 110 },
     'ghk-cu': { basic: 70, cartridge: 100, pen: 140 }, // Row 10.
     'tesamorelin-20mg': { basic: 80, cartridge: 110, pen: 160 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 90, pen: 130 }, // Row 9.
@@ -94,7 +121,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 70, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 70, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 90, cartridge: 120, pen: 160 }, // Row 19.
-    'glutathione': { basic: 40, cartridge: 70, pen: 110 }, // Row 20.
+    'glutathione': { basic: 30, cartridge: 30, pen: 110 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 70, cartridge: 100, pen: 140 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 90, pen: 140 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 100, pen: 140 }, // Row 23.
@@ -102,13 +129,18 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // SGD normal prices: Basic F, Cartridge O, Pen X.
   sg: {
+    'retatrutide-20mg': { basic: null, cartridge: 130, pen: 250 },
+    'retatrutide-60mg': { basic: null, cartridge: 290, pen: 360 },
     'retatrutide': { basic: 150, cartridge: 200, pen: 270 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 110, cartridge: 160, pen: 240 }, // Row 14.
     'klow80': { basic: 160, cartridge: 210, pen: 290 }, // Row 13.
     'mots-c': { basic: 120, cartridge: 170, pen: 240 }, // Row 15.
+    'mots-c-30mg': { basic: 190, cartridge: 170, pen: 260 },
+    'mots-c-40mg': { basic: 240, cartridge: 230, pen: 300 },
     'nad-plus': { basic: 120, cartridge: 170, pen: 240 }, // Row 11.
     'tesamorelin': { basic: 130, cartridge: 180, pen: 260 }, // Row 7.
     'bpc-157': { basic: 120, cartridge: 170, pen: 240 }, // Row 18.
+    'bpc-157-tb-500': { basic: 110, cartridge: 110, pen: 180 },
     'ghk-cu': { basic: 110, cartridge: 160, pen: 230 }, // Row 10.
     'tesamorelin-20mg': { basic: 140, cartridge: 190, pen: 260 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 150, pen: 220 }, // Row 9.
@@ -116,7 +148,7 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 120, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 120, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 150, cartridge: 200, pen: 270 }, // Row 19.
-    'glutathione': { basic: 60, cartridge: 110, pen: 190 }, // Row 20.
+    'glutathione': { basic: 40, cartridge: 40, pen: 190 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 120, cartridge: 170, pen: 240 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 160, pen: 230 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 160, pen: 240 }, // Row 23.
@@ -124,13 +156,18 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
   },
   // MYR normal prices: Basic H, Cartridge Q, Pen Z.
   my: {
+    'retatrutide-20mg': { basic: null, cartridge: 410, pen: 790 },
+    'retatrutide-60mg': { basic: null, cartridge: 900, pen: 1120 },
     'retatrutide': { basic: 480, cartridge: 640, pen: 870 }, // Row 6.
     'cjc-1295-ipamorelin': { basic: 370, cartridge: 530, pen: 750 }, // Row 14.
     'klow80': { basic: 530, cartridge: 690, pen: 910 }, // Row 13.
     'mots-c': { basic: 380, cartridge: 540, pen: 770 }, // Row 15.
+    'mots-c-30mg': { basic: 580, cartridge: 540, pen: 810 },
+    'mots-c-40mg': { basic: 740, cartridge: 720, pen: 940 },
     'nad-plus': { basic: 380, cartridge: 540, pen: 770 }, // Row 11.
     'tesamorelin': { basic: 430, cartridge: 590, pen: 820 }, // Row 7.
     'bpc-157': { basic: 380, cartridge: 540, pen: 770 }, // Row 18.
+    'bpc-157-tb-500': { basic: 350, cartridge: 350, pen: 570 },
     'ghk-cu': { basic: 360, cartridge: 520, pen: 750 }, // Row 10.
     'tesamorelin-20mg': { basic: 460, cartridge: 620, pen: 840 }, // Row 8.
     'ghk-cu-50mg': { basic: null, cartridge: 470, pen: 700 }, // Row 9.
@@ -138,33 +175,38 @@ export const REGIONAL_PRODUCT_PRICES: Readonly<Record<RegionId, ProductPriceTabl
     'semax': { basic: 380, cartridge: null, pen: null }, // Row 16.
     'selank': { basic: 380, cartridge: null, pen: null }, // Row 17.
     'hgh-191-aa-36iu': { basic: 480, cartridge: 640, pen: 870 }, // Row 19.
-    'glutathione': { basic: 210, cartridge: 370, pen: 590 }, // Row 20.
+    'glutathione': { basic: 130, cartridge: 130, pen: 590 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
     'tirzepatide': { basic: 380, cartridge: 540, pen: 770 }, // Row 21.
     'semaglutide': { basic: null, cartridge: 510, pen: 740 }, // Row 22.
     'cagrilintide': { basic: null, cartridge: 530, pen: 750 }, // Row 23.
     '5-amino-1mq': { basic: 320, cartridge: 480, pen: 710 }, // Row 24.
   },
-  // IDR normal prices: Basic J, Cartridge S, Pen AB.
+  // IDR after-discount prices: Basic I, Cartridge R, Pen AA.
   id: {
-    'retatrutide': { basic: 2_099_000, cartridge: 2_799_000, pen: 3_799_000 }, // Row 6.
-    'cjc-1295-ipamorelin': { basic: 1_598_000, cartridge: 2_298_000, pen: 3_298_000 }, // Row 14.
-    'klow80': { basic: 2_300_000, cartridge: 3_000_000, pen: 4_000_000 }, // Row 13.
-    'mots-c': { basic: 1_676_000, cartridge: 2_376_000, pen: 3_376_000 }, // Row 15.
-    'nad-plus': { basic: 1_662_000, cartridge: 2_362_000, pen: 3_362_000 }, // Row 11.
-    'tesamorelin': { basic: 1_872_000, cartridge: 2_572_000, pen: 3_572_000 }, // Row 7.
-    'bpc-157': { basic: 1_662_000, cartridge: 2_362_000, pen: 3_362_000 }, // Row 18.
-    'ghk-cu': { basic: 1_578_000, cartridge: 2_278_000, pen: 3_278_000 }, // Row 10.
-    'tesamorelin-20mg': { basic: 1_992_800, cartridge: 2_692_800, pen: 3_692_800 }, // Row 8.
-    'ghk-cu-50mg': { basic: null, cartridge: 2_051_000, pen: 3_051_000 }, // Row 9.
-    'nad-plus-1000mg': { basic: 1_830_000, cartridge: 2_530_000, pen: 3_530_000 }, // Row 12.
-    'semax': { basic: 1_662_000, cartridge: null, pen: null }, // Row 16.
-    'selank': { basic: 1_662_000, cartridge: null, pen: null }, // Row 17.
-    'hgh-191-aa-36iu': { basic: 2_090_000, cartridge: 2_790_000, pen: 3_790_000 }, // Row 19.
-    'glutathione': { basic: 900_000, cartridge: 1_600_000, pen: 2_600_000 }, // Row 20.
-    'tirzepatide': { basic: 1_662_000, cartridge: 2_362_000, pen: 3_362_000 }, // Row 21.
-    'semaglutide': { basic: null, cartridge: 2_230_400, pen: 3_230_400 }, // Row 22.
-    'cagrilintide': { basic: null, cartridge: 2_299_000, pen: 3_299_000 }, // Row 23.
-    '5-amino-1mq': { basic: 1_389_000, cartridge: 2_099_000, pen: 3_099_000 }, // Row 24.
+    'retatrutide-20mg': { basic: null, cartridge: 1_799_000, pen: 3_499_000 },
+    'retatrutide-60mg': { basic: null, cartridge: 3_999_000, pen: 4_999_000 },
+    'retatrutide': { basic: 1_599_000, cartridge: 1_099_000, pen: 2_799_000 }, // Row 6; Cartridge overridden by owner 26 Oct 2026.
+    'cjc-1295-ipamorelin': { basic: 1_098_000, cartridge: 1_298_000, pen: 2_298_000 }, // Row 14.
+    'klow80': { basic: 1_800_000, cartridge: 2_000_000, pen: 3_000_000 }, // Row 13.
+    'mots-c': { basic: 1_176_000, cartridge: 1_376_000, pen: 2_376_000 }, // Row 15.
+    'mots-c-30mg': { basic: 2_576_000, cartridge: 2_376_000, pen: 3_576_000 }, // Row 27.
+    'mots-c-40mg': { basic: 3_276_000, cartridge: 3_176_000, pen: 4_176_000 }, // Row 28.
+    'nad-plus': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 11.
+    'tesamorelin': { basic: 1_372_000, cartridge: 1_572_000, pen: 2_572_000 }, // Row 7.
+    'bpc-157': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 18.
+    'bpc-157-tb-500': { basic: 1_526_850, cartridge: 1_526_850, pen: 2_526_850 }, // Row 29.
+    'ghk-cu': { basic: 1_078_000, cartridge: 1_278_000, pen: 2_278_000 }, // Row 10.
+    'tesamorelin-20mg': { basic: 1_492_800, cartridge: 1_692_800, pen: 2_692_800 }, // Row 8.
+    'ghk-cu-50mg': { basic: null, cartridge: 1_051_000, pen: 2_051_000 }, // Row 9.
+    'nad-plus-1000mg': { basic: 1_330_000, cartridge: 1_530_000, pen: 2_530_000 }, // Row 12.
+    'semax': { basic: 1_162_000, cartridge: null, pen: null }, // Row 16.
+    'selank': { basic: 1_162_000, cartridge: null, pen: null }, // Row 17.
+    'hgh-191-aa-36iu': { basic: 1_590_000, cartridge: 1_790_000, pen: 2_790_000 }, // Row 19.
+    'glutathione': { basic: 550000, cartridge: 550000, pen: 1_650_000 }, // Basic/Cartridge: Sheet row 20, 18 Nov 2026.
+    'tirzepatide': { basic: 1_162_000, cartridge: 1_362_000, pen: 2_362_000 }, // Row 21.
+    'semaglutide': { basic: null, cartridge: 1_230_400, pen: 2_230_400 }, // Row 22.
+    'cagrilintide': { basic: null, cartridge: 1_299_000, pen: 2_299_000 }, // Row 23.
+    '5-amino-1mq': { basic: 889_000, cartridge: 1_099_000, pen: 2_099_000 }, // Row 24.
   },
 }
 
@@ -197,13 +239,15 @@ export function getRegionalPriceAmount(regionId: RegionId, productSlug: string, 
 
 export type RegionalPriceStatus = 'available' | 'out-of-stock' | 'unavailable' | 'inquiry'
 
-/** I9, J22 and J23 say "out of stock". Their foreign Basic cells are blank. */
+/** I9, I22 and I23 say "out of stock". Their foreign Basic cells are blank. */
 const OUT_OF_STOCK: Partial<Record<RegionId, Readonly<Record<string, readonly VariantId[]>>>> = {
   id: { 'ghk-cu-50mg': ['basic'], semaglutide: ['basic'], cagrilintide: ['basic'] },
 }
 
 /** L16:S17 and U16:AB17 are dashes, so these formats are not available. */
 const UNAVAILABLE_FORMATS: Readonly<Record<string, readonly VariantId[]>> = {
+  'retatrutide-20mg': ['basic'],
+  'retatrutide-60mg': ['basic'],
   semax: ['cartridge', 'pen'],
   selank: ['cartridge', 'pen'],
 }
@@ -227,7 +271,8 @@ export function isRegionalVariantSelectable(regionId: RegionId, productSlug: str
 /** Catalog and wheel use the first package with an actual published price. */
 export function getCatalogPriceVariant(regionId: RegionId, productSlug: string): VariantId {
   const variants: VariantId[] = ['basic', 'cartridge', 'pen']
-  return variants.find((variant) => getRegionalPriceStatus(regionId, productSlug, variant) === 'available')
+  return variants.filter((variant) => getRegionalPriceStatus(regionId, productSlug, variant) === 'available')
+    .sort((a,b) => getRegionalPriceAmount(regionId,productSlug,a)! - getRegionalPriceAmount(regionId,productSlug,b)!)[0]
     ?? variants.find((variant) => isRegionalVariantSelectable(regionId, productSlug, variant))
     ?? 'basic'
 }
@@ -236,7 +281,7 @@ export function formatRegionPrice(region: Region, productSlug: string, variant: 
   const amount = getRegionalPriceAmount(region.id, productSlug, variant)
   if (amount === null) return null
 
-  // Keep comma grouping for IDR (for example, IDR 2,099,000).
+  // Keep comma grouping for IDR (for example, IDR 1,599,000).
   // Other currencies retain their regional formatting.
   return new Intl.NumberFormat(region.currency === 'IDR' ? 'en-US' : region.locale, {
     style: 'currency',

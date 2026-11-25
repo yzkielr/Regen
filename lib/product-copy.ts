@@ -171,6 +171,21 @@ const translations: Record<'ms' | 'id', Record<string, LocalizedProductCopy>> = 
   },
 }
 
+const bpcBlendCopy: Record<Language, Pick<Product, 'tagline' | 'description'>> = {
+  en: {
+    tagline: 'BPC-157 and TB-500 combination.',
+    description: 'BPC-157 + TB-500 10mg combination, available in Basic, Cartridge, and Pen packages.',
+  },
+  id: {
+    tagline: 'Kombinasi BPC-157 dan TB-500.',
+    description: 'Varian kombinasi BPC-157 + TB-500 10mg, tersedia dalam paket Basic, Cartridge, dan Pen.',
+  },
+  ms: {
+    tagline: 'Gabungan BPC-157 dan TB-500.',
+    description: 'Varian gabungan BPC-157 + TB-500 10mg, tersedia dalam pakej Basic, Cartridge, dan Pen.',
+  },
+}
+
 export function getProductCopy(product: Product, language: Language, strengthId?: string): Product {
   const localized = language === 'en' ? product : {
     ...product,
@@ -191,6 +206,7 @@ export function getProductCopy(product: Product, language: Language, strengthId?
     ),
     // A different strength must not inherit the original cartridge's click reference.
     dosage: strength.id === defaultStrength.id ? localized.dosage : '',
+    ...(strength.priceKey === 'bpc-157-tb-500' ? bpcBlendCopy[language] : {}),
   }
 }
 
@@ -204,6 +220,7 @@ type CatalogCopy = {
   labelReference: string
   selectFormat: string
   selectStrength: string
+  selectProductVariant: string
   strengthPhotoNotice: string
   orderConsultation: string
   viewImage: string
@@ -232,6 +249,7 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     labelReference: 'Cartridge label reference (not usage guidance)',
     selectFormat: 'Choose your format',
     selectStrength: 'Choose strength (mg)',
+    selectProductVariant: 'Choose your variant',
     strengthPhotoNotice: 'Illustrative photo. The label shown may differ from the selected strength.',
     orderConsultation: 'Product & Pricing Inquiry',
     viewImage: 'View',
@@ -265,6 +283,7 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     labelReference: 'Info pada label cartridge (bukan panduan penggunaan)',
     selectFormat: 'Pilih format anda',
     selectStrength: 'Pilih kandungan (mg)',
+    selectProductVariant: 'Pilih varian anda',
     strengthPhotoNotice: 'Gambar ilustrasi. Label pada gambar mungkin berbeza daripada kandungan yang dipilih.',
     orderConsultation: 'Tanya Produk & Harga',
     viewImage: 'Lihat',
@@ -298,6 +317,7 @@ export const catalogCopy: Record<Language, CatalogCopy> = {
     labelReference: 'Info pada label cartridge (bukan petunjuk penggunaan)',
     selectFormat: 'Pilih format yang kamu butuhkan',
     selectStrength: 'Pilih ukuran (mg)',
+    selectProductVariant: 'Pilih varian',
     strengthPhotoNotice: 'Foto ilustrasi. Label pada gambar bisa berbeda dari ukuran yang dipilih.',
     orderConsultation: 'Tanya Produk & Harga',
     viewImage: 'Lihat',

@@ -1,3 +1,7 @@
+import { captureOrderAlerts } from './order-alerts';
+import {catalogPrice,invoiceLinePricing} from './invoice-pricing';
+import type {KnowledgeSync} from './knowledge-sync';
+import type {WebsiteKnowledgeImport} from './website-knowledge';
 import type {PricingKnowledgeImport} from './pricing-knowledge';
 import { productTestReply } from './product-tests';
 import { matchCannedReply } from './canned-replies';
@@ -11,7 +15,7 @@ export const collections = ['contacts','knowledge','replies','guardrails','autom
 export type Collection = typeof collections[number];
 export type Settings = { businessName: string; phone: string; email: string; address: string; timezone: string; serviceHours: string; botName: string; botPrompt: string; botEnabled: boolean; confidence: number; fallback: string; greeting: string; invoicePrefix: string; taxPercent: number; currency: string };
 export type Log = { id: string; at: number; area: string; message: string; level: 'info' | 'warning' | 'error' };
-export type Operations = { pricingKnowledgeImport?: PricingKnowledgeImport; cannedMinimumRevision?: number; businessPhoneRevision?: number; records: Record<Collection, Entry[]>; settings: Settings; logs: Log[]; processed: string[]; service?:ServiceState; movements: { id: string; productId: string; quantity: number; reason: string; at: number }[] };
+export type Operations = { knowledgeSync?:KnowledgeSync; botInstructionsUpdatedAt?:number; glutathioneCoaImportedAt?:number; websiteKnowledgeImport?:WebsiteKnowledgeImport; pricingKnowledgeImport?: PricingKnowledgeImport; cannedMinimumRevision?: number; businessPhoneRevision?: number; records: Record<Collection, Entry[]>; settings: Settings; logs: Log[]; processed: string[]; service?:ServiceState; movements: { id: string; productId: string; quantity: number; reason: string; at: number }[] };
 export type OpsEnvelope = { state: Operations; version: number };
 export type OpsAction = { type: 'save' | 'delete' | 'settings' | 'stock' | 'order_status' | 'automation' | 'seed' | 'restore' | 'test_event' | 'import_rows' | 'service' | 'knowledge_import' | 'knowledge_source'; requestId: string; collection?: Collection; id?: string; data?: Record<string, unknown>; quantity?: number; expectedStock?: number; reason?: string; status?: string; backup?: unknown; rows?: Record<string,unknown>[] };
 const idPattern = /^[a-zA-Z0-9_-]{1,80}$/;
@@ -25,7 +29,7 @@ export const money = (n: number) => new Intl.NumberFormat('id-ID', { style:'curr
 export function numeric(value: unknown, name: string, min = 0, max = 1e12): number { const n = Number(value ?? 0); if (!Number.isFinite(n) || n < min || n > max) throw new Error(`${name} harus antara ${min} dan ${max}.`); return n; }
 function text(v: unknown, limit = 4000): string { if (typeof v !== 'string' || v.length > limit) throw new Error(`Teks tidak valid (maksimal ${limit} karakter).`); return v.trim(); }
 function rowBy(s: Operations, c: Collection, id: unknown): Entry { const r=s.records[c].find(r=>r.id===id); if(!r) throw new Error(`Data ${c} tidak ditemukan.`); return r; }
-export type Line = { productId: string; name: string; quantity: number; price: number };
+export type Line = { productId: string; name: string; quantity: number; price: number; pricingVariant?:string; pricingPackage?:string };
 export function orderLines(row: Entry): Line[] { return JSON.parse(String(row.items || '[]')); }
 export function orderTotal(row: Entry): number { const subtotal=orderLines(row).reduce((n,i)=>n+i.price*i.quantity,0); return Math.round((subtotal-Number(row.discount||0))*(1+Number(row.taxPercent||0)/100)+Number(row.shipping||0)); }
 export function checkEntry(s: Operations, c: Collection, input: Record<string, unknown>, id: string, now: number): Entry {
@@ -49,7 +53,7 @@ export function checkEntry(s: Operations, c: Collection, input: Record<string, u
   if(c==='contacts' && r.phone && s.records.contacts.some(a=>a.id!==id && a.phone===r.phone)) throw new Error('Nomor pelanggan sudah terdaftar.');
   if(c==='products') {
     if(s.records.products.some(a=>a.id!==id && String(a.sku).toLowerCase()===String(r.sku).toLowerCase())) throw new Error('SKU sudah digunakan.');
-    r.price=numeric(r.price,'Harga'); r.minimum=numeric(r.minimum,'Stok minimum',0,1000000);
+    const currentPrice=catalogPrice(r);r.pricingNeedsReview=currentPrice===null;r.price=currentPrice==null?numeric(r.price,'Harga'):currentPrice; r.minimum=numeric(r.minimum,'Stok minimum',0,1000000);
     r.stock=previous?previous.stock:numeric(r.stock,'Stok awal',0,1000000);
     if(!Number.isInteger(r.stock)||!Number.isInteger(r.minimum)) throw new Error('Stok harus bilangan bulat.');
   }
@@ -60,7 +64,15 @@ export function checkEntry(s: Operations, c: Collection, input: Record<string, u
     let raw: unknown; try{raw=JSON.parse(String(r.items));}catch{throw new Error('Daftar item tidak valid.');}
     if(!Array.isArray(raw)||!raw.length||raw.length>50) throw new Error('Pesanan memerlukan 1–50 item.');
     const used=new Set<string>();
-    const lines: Line[]=raw.map(i=>{ const product=rowBy(s,'products',i.productId); if(used.has(product.id)) throw new Error('Gabungkan jumlah untuk produk yang sama.'); used.add(product.id); const quantity=numeric(i.quantity,'Jumlah',1,1000000); if(!Number.isInteger(quantity)) throw new Error('Jumlah harus bulat.'); return {productId:product.id,name:String(product.name),quantity,price:numeric(i.price,'Harga')}; });
+    const lines: Line[]=raw.map(i=>{
+      const product=rowBy(s,'products',i.productId);if(used.has(product.id))throw new Error('Gabungkan jumlah untuk produk yang sama.');used.add(product.id);
+      const quantity=numeric(i.quantity,'Jumlah',1,1000000);if(!Number.isInteger(quantity))throw new Error('Jumlah harus bulat.');
+      const old=previous&&orderLines(previous).find(l=>l.productId===product.id);
+      // Keep a saved draft's price unless its package is explicitly changed.
+      if(old&&(i.pricingVariant||'')===(old.pricingVariant||'')&&(i.pricingPackage||'')===(old.pricingPackage||''))return {...old,quantity,price:numeric(i.price,'Harga')};
+      const priced=invoiceLinePricing(product,i.price,{pricingVariant:i.pricingVariant,pricingPackage:i.pricingPackage});
+      return {productId:product.id,quantity,...priced,price:numeric(priced.price,'Harga')};
+    });
     r.items=JSON.stringify(lines); r.shipping=numeric(r.shipping,'Ongkir'); r.taxPercent=numeric(r.taxPercent,'Pajak',0,100); r.discount=numeric(r.discount,'Diskon',0,lines.reduce((n,i)=>n+i.price*i.quantity,0)); r.status='draft';
     r.number=previous?.number??`${s.settings.invoicePrefix}-${new Date(now).toISOString().slice(0,10).replaceAll('-','')}-${id.slice(-6).toUpperCase()}`;
     if(!previous){const base=String(r.number);let suffix=1;while(s.records.orders.some(order=>order.number===r.number))r.number=`${base}-${++suffix}`;}
@@ -92,6 +104,7 @@ export function applyOps(original:Operations,a:OpsAction,now=Date.now(),context:
   } else if(a.type==='knowledge_source'){changeKnowledgeSource(s,a.data??{},now);log(s,a,now,'knowledge',`Sumber knowledge: ${String(a.data?.command)}`);
   } else if(a.type==='service') {
     applyService(s,a.data as {kind:string},a.requestId,now,context);
+    if(['waha_message','incoming','whatsapp_cs_event','whatsapp_test_event','whatsapp_message'].includes(String(a.data?.kind)))captureOrderAlerts(original,s,now);
   } else if(a.type==='save') {
     if(!a.collection||!collections.includes(a.collection)) throw new Error('Modul tidak valid.');
     if(s.records[a.collection].length>=1000&&!s.records[a.collection].some(r=>r.id===a.id)) throw new Error('Batas 1.000 data per modul. Ekspor dan arsipkan data lama.');

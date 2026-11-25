@@ -21,10 +21,10 @@ export function Logo({
     <span className={cn('inline-flex flex-col leading-none', className)}>
       <span className="relative inline-flex w-fit items-center">
         <Image
-          src="/brand/regen-logo-green.png"
+          src="/brand/regen-logo-green-small.webp"
           alt="Regen"
-          width={1916}
-          height={821}
+          width={84}
+          height={36}
           loading="eager"
           className={cn(
             'h-9 w-auto object-contain',
@@ -33,11 +33,11 @@ export function Logo({
         />
         {variant === 'light' && (
           <Image
-            src="/brand/regen-logo-green.png"
+            src="/brand/regen-logo-green-small.webp"
             alt=""
             aria-hidden="true"
-            width={1916}
-            height={821}
+            width={84}
+            height={36}
             loading="eager"
             className="pointer-events-none absolute inset-0 h-9 w-auto object-contain [clip-path:circle(1.85%_at_55.9%_59.62%)]"
           />
