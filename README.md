@@ -312,6 +312,13 @@ directly or request a review. They can also manage authors and categories. Super
 owners can additionally change the default language and target word count.
 Public pages under `/articles`, `/articles/ms`, and `/articles/id` read the last published version.
 
+When laying out an article, group related sentences into one paragraph block, usually two to
+four sentences. Start a new paragraph when the idea changes. Use a subheading for a distinct
+topic or FAQ question. When copying supplied text, preserve its wording and order while
+grouping short paragraphs for readability. Preview the result on desktop and mobile. The
+[CJC-1295 article](https://www.regenlongevitylab.com/articles/id/cjc-1295-no-dac-ipamorelin-apa-kata-riset-tentang-otot)
+is the reference for paragraph flow and spacing.
+
 The website server uses `REGEN_ARTICLES_DATABASE_URL` when supplied, otherwise the existing
 `WORKFLOW_POSTGRES_URL`. Use a development PostgreSQL database and development admin login
 for local editing. The first authenticated workspace request creates `regen_articles` and
