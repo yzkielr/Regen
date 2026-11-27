@@ -69,6 +69,38 @@ export function reportedPurchase(message: ServiceMessage, previous?: ServiceMess
   return null;
 }
 
+const incomplete = /\b(?:gagal|failed|failure|unsuccessful|pending|menunggu|diproses|processing|dibatalkan|cancelled|canceled|ditolak|rejected|scheduled|terjadwal|belum berhasil|belum sukses|not successful|not completed)\b/;
+const example = /\b(?:contoh|sample|example|simulasi|simulation|template|tutorial|demo|dummy|palsu|fake)\b/;
+const transaction = /\b(?:transfer|transaksi|pembayaran|transaction|payment|receipt|remittance)\b/;
+const success = /\b(?:(?:transfer|transaksi|pembayaran|transaction|payment)(?: status)?(?: telah| sudah| is| was| has been)? (?:berhasil|sukses|selesai|successful|success|completed|complete|sent|paid)|(?:successful|completed) (?:transfer|transaction|payment)|status (?:berhasil|sukses|selesai|successful|success|completed|complete|paid))\b/;
+const recipient = /\b(?:penerima|kepada|tujuan|ke rekening|rekening tujuan|nama tujuan|beneficiary|recipient|destination|to account|sent to|transferred to|paid to)\b/;
+const reference = /\b(?:referensi|reference|ref|nomor transaksi|no transaksi|transaction id|transaction number|tanggal|date)\b/;
+const dateOrTime = /\b(?:\d{1,2}[:.]\d{2}(?::\d{2})?|\d{1,4}[/-]\d{1,2}[/-]\d{1,4}|\d{1,2}\s+(?:jan|feb|mar|apr|mei|may|jun|jul|agu|aug|sep|okt|oct|nov|des|dec)[a-z]*\s+\d{2,4})\b/i;
+const amount = /(?:(?:\b(?:Rp\.?|IDR|USD|SGD|MYR|AUD|EUR|GBP|RM|THB)\s*|(?:S\$|US\$|A\$|\$|€|£|฿)\s*)\d[\d.,]*|\b\d[\d.,]*\s*(?:IDR|USD|SGD|MYR|AUD|EUR|GBP|THB)\b)/gi;
+
+// A receipt screenshot is a customer report only. Read the OCR field rather
+// than the AI description, caption, filename, or a product/photo classification.
+// Never infer money received from these pixels or change an invoice to paid.
+export function reportedPaymentImage(message: ServiceMessage): {amount: string} | null {
+  const attachment = message.attachment;
+  const reading = attachment?.analysis;
+  if (message.role !== 'customer' || message.status !== 'received' || attachment?.kind !== 'image' ||
+      attachment.status !== 'ready' || !attachment.fileId || !/^image\/(?:jpeg|png|webp)$/.test(attachment.mime) ||
+      attachment.error || reading?.status !== 'ready' || reading.error || typeof reading.text !== 'string' ||
+      !reading.text.trim() || reading.text.length > 6000) return null;
+  const ocr = reading.text;
+  const text = normalize(ocr);
+  const caption = normalize(message.text || '');
+  if (incomplete.test(text) || incomplete.test(caption) || example.test(text) || example.test(caption)) return null;
+  if (!transaction.test(text) || !success.test(text) || !(recipient.test(text) || /(?:^|\n)\s*to\s*[:\n]/i.test(ocr)) ||
+      !(reference.test(text) || dateOrTime.test(ocr))) return null;
+  const values = [...ocr.matchAll(amount)].filter(m => /[1-9]/.test(m[0]));
+  if (!values.length) return null;
+  // Prefer the labelled transfer amount over fees or balances elsewhere on a receipt.
+  const nominal = values.find(m => /\b(?:nominal|jumlah(?: transfer)?|total(?: transfer)?|amount(?: sent)?)\s*:?\s*$/i.test(ocr.slice(Math.max(0, m.index! - 40), m.index))) || values[0];
+  return {amount: nominal[0].trim().slice(0, 60)};
+}
+
 const paidStatuses = new Set(['paid', 'ready_for_packing', 'shipped', 'completed']);
 const orderStatuses = new Set(['confirmed', 'awaiting_payment', ...paidStatuses]);
 const timestamp = (value: unknown) => typeof value === 'number' && Number.isFinite(value) ? value : 0;
@@ -94,9 +126,11 @@ export function purchasedCustomers(state?: Operations): PurchasedCustomer[] {
     if (!previous || chat.updatedAt > previous.updatedAt) chats.set(chat.contactId, chat);
     let previousMessage: ServiceMessage | undefined;
     for (const message of chat.messages) {
-      const status = reportedPurchase(message, previousMessage);
+      const imageReport = reportedPaymentImage(message);
+      const status = imageReport ? 'payment_reported' : reportedPurchase(message, previousMessage);
       if (message.role !== 'note' && !['draft', 'cancelled'].includes(message.status)) previousMessage = message;
-      if (status) add(chat.contactId, {status, at: message.at, text: message.text.slice(0, 320), chat: chat.id});
+      if (status) add(chat.contactId, {status, at: message.at,
+        text: imageReport ? `Foto bukti transfer · ${imageReport.amount}. Perlu verifikasi admin.` : message.text.slice(0, 320), chat: chat.id});
     }
   }
   const matchedPayments = new Map<string, number>();

@@ -3,7 +3,9 @@ import type { ResearchEvidence } from './research-sources';
 export type ChatMode = 'bot' | 'off' | 'human';
 export type MessageStatus = 'received' | 'draft' | 'queued' | 'simulated' | 'sent' | 'delivered' | 'read' | 'failed' | 'cancelled' | 'unknown';
 export type ChatImage={fileId?:string;mediaId?:string;mime?:string;sourceId?:string;analysis?:string;error?:string};
-export type ChatAttachment={fileId?:string;kind:'image'|'video'|'audio'|'document';mime:string;name:string;size?:number;status:'pending'|'ready'|'unavailable';error?:string};
+// Observation supplied by the existing WAHA media reader, not a payment verification.
+export type ChatMediaReading={status:'ready'|'failed';description?:string;text?:string;products?:string[];audioText?:string;audioStatus?:'transcribed'|'none'|'unavailable';duration?:number;frames?:number;error?:string};
+export type ChatAttachment={analysis?:ChatMediaReading;fileId?:string;kind:'image'|'video'|'audio'|'document';mime:string;name:string;size?:number;status:'pending'|'ready'|'unavailable';error?:string};
 export type ServiceMessage = { attachment?:ChatAttachment; image?:ChatImage; id:string; at:number; role:'customer'|'bot'|'admin'|'owner'|'note'; authorName?:string; ownerTicketId?:string; text:string; status:MessageStatus; providerId?:string; source?:string; confidence?:number; corrects?:string; replyTo?:string; purpose?:'handoff'|'handoff_offer'|'invoice'|'owner_reply'|'testimonial'; research?:ResearchEvidence };
 export type OrderAlert = {messageId:string;at:number;text:string;readAt?:number;readBy?:string};
 export type Conversation = { orderAlert?:OrderAlert; ownerRevision?:number; replyLocale?:ReplyLocale; id:string; contactId:string; test:boolean; transport?:'meta-test'|'meta-cs'|'waha'; lastInboundAt?:number; mode:ChatMode; epoch:number; assignee:string; needsAttention:boolean; reason:string; createdAt:number; updatedAt:number; messages:ServiceMessage[]; pendingHandoff?:{questionId:string;offerId:string;at:number;reason:string}; orderSuggestion?:{questionId:string;draftOrderId?:string;items:{productId:string;quantity:number}[]} };

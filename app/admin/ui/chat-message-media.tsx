@@ -13,7 +13,13 @@ export function ChatMessageMedia({message:m,conversationId}:{message:ServiceMess
  if(!fileId&&!m.image?.mediaId)return <p>Lampiran belum tersedia. Buka dari WhatsApp.</p>;
  const url=fileId?`/admin/api/files?id=${encodeURIComponent(fileId)}&inline=1`:`/admin/api/files?conversation=${encodeURIComponent(conversationId)}&message=${encodeURIComponent(m.id)}`;
  const download=fileId?`/admin/api/files?id=${encodeURIComponent(fileId)}`:url;
- return <MediaPreview key={url} url={url} download={download} name={a?.name||'Foto WhatsApp'} kind={a?.kind||'image'} size={a?.size}/>;
+ return <><MediaPreview key={url} url={url} download={download} name={a?.name||'Foto WhatsApp'} kind={a?.kind||'image'} size={a?.size}/>
+  {a?.analysis?.status==='ready'&&<details className="svc-image-reading"><summary>Hasil pembacaan foto/video</summary>
+   {a.analysis.description&&<p>{a.analysis.description}</p>}
+   {a.analysis.text&&<p style={{whiteSpace:'pre-wrap'}}>{a.analysis.text}</p>}
+   <small>Hasil pembacaan gambar, bukan verifikasi pembayaran.</small>
+  </details>}
+ </>;
 }
 
 function MediaPreview({url,download,name,kind,size}:{url:string;download:string;name:string;kind:string;size?:number}){
