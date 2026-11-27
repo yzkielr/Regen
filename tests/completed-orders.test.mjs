@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {reportedPurchase, purchasedCustomers} from '../app/admin/lib/completed-orders.ts';
+import {reportedPurchase, purchasedCustomers, completedOrderLeads} from '../app/admin/lib/completed-orders.ts';
 
 const message = (text, extra = {}) => ({id: 'm', text, role: 'customer', status: 'received', at: 100, ...extra});
 const chat = (id = 'c', extra = {}) => ({id, contactId: 'buyer', test: false, updatedAt: 100, messages: [], ...extra});
@@ -90,4 +90,89 @@ test('multiple chats for one buyer produce one entry; newest evidence sorts firs
   assert.equal(rows.length, 2);
   assert.equal(rows[0].contactId, 'other');
   assert.equal(rows[1].conversationId, 'new');
+});
+
+test('recognizes checkout variations, abbreviations, reversed wording and English', () => {
+  for (const text of [
+    'saya sudah checkout', 'barusan checkout kak', 'udh CO', 'sdh cek out',
+    'udah check-out di website', 'aku baru aja beli', 'tadi saya pesan',
+    'saya beli tadi pagi', 'pesanan saya sudah dibuat', 'orderan saya berhasil',
+    'checkout berhasil', 'checkoutnya sudah kak', 'check out selesai',
+    "I've checked out", 'I just placed an order', 'I have completed my checkout',
+    'my order is confirmed', 'sudah checkout tapi belum bayar', 'belum bayar tapi sudah checkout',
+    'sudah checkout, pembayaran masih pending',
+  ]) assert.equal(reportedPurchase(message(text)), 'order_reported', text);
+  for (const text of [
+    'uda trf kak', 'baru saja saya transfer', 'pembayarannya sudah selesai',
+    'transfer sudah berhasil', 'invoice saya sudah lunas', 'done payment kak',
+    'payment completed', 'I just made the payment', 'proof of payment attached',
+  ]) assert.equal(reportedPurchase(message(text)), 'payment_reported', text);
+});
+
+test('checkout detection excludes future, negated, failed, conditional and quoted claims', () => {
+  for (const text of [
+    'belum checkout', 'blm co', 'mau checkout', 'besok saya checkout',
+    'nanti saya sudah checkout saya kabari', 'saya belum selesai checkout',
+    'checkout saya belum berhasil', 'checkout gagal', 'checkout pending',
+    'saya sudah checkout tapi gagal', 'kalau sudah checkout apa berikutnya',
+    'apakah checkout sudah berhasil', 'sudah checkout?', 'sudah order belum',
+    'I have not checked out', "I haven't checked out", 'I want to checkout',
+    'if I have checked out', '> saya sudah checkout', 'katanya sudah checkout',
+    'saya mau bayar nanti', 'belum trf', 'payment not completed',
+  ]) assert.equal(reportedPurchase(message(text)), null, text);
+});
+
+test('short completion replies require an immediate explicit checkout/payment prompt', () => {
+  const prompt = (text, extra = {}) => message(text, {role: 'admin', status: 'sent', at: 50, ...extra});
+  assert.equal(reportedPurchase(message('sudah kak'), prompt('Sudah checkout kak?')), 'order_reported');
+  assert.equal(reportedPurchase(message('done'), prompt('Please complete your checkout.')), 'order_reported');
+  assert.equal(reportedPurchase(message('sudah'), prompt('Sudah transfer?')), 'payment_reported');
+  for (const prior of [undefined, prompt('Mau order lagi kak?'), prompt('Sudah baca panduannya?'), prompt('Any questions about payment or checkout?'), prompt('Jika sudah checkout, beri tahu kami'), prompt('Sudah checkout?', {role: 'customer'}), prompt('Sudah checkout?', {status: 'failed'}), prompt('Sudah checkout?', {at: -7200001})]) {
+    assert.equal(reportedPurchase(message('sudah'), prior), null, prior?.text);
+  }
+  assert.equal(reportedPurchase(message('sudah?'), prompt('Sudah checkout?')), null);
+  const s = state(); s.service.conversations.push(chat('c', {messages: [prompt('Sudah checkout?'), message('sudah')]}));
+  assert.equal(purchasedCustomers(s)[0].status, 'order_reported');
+  s.service.conversations[0].messages.splice(1, 0, message('paketnya beda apa?', {at: 60}));
+  assert.deepEqual(purchasedCustomers(s), []);
+});
+
+const lead = (at = 100, messageId = 'want-order') => ({at, messageId, text: 'saya mau order'});
+
+test('a completed checkout moves the earlier lead and preserves mode, history and payment status', () => {
+  const s = state();
+  s.records.orders.push(order({createdAt: 150, updatedAt: 150}));
+  s.service.conversations.push(chat('c', {mode: 'human', orderAlert: lead(), messages: [message('saya sudah checkout', {id: 'checkout', at: 200})]}));
+  const before = structuredClone(s);
+  const customers = purchasedCustomers(s);
+  assert.equal(customers[0].status, 'order_reported');
+  assert.deepEqual(completedOrderLeads(s, customers), [{conversationId: 'c', messageId: 'want-order'}]);
+  assert.deepEqual(s, before);
+});
+
+test('issued invoices retire old leads even without an explicit checkout message', () => {
+  const s = state(); s.records.orders.push(order());
+  s.service.conversations.push(chat('c', {orderAlert: lead()}));
+  assert.deepEqual(completedOrderLeads(s, purchasedCustomers(s)), [{conversationId: 'c', messageId: 'want-order'}]);
+});
+
+test('a returning buyer can create a new lead after the previous purchase', () => {
+  const s = state();
+  s.service.conversations.push(chat('c', {orderAlert: lead(200, 'new-order'), messages: [message('sudah checkout', {at: 100}), message('mau beli lagi', {at: 200})]}));
+  assert.equal(purchasedCustomers(s).length, 1);
+  assert.deepEqual(completedOrderLeads(s, purchasedCustomers(s)), []);
+  s.service.conversations[0].messages.push(message('barusan checkout', {at: 300}));
+  assert.deepEqual(completedOrderLeads(s, purchasedCustomers(s)), [{conversationId: 'c', messageId: 'new-order'}]);
+  // A newer alert arriving during the previous acknowledgement stays pending.
+  s.service.conversations[0].orderAlert = lead(400, 'another-order');
+  assert.deepEqual(completedOrderLeads(s, purchasedCustomers(s)), []);
+});
+
+test('completion leaves other customers, read leads, and test chats untouched', () => {
+  const s = state();
+  s.records.orders.push(order());
+  s.records.contacts.push({id: 'other', name: 'Other'});
+  s.service.conversations.push(chat('other', {contactId: 'other', orderAlert: lead()}), chat('read', {orderAlert: {...lead(), readAt: 150}}), chat('test', {test: true, orderAlert: lead()}), chat('no-alert'));
+  assert.deepEqual(completedOrderLeads(s, purchasedCustomers(s)), []);
+  assert.deepEqual(completedOrderLeads(undefined, []), []);
 });

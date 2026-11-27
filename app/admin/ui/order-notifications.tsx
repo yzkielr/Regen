@@ -1,10 +1,12 @@
 'use client';
-import {createContext, useCallback, useContext, useEffect, useRef, useState} from 'react';
+import {createContext, useCallback, useContext, useEffect, useMemo, useRef, useState} from 'react';
 import type {ReactNode} from 'react';
 import {ShoppingCart, X} from 'lucide-react';
 import type {Operations, OpsAction} from '../lib/operations';
 import type {Conversation} from '../lib/service-types';
 import {hasUnreadOrder} from '../lib/order-alerts';
+import {completedOrderLeads, purchasedCustomers} from '../lib/completed-orders';
+import type {PurchasedCustomer} from '../lib/completed-orders';
 import './order-notifications.css';
 
 type Read = {conversationId: string; messageId: string};
@@ -12,6 +14,7 @@ type Alert = Read & {name: string; text: string; at: number};
 const keyOf = (value: Read) => `${value.conversationId}:${value.messageId}`;
 const Context = createContext({
   alerts: [] as Alert[],
+  customers: [] as PurchasedCustomer[],
   requestedChat: null as {id: string; token: number} | null,
   openChat: (_id: string) => {},
   viewChat: (_id: string | null) => {},
@@ -24,6 +27,9 @@ export function OrderNotificationProvider({state, act, busy, navigate, children}
   state?: Operations; busy: boolean; children: ReactNode; navigate: () => void;
   act: (action: Omit<OpsAction, 'requestId'>) => Promise<boolean>;
 }) {
+  const customers = useMemo(() => purchasedCustomers(state), [state]);
+  const completedLeads = useMemo(() => completedOrderLeads(state, customers), [state, customers]);
+  const completedKeys = useMemo(() => new Set(completedLeads.map(keyOf)), [completedLeads]);
   const [pending, setPending] = useState<Record<string, Read>>({});
   const [viewedId, setViewedId] = useState<string | null>(null);
   const [requestedChat, setRequestedChat] = useState<{id: string; token: number} | null>(null);
@@ -37,7 +43,9 @@ export function OrderNotificationProvider({state, act, busy, navigate, children}
     setPending(old => old[keyOf(alert)] ? old : {...old, [keyOf(alert)]: alert});
   }, []);
   const viewChat = useCallback((id: string | null) => setViewedId(id), []);
-  const isUnread = (chat: Conversation) => hasUnreadOrder(chat) && !pending[keyOf({conversationId: chat.id, messageId: chat.orderAlert!.messageId})];
+  const isUnread = (chat: Conversation) => hasUnreadOrder(chat) &&
+    !completedKeys.has(keyOf({conversationId: chat.id, messageId: chat.orderAlert!.messageId})) &&
+    !pending[keyOf({conversationId: chat.id, messageId: chat.orderAlert!.messageId})];
   const alerts: Alert[] = (state?.service?.conversations || []).filter(isUnread).map(c => ({
     conversationId: c.id, messageId: c.orderAlert!.messageId, text: c.orderAlert!.text, at: c.orderAlert!.at,
     name: String(state?.records.contacts.find(v => v.id === c.contactId)?.name || 'Pelanggan'),
@@ -50,6 +58,13 @@ export function OrderNotificationProvider({state, act, busy, navigate, children}
   };
   // Reading is persisted on the server. A stale acknowledgement only clears its
   // own message ID, so an order arriving during the request remains unread.
+  useEffect(() => {
+    if (!completedLeads.length) return;
+    setPending(old => {
+      const additions = completedLeads.filter(alert => !old[keyOf(alert)]);
+      return additions.length ? {...old, ...Object.fromEntries(additions.map(alert => [keyOf(alert), alert]))} : old;
+    });
+  }, [completedLeads]);
   useEffect(() => {
     const flush = async () => {
       const current = latest.current;
@@ -83,7 +98,7 @@ export function OrderNotificationProvider({state, act, busy, navigate, children}
     const timer = setTimeout(() => setPopup(null), 8000);
     return () => clearTimeout(timer);
   }, [popup]);
-  return <Context.Provider value={{alerts, requestedChat, openChat, viewChat, dismiss, isUnread}}>
+  return <Context.Provider value={{alerts, customers, requestedChat, openChat, viewChat, dismiss, isUnread}}>
     {children}
     {popup && alerts.some(a => keyOf(a) === keyOf(popup)) && <aside className="order-popup" role="status" aria-live="polite">
       <ShoppingCart size={23}/>
@@ -112,8 +127,8 @@ export function OrderNotificationBell() {
     </button>
     {open && <section id="order-notification-list" className="order-notification-list" aria-label="Calon order baru">
       <header><strong>Calon order baru</strong><span>{alerts.length}</span></header>
-      <p className="order-notification-hint">Notifikasi hilang setelah chat dibuka.</p>
-      {!alerts.length && <p className="order-notification-empty">Semua notifikasi sudah dibaca.</p>}
+      <p className="order-notification-hint">Notifikasi hilang setelah chat dibuka atau pembelian terdeteksi.</p>
+      {!alerts.length && <p className="order-notification-empty">Tidak ada calon order baru.</p>}
       {alerts.map(a => <div className="order-notification-item" key={keyOf(a)}>
         <button type="button" onClick={() => {setOpen(false); openChat(a.conversationId);}}><strong>{a.name}</strong><span>{a.text}</span><small>Buka chat →</small></button>
         <button type="button" className="order-dismiss" aria-label={`Bukan order: ${a.name}`} title="Bukan order" onClick={() => dismiss(a)}><X size={16}/></button>

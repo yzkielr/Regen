@@ -1,15 +1,14 @@
 'use client';
-import {useEffect, useMemo, useRef, useState} from 'react';
+import {useEffect, useRef, useState} from 'react';
 import {ShoppingBag, Search, ArrowUpRight, CheckCheck} from 'lucide-react';
 import type {Operations} from '../lib/operations';
-import {purchasedCustomers, purchaseLabels} from '../lib/completed-orders';
+import {purchaseLabels} from '../lib/completed-orders';
 import {useOrderNotifications} from './order-notifications';
 import './completed-orders.css';
 
 const date = (at: number) => new Intl.DateTimeFormat('id-ID', {dateStyle: 'medium', timeZone: 'Asia/Jakarta'}).format(at);
 export function CompletedOrdersButton({state, openOrders}: {state?: Operations; openOrders: () => void}) {
-  const customers = useMemo(() => purchasedCustomers(state), [state]);
-  const {openChat} = useOrderNotifications();
+  const {customers, openChat} = useOrderNotifications();
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState('');
   const [filter, setFilter] = useState('all');
